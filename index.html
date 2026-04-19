@@ -3364,9 +3364,12 @@ function calcPed(rx, peso) {
 }
 
 function renderList() {
-  const q = document.getElementById('search').value.toLowerCase().trim();
-  const peso = parseFloat(document.getElementById('peso').value) || 0;
+  const _s = document.getElementById('search');
+  const _p = document.getElementById('peso');
   const el = document.getElementById('list');
+  if (!_s || !el) return;
+  const q = _s.value.toLowerCase().trim();
+  const peso = parseFloat(_p ? _p.value : '0') || 0;
   el.innerHTML = '';
 
   let filtered = DATA;
@@ -3427,7 +3430,7 @@ function renderList() {
 
 function toggle(id) {
   STATE.openCards[id] = !STATE.openCards[id];
-  renderList();
+  if (document.getElementById('list')) renderList();
 }
 
 // =================== MINHAS CONDUTAS RENDER ===================
