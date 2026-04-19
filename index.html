@@ -3337,6 +3337,7 @@ function setSection(s) {
 // =================== CONDUTAS RENDER ===================
 function buildCats() {
   const el = document.getElementById('cats');
+  if (!el) return;
   el.innerHTML = '';
   CATS.forEach(c => {
     const btn = document.createElement('button');
