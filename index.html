@@ -3424,11 +3424,11 @@ function renderMinhas() {
         </div>
       </div>
       <div class="card-body ${isOpen ? 'open' : ''}">
-        <div class="rx-item" style="white-space:pre-line;font-family:ui-monospace,Consolas,Monaco,monospace;font-size:12.5px;line-height:1.6;">${item.rx}</div>
-        <div style="display:flex;gap:6px;margin-top:10px;">
+        <div style="display:flex;gap:6px;margin-bottom:10px;">
           <button class="copy-btn" style="flex:2;" onclick="copyMinhas('${item.id}', this)">📋 Copiar</button>
-          <button class="copy-btn" style="flex:1;background:var(--success);" onclick="printMinha('${item.id}')">🖨️ Imprimir</button>
+          <button class="copy-btn" style="flex:1;" onclick="printMinha('${item.id}')">🖨️ Imprimir</button>
         </div>
+        <div class="rx-item" style="white-space:pre-line;font-family:ui-monospace,Consolas,Monaco,monospace;font-size:12.5px;line-height:1.6;">${item.rx}</div>
       </div>
     `;
     el.appendChild(card);
@@ -3436,6 +3436,7 @@ function renderMinhas() {
 }
 
 function toggleMinhas(id) {
+  Object.keys(STATE.openMinhas).forEach(function(k) { if (k !== id) STATE.openMinhas[k] = false; });
   STATE.openMinhas[id] = !STATE.openMinhas[id];
   renderMinhas();
 }
@@ -4381,14 +4382,26 @@ function printReceita(title, rx) {
     </div>
   `;
   area.style.display = 'block';
-  // Esconder título e URL do navegador via document.title temporário
-  var oldTitle = document.title;
-  document.title = ' ';
-  setTimeout(() => {
-    window.print();
-    document.title = oldTitle;
-    area.style.display = 'none';
-  }, 100);
+  var conteudo = area.innerHTML;
+  area.style.display = 'none';
+  // Abrir em janela dedicada sem URL/titulo do navegador
+  var css = 'body{font-family:Arial,sans-serif;background:white;color:black;margin:0;padding:0}' +
+    '.upa-receituario{padding:20px 30px}' +
+    '.upa-header{display:flex;align-items:center;margin-bottom:8px;border-bottom:2px solid #000;padding-bottom:8px;gap:16px}' +
+    '.upa-logo{height:55px;object-fit:contain}' +
+    '.upa-header-text{flex:1;text-align:center}' +
+    '.upa-header-text h2{font-size:13pt;font-weight:bold;margin:0 0 2px 0}' +
+    '.upa-header-text h3{font-size:12pt;font-weight:bold;margin:0;text-transform:uppercase;letter-spacing:1px}' +
+    '.upa-nome-linha{margin:14px 0 10px 0;font-size:11pt;border-bottom:1px solid #555;padding-bottom:4px}' +
+    '.upa-conteudo{font-size:11pt;line-height:1.7;white-space:pre-line;min-height:200px;margin:10px 0}' +
+    '.upa-footer{margin-top:30px;display:flex;justify-content:space-between;align-items:flex-end;font-size:10pt}' +
+    '.upa-assinatura{border-top:1px solid #000;width:55%;padding-top:4px;text-align:center;font-size:9.5pt}' +
+    '@page{size:A4;margin:1.5cm 2cm}';
+  var win = window.open('', '_blank', 'width=820,height=960,toolbar=0,menubar=0,location=0,status=0,scrollbars=1');
+  win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title> </title><style>' + css + '</style></head><body>' + conteudo + '</body></html>');
+  win.document.close();
+  win.focus();
+  setTimeout(function() { win.print(); win.close(); }, 400);
 }
 
 function printCustom(id) {
@@ -4587,6 +4600,11 @@ function renderRx() {
         </div>
       </div>
       <div class="card-body ${isOpen?'open':''}">
+        <div style="display:flex;gap:6px;margin-bottom:10px;">
+          ${hasPS ? `<button class="copy-btn" style="flex:1;" onclick="copyRxPS('${item.id}', this)">COPIAR PS</button>` : ''}
+          ${hasCasa ? `<button class="copy-btn" style="flex:1;background:var(--vital);border-color:var(--vital);" onclick="copyRxCasa('${item.id}', this)">COPIAR RECEITA</button>` : ''}
+          ${hasCasa ? `<button class="copy-btn" style="flex:0.6;background:var(--bg);color:var(--vital);font-size:10px;" onclick="printRxCasa('${item.id}')">🖨️</button>` : ''}
+        </div>
         ${hasPS ? `
           <div style="font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:2px;color:var(--pulse);margin:10px 0 6px;text-transform:uppercase;">▸ PRONTO-SOCORRO (IV/IM)</div>
           ${item.ps.map(r => `<div class="rx-item"><div class="rx-name">${r.n}</div>${r.p?`<div class="rx-pos">${r.p}</div>`:''}</div>`).join('')}
@@ -4595,18 +4613,18 @@ function renderRx() {
           <div style="font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:2px;color:var(--vital);margin:10px 0 6px;text-transform:uppercase;">▸ RECEITA PARA CASA</div>
           ${item.casa.map(r => `<div class="rx-item"><div class="rx-name">${r.n}</div><div class="rx-pos">${r.p}</div></div>`).join('')}
         ` : ''}
-        <div style="display:flex;gap:6px;margin-top:10px;">
-          ${hasPS ? `<button class="copy-btn" style="flex:1;" onclick="copyRxPS('${item.id}', this)">COPIAR PS</button>` : ''}
-          ${hasCasa ? `<button class="copy-btn" style="flex:1;background:var(--vital);border-color:var(--vital);" onclick="copyRxCasa('${item.id}', this)">COPIAR RECEITA</button>` : ''}
-          ${hasCasa ? `<button class="copy-btn" style="flex:0.6;background:var(--bg);color:var(--vital);font-size:10px;" onclick="printRxCasa('${item.id}')">🖨️</button>` : ''}
-        </div>
       </div>
     `;
     el.appendChild(card);
   });
 }
 
-function toggleRx(id) { openRx[id] = !openRx[id]; renderRx(); }
+function toggleRx(id) {
+  // fecha todos os outros
+  Object.keys(openRx).forEach(function(k) { if (k !== id) openRx[k] = false; });
+  openRx[id] = !openRx[id];
+  renderRx();
+}
 
 function copyRxPS(id, btn) {
   const item = DATA_RX.find(d => d.id === id);
