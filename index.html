@@ -1064,6 +1064,7 @@
   ::-webkit-scrollbar-thumb:hover { background: var(--cyan); }
 
   /* ===== IMPRESSÃO ===== */
+  /* ===== IMPRESSÃO MODELO UPA ===== */
   @media print {
     body * { visibility: hidden; }
     body::before, body::after { display: none; }
@@ -1075,7 +1076,7 @@
       background: white;
       color: black;
       padding: 0;
-      font-family: "Times New Roman", Times, serif;
+      font-family: Arial, sans-serif;
     }
     .no-print { display: none !important; }
     @page { size: A4; margin: 1.5cm 2cm; }
@@ -1084,18 +1085,71 @@
     display: none;
     background: white;
     color: black;
-    padding: 40px;
-    font-family: "Times New Roman", Times, serif;
+    padding: 0;
+    font-family: Arial, sans-serif;
   }
-  .print-receita { border-bottom: 1px dashed #999; padding: 15px 0 20px; page-break-inside: avoid; }
-  .print-receita:last-child { border-bottom: none; }
-  .print-header { text-align: center; margin-bottom: 14px; }
-  .print-header h2 { font-size: 14pt; font-weight: bold; letter-spacing: 1px; margin-bottom: 2px; }
-  .print-header h3 { font-size: 13pt; font-weight: bold; margin-bottom: 8px; }
-  .print-paciente { font-size: 11pt; margin-bottom: 12px; border-bottom: 1px solid #000; padding-bottom: 4px; }
-  .print-body { font-size: 11pt; line-height: 1.5; white-space: pre-line; margin-bottom: 18px; min-height: 100px; }
-  .print-footer { display: flex; justify-content: space-between; align-items: flex-end; font-size: 10pt; margin-top: 20px; }
-  .print-sig { border-top: 1px solid #000; width: 50%; padding-top: 4px; text-align: center; font-size: 9pt; }
+  .upa-receituario {
+    padding: 20px 30px;
+    page-break-inside: avoid;
+    font-family: Arial, sans-serif;
+  }
+  .upa-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    border-bottom: 2px solid #000;
+    padding-bottom: 8px;
+    gap: 16px;
+  }
+  .upa-logo {
+    height: 55px;
+    object-fit: contain;
+  }
+  .upa-header-text {
+    flex: 1;
+    text-align: center;
+  }
+  .upa-header-text h2 {
+    font-size: 13pt;
+    font-weight: bold;
+    margin: 0 0 2px 0;
+    letter-spacing: 0.5px;
+  }
+  .upa-header-text h3 {
+    font-size: 12pt;
+    font-weight: bold;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .upa-nome-linha {
+    margin: 14px 0 10px 0;
+    font-size: 11pt;
+    font-weight: bold;
+    border-bottom: 1px solid #555;
+    padding-bottom: 4px;
+  }
+  .upa-conteudo {
+    font-size: 11pt;
+    line-height: 1.7;
+    white-space: pre-line;
+    min-height: 200px;
+    margin: 10px 0;
+  }
+  .upa-footer {
+    margin-top: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    font-size: 10pt;
+  }
+  .upa-assinatura {
+    border-top: 1px solid #000;
+    width: 55%;
+    padding-top: 4px;
+    text-align: center;
+    font-size: 9.5pt;
+  }
 
   @media (max-width: 600px) {
     .container { padding: 10px; }
@@ -1502,6 +1556,140 @@
   .combo-bar { border-radius: 10px; }
   .peso-row { border-radius: 10px; }
 
+
+  /* ===== IMPRESSÃO MODELO UPA ===== */
+  @media print {
+    body * { visibility: hidden; }
+    body::before, body::after { display: none; }
+    #print-area, #print-area * { visibility: visible; }
+    #print-area {
+      position: absolute; left: 0; top: 0; width: 100%;
+      background: white; color: black; padding: 0;
+      font-family: Arial, sans-serif;
+    }
+    .no-print { display: none !important; }
+    @page { size: A4; margin: 1.5cm 2cm; }
+  }
+  #print-area { display: none; background: white; color: black; padding: 0; font-family: Arial, sans-serif; }
+  .upa-receituario { padding: 20px 30px; font-family: Arial, sans-serif; }
+  .upa-header { display: flex; align-items: center; margin-bottom: 8px; border-bottom: 2px solid #000; padding-bottom: 8px; gap: 16px; }
+  .upa-logo { height: 55px; object-fit: contain; }
+  .upa-header-text { flex: 1; text-align: center; }
+  .upa-header-text h2 { font-size: 13pt; font-weight: bold; margin: 0 0 2px 0; letter-spacing: 0.5px; }
+  .upa-header-text h3 { font-size: 12pt; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 1px; }
+  .upa-nome-linha { margin: 14px 0 10px 0; font-size: 11pt; border-bottom: 1px solid #555; padding-bottom: 4px; }
+  .upa-conteudo { font-size: 11pt; line-height: 1.7; white-space: pre-line; min-height: 200px; margin: 10px 0; }
+  .upa-footer { margin-top: 30px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 10pt; }
+  .upa-assinatura { border-top: 1px solid #000; width: 55%; padding-top: 4px; text-align: center; font-size: 9.5pt; }
+
+
+  /* Barra de modelos de anamnese */
+  .anam-models-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+    align-items: center;
+  }
+  #custom-anam-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+
+
+  /* ===== EXAME FÍSICO INTERATIVO ===== */
+  .ef-group { margin-bottom: 12px; }
+  .ef-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--txt-3);
+    margin-bottom: 5px;
+  }
+  .ef-pills { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 4px; }
+  .ef-pill {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    color: var(--txt-3);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 5px 11px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .ef-pill.on {
+    background: rgba(0,212,255,0.1);
+    border-color: var(--cyan);
+    color: var(--cyan);
+  }
+  .ef-pill.on-w {
+    background: rgba(255,184,0,0.1);
+    border-color: var(--warn);
+    color: var(--warn);
+  }
+  .ef-sinal {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    color: var(--txt-3);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 5px 11px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .ef-sinal.on {
+    background: rgba(0,232,150,0.08);
+    border-color: var(--vital);
+    color: var(--vital);
+  }
+  .ef-sinal.on-w {
+    background: rgba(255,45,85,0.1);
+    border-color: var(--pulse);
+    color: var(--pulse);
+  }
+  .ef-cz { display: flex; gap: 5px; margin-top: 5px; }
+  .ef-cz.hidden { display: none; }
+  .ef-czb {
+    flex: 1;
+    padding: 6px 4px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--txt-3);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+  }
+  .ef-czb.on {
+    border-color: var(--warn);
+    color: var(--warn);
+    background: rgba(255,184,0,0.08);
+  }
+  .ef-quad {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    color: var(--txt-3);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    padding: 10px 4px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    line-height: 1.3;
+  }
+  .ef-quad.on {
+    background: rgba(255,184,0,0.1);
+    border-color: var(--warn);
+    color: var(--warn);
+  }
+  .mt8 { margin-top: 8px; }
+
 </style>
 </head>
 <body>
@@ -1578,9 +1766,66 @@
     <button class="diag-pill" onclick="jumpDiag('minhas','CONJUNTIVITE')">👁 CONJUNT.</button>
     <button class="diag-pill" onclick="jumpDiag('minhas','TAG')">😰 TAG</button>
   </div>
-  <div class="anam-row">
-    <button class="anam-btn" onclick="toggleAnam('ms')">📋 ANAMNESE-1 SIMPLES</button>
-    <button class="anam-btn" onclick="toggleAnam('mc')">📋 ANAM-2-COMPLETA</button>
+  <!-- MODELOS DE CONDUTA -->
+  <div class="anam-models-bar">
+    <button class="anam-btn" style="border-left-color:var(--vital);" onclick="toggleCondutaBox('m_c1')">1 - SEM NADA</button>
+    <button class="anam-btn" style="border-left-color:var(--vital);" onclick="toggleCondutaBox('m_c2')">2 - ATB</button>
+    <button class="anam-btn" style="border-left-color:var(--vital);" onclick="toggleCondutaBox('m_c3')">3 - DENGUE GECA</button>
+    <div id="custom-conduta-btns"></div>
+    <button class="anam-btn" style="border-left-color:var(--vital);flex:0;padding:12px 14px;font-size:18px;" onclick="toggleCondutaEditor()" title="Novo modelo de conduta">＋</button>
+  </div>
+
+  <div id="conduta-editor-box" style="display:none;background:var(--bg-1);border:1px solid var(--vital);border-radius:10px;padding:16px;margin-bottom:12px;">
+    <div style="font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:2px;color:var(--vital);margin-bottom:10px;">✏️ NOVO MODELO DE CONDUTA</div>
+    <input type="text" id="conduta-editor-nome" placeholder="Nome do modelo" style="width:100%;padding:9px 12px;font-family:var(--font-mono);font-size:13px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);margin-bottom:8px;">
+    <textarea id="conduta-editor-texto" placeholder="Texto da conduta..." style="width:100%;min-height:100px;padding:10px 12px;font-family:var(--font-mono);font-size:12px;line-height:1.7;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);resize:vertical;text-transform:uppercase;"></textarea>
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button class="btn-primary" onclick="saveCondutaModel()">SALVAR</button>
+      <button class="btn-secondary" onclick="document.getElementById('conduta-editor-box').style.display='none'">CANCELAR</button>
+    </div>
+  </div>
+
+  <div class="anam-box" id="cbox-m_c1" style="border-color:var(--vital);box-shadow:0 4px 20px rgba(0,232,150,0.08);">
+    <button class="anam-copy" onclick="copyCondutaBox('m_c1', this)">Copiar</button>
+PRESCREVO MEDICAÇÃO SINTOMATICA
+ORIENTO SINAIS DE ALARME
+RECEITA PARA CASA COM SINTOMATICOS
+  </div>
+  <div class="anam-box" id="cbox-m_c2" style="border-color:var(--vital);box-shadow:0 4px 20px rgba(0,232,150,0.08);">
+    <button class="anam-copy" onclick="copyCondutaBox('m_c2', this)">Copiar</button>
+PRESCREVO MEDICAÇÃO SINTOMATICA
+ORIENTO SINAIS DE ALARME
+RECEITA PARA CASA COM SINTOMATICOS
+ATB PARA CASA
+  </div>
+  <div class="anam-box" id="cbox-m_c3" style="border-color:var(--vital);box-shadow:0 4px 20px rgba(0,232,150,0.08);">
+    <button class="anam-copy" onclick="copyCondutaBox('m_c3', this)">Copiar</button>
+ANALGESIA
+HIDRATAÇÃO NA UNIDADE
+MEDICAÇÃO PARA CASA COM SINTOMATICOS
+ORIENTO SINAIS DE ALARME
+RETORNO SE NECESSARIO
+  </div>
+  <div id="conduta-model-boxes"></div>
+
+  <!-- MODELOS DE ANAMNESE -->  <!-- MODELOS DE ANAMNESE -->  <!-- MODELOS DE ANAMNESE -->
+  <div class="anam-models-bar" id="anam-models-bar">
+    <button class="anam-btn" onclick="toggleAnam('ms')">📋 SIMPLES</button>
+    <button class="anam-btn" onclick="toggleAnam('mc')">📋 COMPLETA</button>
+    <button class="anam-btn" onclick="toggleAnamCirurgia()">🔪 CIRURGIA</button>
+    <div id="custom-anam-btns"></div>
+    <button class="anam-btn" style="border-left-color:var(--vital);flex:0;padding:12px 14px;font-size:18px;" onclick="toggleAnamEditor()" title="Novo modelo de anamnese">＋</button>
+  </div>
+
+  <!-- Editor de anamnese -->
+  <div id="anam-editor-box" style="display:none;background:var(--bg-1);border:1px solid var(--vital);border-radius:10px;padding:16px;margin-bottom:12px;">
+    <div style="font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:2px;color:var(--vital);margin-bottom:10px;">✏️ NOVO MODELO DE ANAMNESE</div>
+    <input type="text" id="anam-editor-nome" placeholder="Nome do modelo (ex: NEUROLÓGICO)" style="width:100%;padding:9px 12px;font-family:var(--font-mono);font-size:13px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);margin-bottom:8px;">
+    <textarea id="anam-editor-texto" placeholder="Texto da anamnese..." style="width:100%;min-height:120px;padding:10px 12px;font-family:var(--font-mono);font-size:12px;line-height:1.7;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);resize:vertical;"></textarea>
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button class="btn-primary" onclick="saveAnamModel()">SALVAR</button>
+      <button class="btn-secondary" onclick="document.getElementById('anam-editor-box').style.display='none'">CANCELAR</button>
+    </div>
   </div>
 
   <div class="anam-box" id="anam-ms">
@@ -1604,6 +1849,221 @@ EXT BEM PERFUNDIDAS, SEM EDEMAS OU EMPASTAMENTO,PULSOS SIMETRICOS.
 PIFR SEM DEFICTS FOCAIS, FORÇA MOTORA PRESERVADA EM MEMBROS, MIMICA FACIAL RPESERVADA, COORDEÇÃO PERESERVADA SEM ATAXIAS.
   </div>
 
+  <!-- ANAMNESE CIRURGIA INTERATIVA -->
+  <div id="anam-cirurgia-box" style="display:none;">
+    <div style="background:var(--bg-1);border:1px solid var(--cyan);border-radius:10px;padding:14px;margin-bottom:10px;">
+      <div style="font-family:var(--font-mono);font-size:9px;font-weight:800;letter-spacing:2px;color:var(--cyan);margin-bottom:12px;">🔪 EXAME FÍSICO — CIRURGIA</div>
+
+      <!-- ESTADO GERAL -->
+      <div class="ef-group">
+        <div class="ef-label">Estado Geral</div>
+        <div class="ef-pills">
+          <span class="ef-pill on" data-eg="eg" onclick="efPill(this,'eg')">BEG</span>
+          <span class="ef-pill" data-eg="eg" onclick="efPill(this,'eg')">REG</span>
+          <span class="ef-pill" data-eg="eg" onclick="efPill(this,'eg')">MEG</span>
+        </div>
+      </div>
+
+      <!-- COLORAÇÃO -->
+      <div class="ef-group">
+        <div class="ef-label">Coloração</div>
+        <div class="ef-pills">
+          <span class="ef-pill on" id="ef-corado" onclick="efToggleCz(this,'ef-corado','desc-cz2','CORADO(A)','DESCORADO(A)')">Corado(a)</span>
+        </div>
+        <div class="ef-cz hidden" id="desc-cz2">
+          <span class="ef-czb" onclick="efSetCz(this,'desc2',1)">+</span>
+          <span class="ef-czb" onclick="efSetCz(this,'desc2',2)">++</span>
+          <span class="ef-czb" onclick="efSetCz(this,'desc2',3)">+++</span>
+          <span class="ef-czb" onclick="efSetCz(this,'desc2',4)">++++</span>
+        </div>
+      </div>
+
+      <!-- HIDRATAÇÃO -->
+      <div class="ef-group">
+        <div class="ef-label">Hidratação</div>
+        <div class="ef-pills">
+          <span class="ef-pill on" id="ef-hidra" onclick="efToggleCz(this,'ef-hidra','hid-cz2','HIDRATADO(A)','DESIDRATADO(A)')">Hidratado(a)</span>
+        </div>
+        <div class="ef-cz hidden" id="hid-cz2">
+          <span class="ef-czb" onclick="efSetCz(this,'hid2',1)">+</span>
+          <span class="ef-czb" onclick="efSetCz(this,'hid2',2)">++</span>
+          <span class="ef-czb" onclick="efSetCz(this,'hid2',3)">+++</span>
+          <span class="ef-czb" onclick="efSetCz(this,'hid2',4)">++++</span>
+        </div>
+      </div>
+
+      <!-- ICTERÍCIA -->
+      <div class="ef-group">
+        <div class="ef-label">Icterícia</div>
+        <div class="ef-pills">
+          <span class="ef-pill on" id="ef-ict" onclick="efToggleCz(this,'ef-ict','ict-cz2','ANICTÉRICO(A)','ICTÉRICO(A)')">Anictérico(a)</span>
+        </div>
+        <div class="ef-cz hidden" id="ict-cz2">
+          <span class="ef-czb" onclick="efSetCz(this,'ict2',1)">+</span>
+          <span class="ef-czb" onclick="efSetCz(this,'ict2',2)">++</span>
+          <span class="ef-czb" onclick="efSetCz(this,'ict2',3)">+++</span>
+          <span class="ef-czb" onclick="efSetCz(this,'ict2',4)">++++</span>
+        </div>
+      </div>
+
+      <!-- CIANOSE -->
+      <div class="ef-group">
+        <div class="ef-label">Cianose</div>
+        <div class="ef-pills">
+          <span class="ef-pill on" id="ef-cia" onclick="efToggleCz(this,'ef-cia','cia-cz2','ACIANÓTICO(A)','CIANÓTICO(A)')">Acianótico(a)</span>
+        </div>
+        <div class="ef-cz hidden" id="cia-cz2">
+          <span class="ef-czb" onclick="efSetCz(this,'cia2',1)">+</span>
+          <span class="ef-czb" onclick="efSetCz(this,'cia2',2)">++</span>
+          <span class="ef-czb" onclick="efSetCz(this,'cia2',3)">+++</span>
+        </div>
+      </div>
+
+      <!-- FEBRE / ORIENTAÇÃO -->
+      <div class="ef-group">
+        <div class="ef-label">Temperatura / Consciência</div>
+        <div class="ef-pills">
+          <span class="ef-pill on" id="ef-feb" onclick="efToggle2(this,'ef-feb','AFEBRIL','FEBRIL')">Afebril</span>
+          <span class="ef-pill on" id="ef-lote" onclick="efToggle2(this,'ef-lote','LOTE','DESORIENTADO(A)')">LOTE</span>
+        </div>
+      </div>
+
+      <!-- SINAIS VITAIS -->
+      <div class="ef-group">
+        <div class="ef-label">Sinais Vitais (opcional)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+          <div><div style="font-family:var(--font-mono);font-size:9px;color:var(--txt-3);margin-bottom:3px;">PA (mmHg)</div><input type="text" id="ef-pa" placeholder="120x80" style="width:100%;padding:7px 10px;font-family:var(--font-mono);font-size:13px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--cyan);"></div>
+          <div><div style="font-family:var(--font-mono);font-size:9px;color:var(--txt-3);margin-bottom:3px;">FC (bpm)</div><input type="text" id="ef-fc" placeholder="80" style="width:100%;padding:7px 10px;font-family:var(--font-mono);font-size:13px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--cyan);"></div>
+          <div><div style="font-family:var(--font-mono);font-size:9px;color:var(--txt-3);margin-bottom:3px;">SpO2 (%)</div><input type="text" id="ef-spo2" placeholder="98" style="width:100%;padding:7px 10px;font-family:var(--font-mono);font-size:13px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--cyan);"></div>
+          <div><div style="font-family:var(--font-mono);font-size:9px;color:var(--txt-3);margin-bottom:3px;">Temp (°C)</div><input type="text" id="ef-temp" placeholder="36.5" style="width:100%;padding:7px 10px;font-family:var(--font-mono);font-size:13px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--cyan);"></div>
+        </div>
+      </div>
+
+      <!-- AC / AR -->
+      <div class="ef-group">
+        <div class="ef-label">Aparelho Cardiovascular</div>
+        <div class="ef-pills">
+          <span class="ef-pill on" data-eg="ac" onclick="efPill(this,'ac')">BRNF 2T s/ sopros</span>
+          <span class="ef-pill" data-eg="ac" onclick="efPill(this,'ac')">BRNF 2T c/ sopros</span>
+          <span class="ef-pill" data-eg="ac" onclick="efPill(this,'ac')">Arrítmico 2T</span>
+        </div>
+      </div>
+      <div class="ef-group">
+        <div class="ef-label">Aparelho Respiratório</div>
+        <div class="ef-pills">
+          <span class="ef-pill on" data-eg="ar" onclick="efPill(this,'ar')">MV+ bilateral s/ RA, eupneico</span>
+          <span class="ef-pill" data-eg="ar" onclick="efPill(this,'ar')">MV+ bilateral c/ RA</span>
+          <span class="ef-pill" data-eg="ar" onclick="efPill(this,'ar')">MV reduzido bilateral</span>
+        </div>
+      </div>
+
+      <!-- ABDOME -->
+      <div class="ef-group">
+        <div class="ef-label">Inspeção Abdominal</div>
+        <div class="ef-pills">
+          <span class="ef-pill on" data-eg="insp" onclick="efPill(this,'insp')">Plano e simétrico</span>
+          <span class="ef-pill" data-eg="insp" onclick="efPill(this,'insp')">Globoso</span>
+          <span class="ef-pill" data-eg="insp" onclick="efPill(this,'insp')">Distendido</span>
+          <span class="ef-pill" data-eg="insp" onclick="efPill(this,'insp')">Escavado</span>
+        </div>
+      </div>
+      <div class="ef-group">
+        <div class="ef-label">RHA</div>
+        <div class="ef-pills">
+          <span class="ef-pill on" data-eg="rha" onclick="efPill(this,'rha')">Presentes e normoativos</span>
+          <span class="ef-pill" data-eg="rha" onclick="efPill(this,'rha')">Aumentados</span>
+          <span class="ef-pill" data-eg="rha" onclick="efPill(this,'rha')">Diminuídos</span>
+          <span class="ef-pill" data-eg="rha" onclick="efPill(this,'rha')">Ausentes</span>
+        </div>
+      </div>
+      <div class="ef-group">
+        <div class="ef-label">Palpação Superficial</div>
+        <div class="ef-pills">
+          <span class="ef-pill on" data-eg="pals" onclick="efPill(this,'pals')">Flácido e indolor</span>
+          <span class="ef-pill" data-eg="pals" onclick="efPill(this,'pals')">Flácido com dor</span>
+          <span class="ef-pill" data-eg="pals" onclick="efPill(this,'pals')">Tenso e doloroso</span>
+          <span class="ef-pill" data-eg="pals" onclick="efPill(this,'pals')">Abdome em tábua</span>
+        </div>
+      </div>
+      <div class="ef-group">
+        <div class="ef-label">Palpação Profunda</div>
+        <div class="ef-pills">
+          <span class="ef-pill on" data-eg="palp" onclick="efPill(this,'palp')">Indolor</span>
+          <span class="ef-pill" data-eg="palp" onclick="efPill(this,'palp')">Dolorosa</span>
+          <span class="ef-pill" data-eg="palp" onclick="efPill(this,'palp')">Massa palpável</span>
+        </div>
+      </div>
+
+      <!-- LOCALIZAÇÃO DOR -->
+      <div class="ef-group">
+        <div class="ef-label">Localização da Dor</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:6px;">
+          <div class="ef-quad" onclick="efQuad(this,'HDE')">HDE</div>
+          <div class="ef-quad" onclick="efQuad(this,'EPIGÁSTRIO')">Epigástrio</div>
+          <div class="ef-quad" onclick="efQuad(this,'HDD')">HDD</div>
+          <div class="ef-quad" onclick="efQuad(this,'FLANCO E')">Flanco E</div>
+          <div class="ef-quad" onclick="efQuad(this,'MESOGÁSTRIO')">Mesogástrio</div>
+          <div class="ef-quad" onclick="efQuad(this,'FLANCO D')">Flanco D</div>
+          <div class="ef-quad" onclick="efQuad(this,'FIE')">FIE</div>
+          <div class="ef-quad" onclick="efQuad(this,'HIPOGÁSTRIO')">Hipogástrio</div>
+          <div class="ef-quad" onclick="efQuad(this,'FID')">FID</div>
+        </div>
+        <span class="ef-pill" style="font-size:10px;" onclick="efClearQuads()">Limpar ✕</span>
+      </div>
+
+      <!-- SINAIS ESPECÍFICOS -->
+      <div class="ef-group">
+        <div class="ef-label">Sinais Específicos</div>
+        <div class="ef-pills">
+          <span class="ef-sinal on" id="ef-db" onclick="efSinal(this,'db')">DB −</span>
+          <span class="ef-sinal on" id="ef-mu" onclick="efSinal(this,'mu')">Murphy −</span>
+          <span class="ef-sinal on" id="ef-gi" onclick="efSinal(this,'gi')">Giordano −</span>
+          <span class="ef-sinal on" id="ef-bl" onclick="efSinal(this,'bl')">Blumberg −</span>
+          <span class="ef-sinal on" id="ef-ro" onclick="efSinal(this,'ro')">Rovsing −</span>
+          <span class="ef-sinal on" id="ef-ps" onclick="efSinal(this,'ps')">Psoas −</span>
+        </div>
+      </div>
+
+      <!-- NEUROLÓGICO -->
+      <div class="ef-group">
+        <div class="ef-label">Pupilas</div>
+        <div class="ef-pills">
+          <span class="ef-pill on" data-eg="pirf" onclick="efPill(this,'pirf')">PIRF</span>
+          <span class="ef-pill" data-eg="pirf" onclick="efPill(this,'pirf')">Anisocóricas</span>
+          <span class="ef-pill" data-eg="pirf" onclick="efPill(this,'pirf')">Midriáticas</span>
+          <span class="ef-pill" data-eg="pirf" onclick="efPill(this,'pirf')">Miióticas</span>
+        </div>
+      </div>
+      <div class="ef-group">
+        <div class="ef-label">Glasgow</div>
+        <div class="ef-pills">
+          <span class="ef-pill on" data-eg="glas" onclick="efPill(this,'glas')">G15</span>
+          <span class="ef-pill" data-eg="glas" onclick="efPill(this,'glas')">G14</span>
+          <span class="ef-pill" data-eg="glas" onclick="efPill(this,'glas')">G13</span>
+          <span class="ef-pill" data-eg="glas" onclick="efPill(this,'glas')">G12</span>
+          <span class="ef-pill" data-eg="glas" onclick="efPill(this,'glas')">≤10</span>
+        </div>
+      </div>
+
+      <!-- MMII -->
+      <div class="ef-group">
+        <div class="ef-label">MMII</div>
+        <div class="ef-pills">
+          <span class="ef-pill on" id="ef-mmii" onclick="efToggleCz(this,'ef-mmii','mmii-cz2','BEM PERFUNDIDOS, S/ EDEMAS, PULSOS SIMÉTRICOS','EDEMA PRESENTE')">S/ edema, bem perfundidos</span>
+        </div>
+        <div class="ef-cz hidden" id="mmii-cz2">
+          <span class="ef-czb" onclick="efSetCz(this,'mmii2',1)">+</span>
+          <span class="ef-czb" onclick="efSetCz(this,'mmii2',2)">++</span>
+          <span class="ef-czb" onclick="efSetCz(this,'mmii2',3)">+++</span>
+          <span class="ef-czb" onclick="efSetCz(this,'mmii2',4)">++++</span>
+        </div>
+      </div>
+
+      <button class="copy-btn" style="margin-top:10px;" onclick="gerarEcopiarEF(this)">📋 GERAR E COPIAR EXAME FÍSICO</button>
+    </div>
+  </div>
+  <div id="custom-anam-boxes"></div>
+
   <div class="cats" id="cats-minhas"></div>
   <div id="list-minhas"></div>
 </div>
@@ -1618,13 +2078,15 @@ PIFR SEM DEFICTS FOCAIS, FORÇA MOTORA PRESERVADA EM MEMBROS, MIMICA FACIAL RPES
     <button class="diag-pill ivas" onclick="jumpDiag('rx','Respiratório')">🤧 RESPIRAT.</button>
     <button class="diag-pill geca" onclick="jumpDiag('rx','Gastrointestinal')">🤮 GASTRO</button>
     <button class="diag-pill itu" onclick="jumpDiag('rx','Genitourinário')">🦠 GENITURIN.</button>
-    <button class="diag-pill dor" onclick="jumpDiag('rx','Dor/Analgesia')">💊 DOR</button>
-    <button class="diag-pill gin" onclick="jumpDiag('rx','Cabeça/Olhos')">🧠 CABEÇA</button>
+    <button class="diag-pill dor" onclick="jumpDiag('rx','Cabeça/Olhos')">🧠 CABEÇA</button>
     <button class="diag-pill" onclick="jumpDiag('rx','Osteoarticular')">🦴 OSTEOART.</button>
-    <button class="diag-pill" onclick="jumpDiag('rx','Cardiovascular')">🫀 CARDIO</button>
     <button class="diag-pill" onclick="jumpDiag('rx','Dermatologia')">🩹 DERMAT.</button>
-    <button class="diag-pill" onclick="jumpDiag('rx','Psiquiatria')">🧠 PSIQ.</button>
-    <button class="diag-pill" onclick="jumpDiag('rx','Endócrino')">⚗️ ENDÓCR.</button>
+    <button class="diag-pill" onclick="jumpDiag('rx','Cardiologia')">🫀 CARDIO</button>
+    <button class="diag-pill" onclick="jumpDiag('rx','Neurologia')">🧠 NEURO</button>
+    <button class="diag-pill" onclick="jumpDiag('rx','Psiquiatria')">😰 PSIQ.</button>
+    <button class="diag-pill gin" onclick="jumpDiag('rx','Gestante')">🤰 GESTANTE</button>
+    <button class="diag-pill" onclick="jumpDiag('rx','Infectologia')">🦠 INFECTO</button>
+    <button class="diag-pill" onclick="jumpDiag('rx','IOT/Sedação')">💉 IOT/SED.</button>
   </div>
   <div class="peso-row">
     <label>⚖️ Peso pediátrico:</label>
@@ -2563,6 +3025,184 @@ const MINHAS = [
   // --- SARNA ---
   { id:'m_sar1', cat:'SARNA', title:'SARNA',
     rx:'VIA ORAL-\n\n1) IVERMECTINA 6 MG----------------------------------2 CPS\nTOMAR 1 CP E APÓS 7 DIAS REPETIR DOSE' },
+
+  // ===== CARDIOLOGIA =====
+  { id:'rx_crise_hta', cat:'Cardiologia', cid:'I10', tag:'CRISE HTA', tagClass:'tag-iv',
+    title:'Crise Hipertensiva',
+    ps:[
+      {n:'Captopril 25-50mg VO', p:'Urgência (sem lesão de órgão alvo). Repetir em 30 min se necessário'},
+      {n:'Nifedipina 10mg VO', p:'Alternativa. Início 5-15 min, duração 3-5h'},
+      {n:'Nitroprussiato de sódio 1 amp (50mg) + SG5% 240ml EV BIC', p:'Emergência. Iniciar 3ml/h, aferir PA a cada 2min. Máx 24-48h'}
+    ],
+    casa:[]},
+
+  { id:'rx_iam', cat:'Cardiologia', cid:'I21', tag:'IAM', tagClass:'tag-emerg',
+    title:'IAM (MONABC)',
+    ps:[
+      {n:'M — Morfina 1-5mg EV bolus 5/5min', p:'Se dor refratária ao nitrato'},
+      {n:'O — O₂ 2-5L/min cateter/máscara', p:'Meta SatO₂ >94%'},
+      {n:'N — Nitrato (Isordil) 5mg SL 5/5min', p:'Até 3 doses. NÃO usar se Viagra ou IAM VD'},
+      {n:'A — AAS 300mg macerado VO', p:'Dose de ataque'},
+      {n:'B — Betabloqueador: Metoprolol 25mg EV bolus', p:'Ou Atenolol 25mg. Preferir EV. Meta FC ~60'},
+      {n:'C — Clopidogrel 300mg VO', p:'Dose de ataque'},
+      {n:'H — HBPM 1mg/kg SC (+ 30mg EV em bolus)', p:'12/12h. >75 anos: sem bolus, 0,75mg/kg'}
+    ],
+    casa:[]},
+
+  { id:'rx_convulsao', cat:'Neurologia', cid:'R56.8', tag:'CONVULSÃO', tagClass:'tag-emerg',
+    title:'Crise Convulsiva Adulto',
+    ps:[
+      {n:'Diazepam 10mg + AD 8ml EV lento', p:'Ou 10mg via retal'},
+      {n:'Fenitoína 100mg 1amp EV 8/8h', p:''},
+      {n:'Fenitoína 15-20mg/kg + SF 250ml EV', p:'Correr em 30 minutos'},
+      {n:'Fenobarbital 1amp EV (se refratário)', p:''},
+      {n:'Midazolam 0,2mg/kg EV bolus (se refratário)', p:''},
+      {n:'IOT + VM (refratário ao tratamento clínico)', p:''}
+    ],
+    casa:[]},
+
+  { id:'rx_avc_isq', cat:'Neurologia', cid:'I64', tag:'AVCi', tagClass:'tag-emerg',
+    title:'AVCi Não Extenso / AIT',
+    ps:[
+      {n:'Jejum + Decúbito 30°', p:''},
+      {n:'SF 0,9% 1000ml EV 8/8h', p:'Se sem disfunção cardíaca'},
+      {n:'AAS 200mg 1x/dia', p:''},
+      {n:'Dipirona 2ml EV 6/6h', p:'Se T >37,8°C'},
+      {n:'Fenitoína 100mg 1amp EV 8/8h', p:''},
+      {n:'Captopril 25mg', p:'Se PAS>220mmHg ou PAD>120mmHg ou PAM>130mmHg'}
+    ],
+    casa:[]},
+
+  { id:'rx_dengue', cat:'Infectologia', cid:'A90', tag:'DENGUE', tagClass:'tag-vo',
+    title:'Dengue',
+    ps:[
+      {n:'Grupo A (sem alterações): Hidratação oral 80ml/kg/dia', p:''},
+      {n:'Grupo B (comorbidades, laço+, gestante): Ht normal = A; ↑Ht>10% = hidratação supervisionada', p:''},
+      {n:'Grupo C (sinais de alarme): SF 0,9% EV 20ml/kg/h — internar', p:''},
+      {n:'Grupo D (choque): SF 0,9% EV 20ml/kg em 20min — UTI', p:''}
+    ],
+    casa:[
+      {n:'Dipirona 500mg ——— 1cx', p:'1cp 6/6h se febre. NÃO usar AAS nem ibuprofeno'},
+      {n:'Hidratação oral abundante', p:'80ml/kg/dia VO'}
+    ]},
+
+  { id:'rx_sepse', cat:'Infectologia', cid:'A41.9', tag:'SEPSE', tagClass:'tag-emerg',
+    title:'Sepse / Choque Séptico',
+    ps:[
+      {n:'qSOFA ≥2: suspeitar sepse', p:'FR≥22 + Glasgow<15 + PAS≤100'},
+      {n:'Acesso venoso + Lactato + Hemoculturas (2 amostras)', p:'Antes do ATB'},
+      {n:'ATB AMPLO ESPECTRO em até 1h: Ceftriaxone 2G EV', p:'+ Metronidazol 500mg se suspeita abdominal'},
+      {n:'Reposição volêmica: SF 0,9% 30ml/kg EV em 3h', p:''},
+      {n:'Se hipotensão refratária: Noradrenalina 0,05-0,2mcg/kg/min BIC', p:'Diluição: 5amp 2mg em 234ml SF = 0,06mg/ml. Fórmula: peso x dose = ml/h'}
+    ],
+    casa:[]},
+
+  { id:'rx_gestante', cat:'Gestante', cid:'Z34', tag:'GESTANTE', tagClass:'tag-vo',
+    title:'Gestante — Sintomáticos Seguros',
+    ps:[
+      {n:'Paracetamol 500mg EV', p:'Se dor intensa'},
+      {n:'Decadron 1amp IM', p:'Se necessário'},
+      {n:'Tramal 1amp EV (com cautela)', p:'Se dor refratária'}
+    ],
+    casa:[
+      {n:'Paracetamol 500mg ——— 1cx', p:'1cp VO 4/4h se dor. Pode associar prednisona 5mg se dor intensa'},
+      {n:'Buscopan (escopolamina) 10mg ——— 1cx', p:'1cp 8/8h se cólica'},
+      {n:'Ondansetrona (Vonau/Zofran) 4mg ——— 1cx', p:'1cp 8/8h se náuseas e vômitos'},
+      {n:'Meclizina (Meclin) 25mg ——— 1cx', p:'1cp 8/8h se náuseas'},
+      {n:'Metoclopramida (Plasil) 4mg ——— 1cx', p:'1cp/1amp 8/8h se náuseas'},
+      {n:'Loratadina 10mg ——— 1cx', p:'1cp 1x/dia se alergia'},
+      {n:'Miconazol creme vaginal ——— 1 bisnaga', p:'1 aplicador à noite por 7 noites (candidíase)'},
+      {n:'Metronidazol vaginal ——— 1 bisnaga', p:'1 aplicador à noite por 5 dias (vaginose)'}
+    ]},
+
+  { id:'rx_gest_hta', cat:'Gestante', cid:'O13', tag:'DHEG', tagClass:'tag-iv',
+    title:'Gestante — HAS / DHEG',
+    ps:[
+      {n:'Nifedipino 20mg VO 30/30min', p:'HAS aguda grave'},
+      {n:'Hidralazina 5mg/1amp EV 30/30min', p:'Alternativa'},
+      {n:'MgSO4 8ml + SF 92ml EV em 20min (BIC 300ml/h)', p:'Crise hipertensiva/eclâmpsia'},
+      {n:'MgSO4 10ml + SG5% 500ml EV 100ml/h BIC', p:'Manutenção'}
+    ],
+    casa:[
+      {n:'Metildopa 250mg ——— contínuo', p:'1-2cp VO 6/6h. Primeira linha na gestação'}
+    ]},
+
+  { id:'rx_agitacao', cat:'Psiquiatria', cid:'R45.1', tag:'AGITAÇÃO', tagClass:'tag-im',
+    title:'Agitação Intensa / Surto',
+    ps:[
+      {n:'Haloperidol 5mg IM', p:'Repetir 5/5min se necessário. Máx 80mg'},
+      {n:'Prometazina (Fenergan) 1amp IM', p:'Associar ao haloperidol'},
+      {n:'Haloperidol 5mg VO 1-4x/dia (surto psicótico)', p:'Máx 40mg/dia'},
+      {n:'Clorpromazina 100mg VO 1-4x/dia', p:'Máx 600mg/dia. Se não der VO: 5mg IM'}
+    ],
+    casa:[]},
+
+  { id:'rx_ansiedade', cat:'Psiquiatria', cid:'F45.3', tag:'ANSIEDADE', tagClass:'tag-vo',
+    title:'Crise de Ansiedade / Pânico',
+    ps:[
+      {n:'Diazepam 10mg VO', p:''}
+    ],
+    casa:[
+      {n:'Sertralina 50mg ——— contínuo', p:'1cp pela manhã todos os dias (ansiedade/depressão)'}
+    ]},
+
+  { id:'rx_alcool', cat:'Psiquiatria', cid:'F10.3', tag:'ABSTINÊNCIA', tagClass:'tag-iv',
+    title:'Síndrome Abstinência Álcool',
+    ps:[
+      {n:'SF 0,9% 500ml + SG10% 500ml + KCl 19,1% 10ml EV 6/6h', p:''},
+      {n:'Tiamina 100mg + SF 250ml EV agora', p:'SEMPRE antes da glicose'},
+      {n:'Diazepam 10mg EV em 4min ACM', p:''},
+      {n:'Diazepam 10mg 1cp VO 1/1h', p:''},
+      {n:'Omeprazol 40mg EV 1x/dia', p:''},
+      {n:'Metoclopramida 10mg EV 8/8h SN', p:''},
+      {n:'Dipirona 1G EV 6/6h SN', p:''},
+      {n:'Dextro 4/4h + Insulina Regular conforme esquema', p:''},
+      {n:'Monitorização cardíaca + PANI + oximetria', p:''}
+    ],
+    casa:[]},
+
+  { id:'rx_dor_cronica', cat:'Psiquiatria', cid:'R52', tag:'DOR CRÔNICA', tagClass:'tag-vo',
+    title:'Dor Crônica Neuropática',
+    ps:[
+      {n:'Dipirona 2g + Tramadol 100mg EV', p:'Crise aguda'},
+    ],
+    casa:[
+      {n:'Amitriptilina 25mg ——— contínuo', p:'2h antes de dormir'},
+      {n:'Gabapentina 400mg ——— contínuo', p:'3x ao dia (aumentar até 3600mg SN)'},
+      {n:'Ciclobenzaprina 5-20mg ——— contínuo', p:'À noite'},
+      {n:'Tramadol 50mg ——— 1cx', p:'1cp 6/6h SN'},
+      {n:'Paracetamol 750mg ——— 1cx', p:'1cp 6/6h SN (resgate)'}
+    ]},
+
+  { id:'rx_ioa', cat:'IOT/Sedação', cid:'Z99.1', tag:'IOT', tagClass:'tag-emerg',
+    title:'Intubação Rápida Sequência',
+    ps:[
+      {n:'Fentanil 3mcg/kg EV', p:'1amp=10ml=50mcg/ml. Ex 70kg: 4,2ml'},
+      {n:'Midazolam 0,2-0,3mg/kg EV', p:'1amp=15mg. Ex 70kg: 3ml de 5mg/ml'},
+      {n:'Succinilcolina (Quelicin) 1,5mg/kg EV bolus + 10ml AD', p:'1amp=100mg. Ex 70kg: 105mg ≈ 1amp'},
+      {n:'Propofol 1,5-2mg/kg EV', p:'Alternativa ao midazolam. Ex 70kg: 140mg'},
+      {n:'Rocurônio 1mg/kg EV', p:'Alternativa à succinilcolina'}
+    ],
+    casa:[]},
+
+  { id:'rx_sedacao', cat:'IOT/Sedação', cid:'Z99.1', tag:'SEDAÇÃO', tagClass:'tag-iv',
+    title:'Sedação Contínua (BIC)',
+    ps:[
+      {n:'Midazolam: 100mg (20ml) em 80ml SF = 1mg/ml. BIC 0,01-0,6mg/kg/h', p:'Fórmula: dose x peso = ml/h'},
+      {n:'Propofol: 400mg (1amp 20ml/20mg) em 100ml SG5% = 4mg/ml. BIC 0,3-3mg/kg/h', p:'Fórmula: dose x peso / 4 = ml/h. Prática: 5,25-52,5ml/h p/ 70kg'},
+      {n:'Fentanil: 500mcg em 75ml SF. BIC 50-500mcg/h', p:'Prática 50mcg/h=4ml/h, 500mcg/h=40ml/h'}
+    ],
+    casa:[]},
+
+  { id:'rx_vasoativos', cat:'IOT/Sedação', cid:'R57.9', tag:'VASOATIVO', tagClass:'tag-iv',
+    title:'Drogas Vasoativas',
+    ps:[
+      {n:'Noradrenalina: 5amp 2mg em 234ml SF = 0,06mg/ml. Dose 0,05-2mcg/kg/min', p:'Fórmula: peso x dose = ml/h'},
+      {n:'Dopamina: 5amp 50mg em 200ml SF = 1mg/ml. Dose 2,5-20mcg/kg/min', p:'Fórmula: peso x dose x 0,06 = ml/h'},
+      {n:'Dobutamina: 1amp 250mg em 230ml SF = 1mg/ml. Dose 3-15mcg/kg/min', p:'Fórmula: peso x dose x 0,06 = ml/h'},
+      {n:'Terbutalina: 10amp em SF 240ml. Dose 0,1-0,2mcg/kg/min', p:'Fórmula: 3 x alvo x peso = ml/h'}
+    ],
+    casa:[]}
 ];
 
 // =================== ESTADO ===================
@@ -3642,26 +4282,31 @@ function formatData() {
   return d.toLocaleDateString('pt-BR');
 }
 
+const UPA_LOGO_B64 = "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";
+
 function printReceita(title, rx) {
   const perfil = getPerfil();
-  const header = perfil.header || 'RECEITUÁRIO';
-  const cidade = perfil.cidade || '';
+  const cidade = perfil.cidade || 'Taquaritinga';
   const nome = perfil.nome || '';
   const crm = perfil.crm || '';
-  const paciente = prompt('Nome do paciente:', '') || '___________________________________';
+  const header = perfil.header || 'PREFEITURA MUNICIPAL DE TAQUARITINGA/SP';
+  const dataHoje = new Date().toLocaleDateString('pt-BR');
 
   const area = document.getElementById('print-area');
   area.innerHTML = `
-    <div class="print-receita">
-      <div class="print-header">
-        <h2>${escapeHtml(header)}</h2>
-        <h3>RECEITUÁRIO</h3>
+    <div class="upa-receituario">
+      <div class="upa-header">
+        <img class="upa-logo" src="data:image/jpeg;base64,${UPA_LOGO_B64}" alt="UPA">
+        <div class="upa-header-text">
+          <h2>${escapeHtml(header)}</h2>
+          <h3>RECEITUÁRIO</h3>
+        </div>
       </div>
-      <div class="print-paciente"><strong>Nome:</strong> ${escapeHtml(paciente)}</div>
-      <div class="print-body">${escapeHtml(rx)}</div>
-      <div class="print-footer">
-        <div>${escapeHtml(cidade)}${cidade ? ', ' : ''}${formatData()}</div>
-        <div class="print-sig">
+      <div class="upa-nome-linha">Nome: _______________________________________________&emsp;Data: ${dataHoje}</div>
+      <div class="upa-conteudo">${escapeHtml(rx)}</div>
+      <div class="upa-footer">
+        <div>${escapeHtml(cidade)}, ${dataHoje}</div>
+        <div class="upa-assinatura">
           ${escapeHtml(nome)}${nome ? '<br>' : ''}${escapeHtml(crm)}
         </div>
       </div>
@@ -4088,6 +4733,349 @@ function jumpDiag(tipo, cat) {
   }
 }
 
+
+// =================== EXAME FÍSICO INTERATIVO ===================
+var efState = {
+  eg: 'BEG', ac: 'BRNF 2T s/ sopros', ar: 'MV+ bilateral s/ RA, eupneico',
+  insp: 'Plano e simétrico', rha: 'Presentes e normoativos',
+  pals: 'Flácido e indolor', palp: 'Indolor',
+  pirf: 'PIRF', glas: 'G15',
+  corado: true, hidra: true, ict: false, cia: false, feb: true, lote: true, mmii: true,
+  db: true, mu: true, gi: true, bl: true, ro: true, ps: true
+};
+var efCzState = {};
+var efToggleState = {};
+var efQuads = [];
+
+function efPill(el, group) {
+  var pills = document.querySelectorAll('[data-eg="' + group + '"]');
+  pills.forEach(function(p) { p.classList.remove('on'); });
+  el.classList.add('on');
+  efState[group] = el.textContent.trim();
+}
+
+var efToggleMap = {
+  'ef-corado':  { czId:'desc-cz2',  key:'corado', tTrue:'CORADO(A)',     tFalse:'DESCORADO(A)',    labelT:'Corado(a)',      labelF:'Descorado(a)' },
+  'ef-hidra':   { czId:'hid-cz2',   key:'hidra',  tTrue:'HIDRATADO(A)',  tFalse:'DESIDRATADO(A)',  labelT:'Hidratado(a)',   labelF:'Desidratado(a)' },
+  'ef-ict':     { czId:'ict-cz2',   key:'ict',    tTrue:'ANICTÉRICO(A)', tFalse:'ICTÉRICO(A)',     labelT:'Anictérico(a)', labelF:'Ictérico(a)', inverted:true },
+  'ef-cia':     { czId:'cia-cz2',   key:'cia',    tTrue:'ACIANÓTICO(A)', tFalse:'CIANÓTICO(A)',    labelT:'Acianótico(a)', labelF:'Cianótico(a)', inverted:true },
+  'ef-mmii':    { czId:'mmii-cz2',  key:'mmii',   tTrue:'BEM PERFUNDIDOS, S/ EDEMAS, PULSOS SIMÉTRICOS', tFalse:'EDEMA PRESENTE', labelT:'S/ edema, bem perfundidos', labelF:'Edema presente', inverted:true }
+};
+
+function efToggleCz(el, elId, czId, tT, tF) {
+  var cfg = efToggleMap[elId];
+  if (!cfg) return;
+  var inverted = cfg.inverted;
+  efState[cfg.key] = !efState[cfg.key];
+  var isPositive = inverted ? !efState[cfg.key] : efState[cfg.key];
+  el.textContent = efState[cfg.key] ? cfg.labelT : cfg.labelF;
+  if (isPositive) { el.classList.add('on'); el.classList.remove('on-w'); }
+  else { el.classList.remove('on'); el.classList.add('on-w'); }
+  var cz = document.getElementById(czId);
+  if (cz) { cz.classList.toggle('hidden', efState[cfg.key] === (inverted ? true : true)); 
+    // mostra cruzes se estado negativo (descorado, desidratado, ictérico, etc.)
+    var showCz = inverted ? efState[cfg.key] === false : efState[cfg.key] === false;
+    if (inverted) showCz = efState[cfg.key] === false; // ict=false = ictérico = mostrar cruzes
+    else showCz = efState[cfg.key] === false; // corado=false = descorado = mostrar cruzes
+    cz.classList.toggle('hidden', !showCz);
+  }
+}
+
+// Simplificado: toggle direto por chave
+function efToggle2(el, elId, textTrue, textFalse) {
+  var key = elId.replace('ef-','');
+  efState[key] = !efState[key];
+  el.textContent = efState[key] ? textTrue.charAt(0).toUpperCase() + textTrue.slice(1).toLowerCase() : textFalse.charAt(0).toUpperCase() + textFalse.slice(1).toLowerCase();
+  if (efState[key]) { el.classList.add('on'); el.classList.remove('on-w'); }
+  else { el.classList.remove('on'); el.classList.add('on-w'); }
+  // guarda o texto em maiúsculo para o gerador
+  efState[key + '_text'] = efState[key] ? textTrue : textFalse;
+}
+
+var efSinaisMap = { db:['DB NEGATIVO','DB POSITIVO'], mu:['MURPHY NEGATIVO','MURPHY POSITIVO'], gi:['GIORDANO NEGATIVO','GIORDANO POSITIVO'], bl:['BLUMBERG NEGATIVO','BLUMBERG POSITIVO'], ro:['ROVSING NEGATIVO','ROVSING POSITIVO'], ps:['PSOAS NEGATIVO','PSOAS POSITIVO'] };
+var efSinaisLabel = { db:['DB −','DB +'], mu:['Murphy −','Murphy +'], gi:['Giordano −','Giordano +'], bl:['Blumberg −','Blumberg +'], ro:['Rovsing −','Rovsing +'], ps:['Psoas −','Psoas +'] };
+
+function efSinal(el, key) {
+  efState[key] = !efState[key];
+  el.textContent = efSinaisLabel[key][efState[key] ? 0 : 1];
+  if (efState[key]) { el.classList.add('on'); el.classList.remove('on-w'); }
+  else { el.classList.remove('on'); el.classList.add('on-w'); }
+}
+
+function efSetCz(el, key, n) {
+  var btns = el.parentElement.querySelectorAll('.ef-czb');
+  btns.forEach(function(b) { b.classList.remove('on'); });
+  el.classList.add('on');
+  efCzState[key] = n;
+}
+
+function efQuad(el, quad) {
+  el.classList.toggle('on');
+  var idx = efQuads.indexOf(quad);
+  if (el.classList.contains('on')) { if (idx === -1) efQuads.push(quad); }
+  else { if (idx > -1) efQuads.splice(idx, 1); }
+}
+
+function efClearQuads() {
+  efQuads = [];
+  document.querySelectorAll('.ef-quad.on').forEach(function(el) { el.classList.remove('on'); });
+}
+
+function toggleAnamCirurgia() {
+  var box = document.getElementById('anam-cirurgia-box');
+  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+}
+
+function czStr(key) {
+  var n = efCzState[key];
+  if (!n) return '';
+  return ' ' + '+'.repeat(n) + '/4';
+}
+
+function gerarEcopiarEF(btn) {
+  // ESTADO GERAL
+  var eg = efState.eg || 'BEG';
+  
+  // Coloração
+  var cor = efState.corado ? 'CORADO(A)' : ('DESCORADO(A)' + czStr('desc2'));
+  
+  // Hidratação
+  var hid = efState.hidra ? 'HIDRATADO(A)' : ('DESIDRATADO(A)' + czStr('hid2'));
+  
+  // Febre
+  var feb = (efState.feb_text || 'AFEBRIL');
+  
+  // Icterícia
+  var ict = efState.ict ? ('ICTÉRICO(A)' + czStr('ict2')) : 'ANICTÉRICO(A)';
+  
+  // Cianose
+  var cia = efState.cia ? ('CIANÓTICO(A)' + czStr('cia2')) : 'ACIANÓTICO(A)';
+  
+  // Orientação
+  var lote = (efState.lote_text || 'LOTE');
+  
+  // Linha 1
+  var linha1 = eg + ', ' + cor + ', ' + hid + ', ' + feb + ', ' + ict + ', ' + cia + ', ' + lote + '.';
+  
+  // Sinais vitais
+  var pa = (document.getElementById('ef-pa').value||'').trim();
+  var fc = (document.getElementById('ef-fc').value||'').trim();
+  var spo2 = (document.getElementById('ef-spo2').value||'').trim();
+  var temp = (document.getElementById('ef-temp').value||'').trim();
+  var svArr = [];
+  if (pa) svArr.push('PA: ' + pa + 'mmHg');
+  if (fc) svArr.push('FC: ' + fc + 'bpm');
+  if (spo2) svArr.push('SpO2: ' + spo2 + '%');
+  if (temp) svArr.push('T: ' + temp + '°C');
+  var sv = svArr.length ? svArr.join(' | ') + '.' : '';
+  
+  // ACV / AR
+  var acMap = { 'BRNF 2T s/ sopros':'BRNF EM 2 TEMPOS, S/ SOPROS.', 'BRNF 2T c/ sopros':'BRNF EM 2 TEMPOS, COM SOPROS.', 'Arrítmico 2T':'ARRÍTMICO EM 2 TEMPOS.' };
+  var arMap = { 'MV+ bilateral s/ RA, eupneico':'MV+ FISIOLÓGICOS BILATERALMENTE, S/ RA. EUPNEICO(A).', 'MV+ bilateral c/ RA':'MV+ BILATERALMENTE COM RUÍDOS ADVENTÍCIOS.', 'MV reduzido bilateral':'MV REDUZIDO BILATERALMENTE.' };
+  var ac = 'ACV: ' + (acMap[efState.ac] || (efState.ac.toUpperCase() + '.'));
+  var ar = 'AR: ' + (arMap[efState.ar] || (efState.ar.toUpperCase() + '.'));
+  
+  // Abdome
+  var abdParts = [];
+  var inspMap = { 'Plano e simétrico':'ABDOME PLANO E SIMÉTRICO', 'Globoso':'ABDOME GLOBOSO', 'Distendido':'ABDOME DISTENDIDO', 'Escavado':'ABDOME ESCAVADO' };
+  abdParts.push(inspMap[efState.insp] || efState.insp.toUpperCase());
+  
+  var rhaMap = { 'Presentes e normoativos':'RHA PRESENTES E NORMOATIVOS', 'Aumentados':'RHA AUMENTADOS', 'Diminuídos':'RHA DIMINUÍDOS', 'Ausentes':'RHA AUSENTES' };
+  abdParts.push(rhaMap[efState.rha] || ('RHA ' + efState.rha.toUpperCase()));
+  
+  var palsMap = { 'Flácido e indolor':'FLÁCIDO E INDOLOR À PALPAÇÃO SUPERFICIAL', 'Flácido com dor':'FLÁCIDO COM DOR À PALPAÇÃO SUPERFICIAL', 'Tenso e doloroso':'TENSO E DOLOROSO À PALPAÇÃO SUPERFICIAL', 'Abdome em tábua':'ABDOME EM TÁBUA' };
+  abdParts.push(palsMap[efState.pals] || efState.pals.toUpperCase());
+  
+  var palpMap = { 'Indolor':'INDOLOR À PALPAÇÃO PROFUNDA', 'Dolorosa':'DOLOROSO À PALPAÇÃO PROFUNDA', 'Massa palpável':'MASSA PALPÁVEL À PALPAÇÃO PROFUNDA' };
+  abdParts.push(palpMap[efState.palp] || efState.palp.toUpperCase());
+  
+  if (efQuads.length) abdParts.push('DOR EM: ' + efQuads.join(', '));
+  
+  abdParts.push('SEM VISCEROMEGALIAS');
+  
+  var sinaisArr = [];
+  ['db','mu','gi','bl','ro','ps'].forEach(function(k) {
+    sinaisArr.push(efSinaisMap[k][efState[k] ? 0 : 1]);
+  });
+  abdParts.push(sinaisArr.join(', ') + '.');
+  
+  var abd = 'ABD: ' + abdParts.join(', ') + '.';
+  
+  // MMII
+  var mmii = 'EXT: ' + (efState.mmii ? 'BEM PERFUNDIDOS, S/ EDEMAS, PULSOS SIMÉTRICOS.' : ('EDEMA' + czStr('mmii2') + ', PULSOS SIMÉTRICOS.'));
+  
+  // Neuro
+  var pirf = efState.pirf || 'PIRF';
+  var glas = efState.glas || 'G15';
+  var neuro = 'NEURO: PUPILAS ' + pirf.toUpperCase() + ', SEM DÉFICITS FOCAIS, GLASGOW ' + glas.replace('G','') + '.';
+  
+  var parts = [linha1];
+  if (sv) parts.push(sv);
+  parts.push(ac, ar, abd, mmii, neuro);
+  
+  var texto = parts.join('\n');
+  
+  navigator.clipboard.writeText(texto).then(function() {
+    btn.textContent = '✓ COPIADO';
+    btn.classList.add('copied');
+    setTimeout(function() { btn.textContent = '📋 GERAR E COPIAR EXAME FÍSICO'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+
+
+// =================== MODELOS DE CONDUTA ===================
+var CONDUTA_MODELS = JSON.parse(localStorage.getItem('plantao_conduta_models') || '[]');
+
+function renderCondutaModelBtns() {
+  var bar = document.getElementById('custom-conduta-btns');
+  var boxes = document.getElementById('conduta-model-boxes');
+  if (!bar || !boxes) return;
+
+  bar.innerHTML = CONDUTA_MODELS.map(function(m) {
+    return '<div style="display:flex;align-items:center;gap:2px;">' +
+      '<button class="anam-btn" style="border-left-color:var(--vital);" data-cid="' + m.id + '" data-action="open">' + m.name + '</button>' +
+      '<button style="background:none;border:none;color:var(--pulse);cursor:pointer;font-size:14px;padding:0 4px;" data-cid="' + m.id + '" data-action="del" title="Excluir">✕</button>' +
+      '</div>';
+  }).join('');
+  bar.querySelectorAll('[data-action="open"]').forEach(function(btn) {
+    btn.onclick = function() { toggleCondutaModel(btn.getAttribute('data-cid')); };
+  });
+  bar.querySelectorAll('[data-action="del"]').forEach(function(btn) {
+    btn.onclick = function() { deleteCondutaModel(btn.getAttribute('data-cid')); };
+  });
+
+  boxes.innerHTML = CONDUTA_MODELS.map(function(m) {
+    return '<div class="anam-box" id="conduta-model-' + m.id + '" style="border-color:var(--vital);box-shadow:0 4px 20px rgba(0,232,150,0.1);">' +
+      '<button class="anam-copy" data-cid="' + m.id + '" data-action="copy">Copiar</button>' +
+      m.text +
+      '</div>';
+  }).join('');
+  boxes.querySelectorAll('[data-action="copy"]').forEach(function(btn) {
+    btn.onclick = function() { copyCondutaModel(btn.getAttribute('data-cid'), btn); };
+  });
+}
+
+function toggleCondutaEditor() {
+  var box = document.getElementById('conduta-editor-box');
+  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+}
+
+function saveCondutaModel() {
+  var nome = document.getElementById('conduta-editor-nome').value.trim().toUpperCase();
+  var texto = document.getElementById('conduta-editor-texto').value.trim().toUpperCase();
+  if (!nome || !texto) { alert('Preencha nome e texto.'); return; }
+  var model = { id: 'cm_' + Date.now(), name: nome, text: texto };
+  CONDUTA_MODELS.push(model);
+  localStorage.setItem('plantao_conduta_models', JSON.stringify(CONDUTA_MODELS));
+  document.getElementById('conduta-editor-nome').value = '';
+  document.getElementById('conduta-editor-texto').value = '';
+  document.getElementById('conduta-editor-box').style.display = 'none';
+  renderCondutaModelBtns();
+}
+
+function toggleCondutaModel(id) {
+  var box = document.getElementById('conduta-model-' + id);
+  if (box) box.classList.toggle('open');
+}
+
+function copyCondutaModel(id, btn) {
+  var m = CONDUTA_MODELS.find(function(x) { return x.id === id; });
+  if (!m) return;
+  navigator.clipboard.writeText(m.text).then(function() {
+    btn.textContent = '✓'; btn.classList.add('copied');
+    setTimeout(function() { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 1500);
+    STATE.history.unshift({ title: m.name + ' (conduta)', content: m.text, time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) });
+  });
+}
+
+function deleteCondutaModel(id) {
+  if (!confirm('Excluir este modelo?')) return;
+  CONDUTA_MODELS = CONDUTA_MODELS.filter(function(m) { return m.id !== id; });
+  localStorage.setItem('plantao_conduta_models', JSON.stringify(CONDUTA_MODELS));
+  renderCondutaModelBtns();
+}
+
+
+
+
+function toggleCondutaBox(id) {
+  var box = document.getElementById('cbox-' + id);
+  if (box) box.classList.toggle('open');
+}
+
+function copyCondutaBox(id, btn) {
+  var box = document.getElementById('cbox-' + id);
+  if (!box) return;
+  var txt = box.innerText.replace('Copiar', '').trim();
+  navigator.clipboard.writeText(txt).then(function() {
+    btn.textContent = '✓'; btn.classList.add('copied');
+    setTimeout(function() { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 1500);
+    STATE.history.unshift({ title: id, content: txt, time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) });
+  });
+}
+
+
+// =================== ANAMNESE CUSTOM JS ===================
+let ANAM_MODELS = JSON.parse(localStorage.getItem('plantao_anam_models') || '[]');
+
+function renderCustomAnamBtns() {
+  const bar = document.getElementById('custom-anam-btns');
+  const boxes = document.getElementById('custom-anam-boxes');
+  if (!bar || !boxes) return;
+  bar.innerHTML = ANAM_MODELS.map(m =>
+    `<div style="display:flex;align-items:center;gap:2px;">
+      <button class="anam-btn" onclick="toggleAnamCustom('${m.id}')">${m.name}</button>
+      <button style="background:none;border:none;color:var(--pulse);cursor:pointer;font-size:14px;padding:0 4px;" onclick="deleteAnamModel('${m.id}')" title="Excluir">✕</button>
+    </div>`
+  ).join('');
+  boxes.innerHTML = ANAM_MODELS.map(m => `
+    <div class="anam-box" id="anam-${m.id}">
+      <button class="anam-copy" onclick="copyAnamCustom('${m.id}', this)">Copiar</button>
+${m.text}
+    </div>
+  `).join('');
+}
+
+function toggleAnamCustom(id) {
+  const box = document.getElementById('anam-' + id);
+  if (box) box.classList.toggle('open');
+}
+
+function copyAnamCustom(id, btn) {
+  const m = ANAM_MODELS.find(x => x.id === id);
+  if (!m) return;
+  navigator.clipboard.writeText(m.text).then(() => {
+    btn.textContent = '✓'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 1500);
+  });
+}
+
+function toggleAnamEditor() {
+  const box = document.getElementById('anam-editor-box');
+  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+}
+
+function saveAnamModel() {
+  const nome = document.getElementById('anam-editor-nome').value.trim().toUpperCase();
+  const texto = document.getElementById('anam-editor-texto').value.trim();
+  if (!nome || !texto) { alert('Preencha nome e texto.'); return; }
+  const model = { id: 'am_' + Date.now(), name: nome, text: texto };
+  ANAM_MODELS.push(model);
+  localStorage.setItem('plantao_anam_models', JSON.stringify(ANAM_MODELS));
+  document.getElementById('anam-editor-nome').value = '';
+  document.getElementById('anam-editor-texto').value = '';
+  document.getElementById('anam-editor-box').style.display = 'none';
+  renderCustomAnamBtns();
+}
+
+function deleteAnamModel(id) {
+  if (!confirm('Excluir este modelo?')) return;
+  ANAM_MODELS = ANAM_MODELS.filter(m => m.id !== id);
+  localStorage.setItem('plantao_anam_models', JSON.stringify(ANAM_MODELS));
+  renderCustomAnamBtns();
+}
+
 // =================== INIT ===================
 loadPerfil();
 loadCustom();
@@ -4097,6 +5085,8 @@ renderList();
 buildCatsMinhas();
 renderMinhas();
 renderCustom();
+renderCustomAnamBtns();
+renderCondutaModelBtns();
 // Seção Prescrições
 buildCatsRx();
 renderRx();
