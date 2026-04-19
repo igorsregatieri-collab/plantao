@@ -3411,6 +3411,12 @@ function renderMinhas() {
 
   filtered.forEach(item => {
     const isOpen = STATE.openMinhas[item.id];
+    const isPed = item.title.toUpperCase().includes('PED') || item.title.toUpperCase().includes('PEDIÁT') || item.cat === 'PEDIATRIA';
+    const hasSeki = item.rx.toUpperCase().includes('SEKI') || item.rx.toUpperCase().includes('XAROPE');
+    const showPeso = isPed || hasSeki;
+    const pesoId = 'peso-min-' + item.id;
+    const rxId = 'rx-min-' + item.id;
+
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
@@ -3425,10 +3431,18 @@ function renderMinhas() {
       </div>
       <div class="card-body ${isOpen ? 'open' : ''}">
         <div style="display:flex;gap:6px;margin-bottom:10px;">
-          <button class="copy-btn" style="flex:2;" onclick="copyMinhas('${item.id}', this)">📋 Copiar</button>
-          <button class="copy-btn" style="flex:1;" onclick="printMinha('${item.id}')">🖨️ Imprimir</button>
+          <button class="copy-btn" style="flex:2;" onclick="copyMinhasRx('${item.id}', this)">📋 Copiar</button>
+          <button class="copy-btn" style="flex:1;" onclick="printMinhaRx('${item.id}')">🖨️ Imprimir</button>
         </div>
-        <div class="rx-item" style="white-space:pre-line;font-family:ui-monospace,Consolas,Monaco,monospace;font-size:12.5px;line-height:1.6;">${item.rx}</div>
+        ${showPeso ? `
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:8px 10px;background:var(--warn-glow);border:1px solid var(--warn);border-radius:8px;">
+          <span style="font-family:var(--font-mono);font-size:10px;color:var(--warn);font-weight:700;">⚖️ PESO (kg)</span>
+          <input type="number" id="${pesoId}" placeholder="kg" min="1" max="100" step="0.5"
+            style="width:70px;padding:5px 8px;font-family:var(--font-mono);font-size:13px;font-weight:700;border:1px solid var(--warn);border-radius:6px;background:var(--bg);color:var(--warn);text-align:center;"
+            oninput="calcDoseMinhas('${item.id}')">
+          <span style="font-family:var(--font-mono);font-size:9px;color:var(--txt-3);">Digite para calcular doses</span>
+        </div>` : ''}
+        <div id="${rxId}" class="rx-item" style="white-space:pre-line;font-family:ui-monospace,Consolas,Monaco,monospace;font-size:12.5px;line-height:1.6;">${item.rx}</div>
       </div>
     `;
     el.appendChild(card);
@@ -3441,22 +3455,7 @@ function toggleMinhas(id) {
   renderMinhas();
 }
 
-function copyMinhas(id, btn) {
-  const item = MINHAS.find(d => d.id === id);
-  if (!item) return;
-  navigator.clipboard.writeText(item.rx).then(() => {
-    btn.textContent = '✓ Copiado!';
-    btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = '📋 Copiar receita'; btn.classList.remove('copied'); }, 1800);
-
-    STATE.history.unshift({
-      title: item.title + ' (minha)',
-      content: item.rx,
-      time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-    });
-    if (STATE.history.length > 50) STATE.history.pop();
-  });
-}
+// copyMinhas substituída por copyMinhasRx
 
 function toggleFav(id) {
   STATE.favorites[id] = !STATE.favorites[id];
@@ -4381,7 +4380,12 @@ function printReceita(title, rx) {
       </div>
     </div>
   `;
+  // Pedir nome do paciente
+  var nomePac = prompt('Nome do paciente (ou deixe em branco):', '') || '_______________________________________________';
   area.style.display = 'block';
+  // Atualizar linha do nome
+  var nomeEl = area.querySelector('.upa-nome-linha');
+  if (nomeEl) nomeEl.innerHTML = 'Nome: <strong>' + nomePac + '</strong>&emsp;Data: ' + new Date().toLocaleDateString('pt-BR');
   var conteudo = area.innerHTML;
   area.style.display = 'none';
   // Abrir em janela dedicada sem URL/titulo do navegador
@@ -4409,10 +4413,7 @@ function printCustom(id) {
   if (item) printReceita(item.title, item.rx);
 }
 
-function printMinha(id) {
-  const item = MINHAS.find(c => c.id === id);
-  if (item) printReceita(item.title, item.rx);
-}
+// printMinha substituída por printMinhaRx
 
 // =================== COMBO (seleção múltipla) ===================
 STATE.combo = [];
@@ -5259,6 +5260,187 @@ function calcPlantao() {
 
 // Inicializar plantão
 try { calcPlantao(); } catch(e) {}
+
+
+
+// =================== DOSE PEDIÁTRICA MINHAS ===================
+// Regras de dose por peso:
+// SEKI xarope: <15kg → 5ml | ≥15kg → 10ml
+// DIPIRONA 500mg/ml: 1 gota/kg (máx 40 gotas)
+// CETOPROFENO 20mg/ml: 0,5mg/kg → gotas = (peso*0,5/20)*20 = peso*0,5 gotas
+// ONDANSETRONA 4mg/5ml: 0,15mg/kg → ml = (peso*0,15/0,8)
+// PREDNISOLONA 3mg/ml: 1mg/kg → ml = peso/3
+// NIMESULIDA 50mg/ml: 5mg/kg → gotas = (peso*5/50)*20
+// BROMOPRIDA 4mg/ml: 0,1mg/kg → gotas = (peso*0,1/4)*20
+
+function calcDosePedItem(linha, peso) {
+  var l = linha.toUpperCase();
+  var result = linha;
+
+  // SEKI XAROPE
+  if (l.includes('SEKI') && l.includes('ML')) {
+    var dose = peso < 15 ? 5 : 10;
+    result = linha.replace(/\d+(?:[,\.]\d+)?\s*ML/gi, dose + ' ML');
+  }
+  // DIPIRONA gotas (500mg/ml → 1 gota/kg)
+  else if ((l.includes('DIPIRONA') && l.includes('GOTAS')) || (l.includes('DIPIRONA') && l.includes('500 MG/ML'))) {
+    var gotas = Math.min(Math.round(peso), 40);
+    result = linha.replace(/\d+\s*GOTAS/gi, gotas + ' GOTAS');
+  }
+  // CETOPROFENO gotas (20mg/ml, 0,5mg/kg)
+  else if (l.includes('CETOPROFENO') && l.includes('GOTAS')) {
+    var gotas2 = Math.round(peso * 0.5);
+    result = linha.replace(/\d+\s*GOTAS/gi, gotas2 + ' GOTAS');
+  }
+  // ONDANSETRONA ml (4mg/5ml → 0,15mg/kg)
+  else if ((l.includes('ONDASETRONA') || l.includes('ONDANSETRONA')) && l.includes('ML')) {
+    var ml = Math.round((peso * 0.15 / 0.8) * 10) / 10;
+    result = linha.replace(/\d+(?:[,\.]\d+)?\s*ML/gi, ml + ' ML');
+  }
+  // PREDNISOLONA ml (3mg/ml → 1mg/kg)
+  else if (l.includes('PREDNISOLONA') && l.includes('ML')) {
+    var ml2 = Math.round((peso / 3) * 10) / 10;
+    result = linha.replace(/\d+(?:[,\.]\d+)?\s*ML/gi, ml2 + ' ML');
+  }
+  // NIMESULIDA gotas (50mg/ml → 5mg/kg)
+  else if (l.includes('NIMESULIDA') && l.includes('GOTAS')) {
+    var gotas3 = Math.round(peso * 2);
+    result = linha.replace(/\d+\s*GOTAS/gi, gotas3 + ' GOTAS');
+  }
+  // BROMOPRIDA gotas (4mg/ml → 0,1mg/kg)
+  else if (l.includes('BROMOPRIDA') && l.includes('GOTAS')) {
+    var gotas4 = Math.round(peso * 0.5);
+    result = linha.replace(/\d+\s*GOTAS/gi, gotas4 + ' GOTAS');
+  }
+  // AMOXICILINA xarope ml (250mg/5ml → 50mg/kg/dia ÷ 2)
+  else if (l.includes('AMOXICILINA') && l.includes('ML')) {
+    var ml3 = Math.round((peso * 50 / 2) / 50 * 10) / 10;
+    result = linha.replace(/\d+(?:[,\.]\d+)?\s*ML/gi, ml3 + ' ML');
+  }
+  // CEFALEXINA xarope ml (250mg/5ml → 25mg/kg/dose)
+  else if (l.includes('CEFALEXINA') && l.includes('ML')) {
+    var ml4 = Math.round((peso * 25 / 50) * 10) / 10;
+    result = linha.replace(/\d+(?:[,\.]\d+)?\s*ML/gi, ml4 + ' ML');
+  }
+
+  return result;
+}
+
+function calcDoseMinhas(itemId) {
+  var item = MINHAS.find(function(d) { return d.id === itemId; });
+  if (!item) return;
+  var pesoEl = document.getElementById('peso-min-' + itemId);
+  var rxEl = document.getElementById('rx-min-' + itemId);
+  if (!pesoEl || !rxEl) return;
+  var peso = parseFloat(pesoEl.value);
+  if (!peso || peso <= 0) { rxEl.textContent = item.rx; return; }
+
+  var txt = item.rx;
+  var up = txt.toUpperCase();
+
+  // Processar cada bloco de medicamento
+  // Estratégia: substituir números de gotas/ml nas linhas TOMAR baseado no med anterior
+
+  var linhas = txt.split('\n');
+  var medAtual = '';
+  var resultado = linhas.map(function(linha) {
+    var lu = linha.toUpperCase();
+
+    // Detectar qual medicamento é essa linha
+    if (lu.includes('DIPIRONA') && lu.includes('MG/ML')) medAtual = 'dipirona';
+    else if (lu.includes('CETOPROFENO') || lu.includes('CETOTPROFENO')) medAtual = 'cetoprofeno';
+    else if (lu.includes('SEKI')) medAtual = 'seki';
+    else if (lu.includes('BROMOPRIDA')) medAtual = 'bromoprida';
+    else if (lu.includes('PREDNISOLONA') || lu.includes('PREDISIM')) medAtual = 'prednisolona';
+    else if (lu.includes('NIMESULIDA') && lu.includes('MG/ML')) medAtual = 'nimesulida';
+    else if (lu.includes('ONDASETRONA') || lu.includes('ONDANSETRONA')) medAtual = 'ondansetrona';
+    else if (lu.includes('AMOXICILINA') && lu.includes('MG/5ML')) medAtual = 'amoxicilina';
+    else if (lu.includes('CEFALEXINA') && lu.includes('MG/5ML')) medAtual = 'cefalexina';
+    else if (lu.includes('AZITROMICINA') && lu.includes('MG/5ML')) medAtual = 'azitromicina';
+    else if (lu.includes('BACTRIM') || lu.includes('SULFAMETOXAZOL')) medAtual = 'bactrim';
+    else if (lu.includes('LORATADINA') && lu.includes('MG/ML')) medAtual = 'loratadina';
+    else if (lu.includes('FLORATIL')) medAtual = 'floratil';
+    else if (lu.includes('ZINCO')) medAtual = 'zinco';
+
+    // Linha de TOMAR — calcular dose
+    if (lu.includes('TOMAR') || lu.includes('USAR') || lu.includes('APLICAR')) {
+      var novaLinha = linha;
+      switch(medAtual) {
+        case 'dipirona':
+          var g = Math.min(Math.round(peso), 40);
+          novaLinha = linha.replace(/\d+\s*GOTAS/gi, g + ' GOTAS');
+          break;
+        case 'cetoprofeno':
+          var g2 = Math.round(peso * 0.5);
+          novaLinha = linha.replace(/\d+\s*GOTAS/gi, g2 + ' GOTAS');
+          break;
+        case 'seki':
+          var ml = peso < 15 ? 5 : 10;
+          novaLinha = linha.replace(/\d+(?:[,\.]\d+)?\s*ML/gi, ml + ' ML');
+          break;
+        case 'bromoprida':
+          var g3 = Math.round(peso * 0.5);
+          novaLinha = linha.replace(/\d+\s*GOTAS/gi, g3 + ' GOTAS');
+          break;
+        case 'prednisolona':
+          var ml2 = Math.max(1, Math.round((peso / 3) * 2) / 2);
+          novaLinha = linha.replace(/\d+(?:[,\.]\d+)?\s*ML/gi, ml2 + ' ML');
+          break;
+        case 'nimesulida':
+          var g4 = Math.round(peso * 2);
+          novaLinha = linha.replace(/\d+\s*GOTAS/gi, g4 + ' GOTAS');
+          break;
+        case 'ondansetrona':
+          var ml3 = Math.max(1, Math.round((peso * 0.15 / 0.8) * 2) / 2);
+          novaLinha = linha.replace(/\d+(?:[,\.]\d+)?\s*ML/gi, ml3 + ' ML');
+          break;
+        case 'amoxicilina':
+          var ml4 = Math.max(1, Math.round((peso * 25 / 50) * 2) / 2);
+          novaLinha = linha.replace(/\d+(?:[,\.]\d+)?\s*ML/gi, ml4 + ' ML');
+          break;
+        case 'cefalexina':
+          var ml5 = Math.max(1, Math.round((peso * 25 / 50) * 2) / 2);
+          novaLinha = linha.replace(/\d+(?:[,\.]\d+)?\s*ML/gi, ml5 + ' ML');
+          break;
+        case 'azitromicina':
+          var ml6 = Math.max(1, Math.round((peso * 10 / 40) * 2) / 2);
+          novaLinha = linha.replace(/\d+(?:[,\.]\d+)?\s*ML/gi, ml6 + ' ML');
+          break;
+        case 'bactrim':
+          var ml7 = Math.max(1, Math.round((peso * 0.5) * 2) / 2);
+          novaLinha = linha.replace(/\d+(?:[,\.]\d+)?\s*ML/gi, ml7 + ' ML');
+          break;
+        case 'loratadina':
+          var ml8 = peso <= 30 ? 5 : 10;
+          novaLinha = linha.replace(/\d+(?:[,\.]\d+)?\s*ML/gi, ml8 + ' ML');
+          break;
+      }
+      return novaLinha;
+    }
+    return linha;
+  });
+
+  rxEl.textContent = resultado.join('\n');
+}
+function copyMinhasRx(id, btn) {
+  var item = MINHAS.find(function(d) { return d.id === id; });
+  if (!item) return;
+  var rxEl = document.getElementById('rx-min-' + id);
+  var txt = rxEl ? rxEl.textContent : item.rx;
+  navigator.clipboard.writeText(txt).then(function() {
+    btn.textContent = '✓ COPIADO'; btn.classList.add('copied');
+    setTimeout(function() { btn.textContent = '📋 Copiar'; btn.classList.remove('copied'); }, 1800);
+    STATE.history.unshift({ title: item.title, content: txt, time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) });
+  });
+}
+
+function printMinhaRx(id) {
+  var item = MINHAS.find(function(d) { return d.id === id; });
+  if (!item) return;
+  var rxEl = document.getElementById('rx-min-' + id);
+  var txt = rxEl ? rxEl.textContent : item.rx;
+  printReceita(item.title, txt);
+}
 
 
 // =================== ANAMNESE CUSTOM JS ===================
