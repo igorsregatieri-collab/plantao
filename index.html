@@ -1690,6 +1690,13 @@
   }
   .mt8 { margin-top: 8px; }
 
+
+  /* Drag and drop */
+  .draggable { cursor: grab; }
+  .draggable:active { cursor: grabbing; }
+  .drag-over { border: 2px dashed var(--cyan) !important; opacity: 0.7; }
+  .drag-hint { font-family: var(--font-mono); font-size: 9px; color: var(--txt-4); letter-spacing: 1px; margin-bottom: 4px; }
+
 </style>
 </head>
 <body>
@@ -2256,6 +2263,37 @@ RETORNO SE NECESSARIO
         <div class="field"><label>Nome Pessoa 2</label><input type="text" id="pt-nome2" oninput="calcPlantao()" placeholder="Dr(a). 2"></div>
       </div>
       <div class="result" id="pt-result">Preencha os campos</div>
+    </div>
+
+
+    <div class="panel" style="grid-column:span 2;">
+      <h2>💉 Sequência Rápida de Intubação (IOT)</h2>
+      <div class="desc">Pré-anestésico → Indução (opióide + hipnótico + bloqueador NM)</div>
+      <div class="field-row">
+        <div class="field"><label>Peso (kg)</label><input type="number" id="iot-peso" oninput="calcIOT()" placeholder="70" step="1" style="font-size:18px;font-weight:700;"></div>
+        <div class="field"><label>Opióide</label>
+          <select id="iot-opio" onchange="calcIOT()">
+            <option value="fentanil">Fentanil 50mcg/ml — 1-2mcg/kg EV bolus lento</option>
+            <option value="alfentanil">Alfentanila 55,4mcg/ml — 10-30mcg/kg EV bolus</option>
+            <option value="remifentanil">Remifentanila 50mcg/ml — 0,5-1mcg/kg EV bolus</option>
+          </select>
+        </div>
+        <div class="field"><label>Hipnótico</label>
+          <select id="iot-hipno" onchange="calcIOT()">
+            <option value="propofol">Propofol 10mg/ml — 1-2mg/kg EV bolus</option>
+            <option value="etomidato">Etomidato 2mg/ml — 0,3mg/kg EV bolus</option>
+            <option value="cetamina">Cetamina 50mg/ml — 0,5-2mg/kg EV bolus</option>
+            <option value="midazolam">Midazolam 5mg/ml — 0,2mg/kg EV bolus</option>
+          </select>
+        </div>
+        <div class="field"><label>Bloqueador NM</label>
+          <select id="iot-relax" onchange="calcIOT()">
+            <option value="succinil">Succinilcolina 10mg/ml — 1-1,5mg/kg EV bolus</option>
+            <option value="rocuronio">Rocurônio 10mg/ml — 1,2mg/kg EV bolus</option>
+          </select>
+        </div>
+      </div>
+      <div id="iot-result" class="result" style="margin-top:10px;">Preencha o peso</div>
     </div>
 
     <div class="panel">
@@ -3396,14 +3434,27 @@ function buildCatsMinhas() {
   // Recalcular categorias incluindo extras
   var extras2 = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]');
   CATS_MINHAS = ['TODAS', ...Array.from(new Set(MINHAS.concat(extras2).map(function(d){return d.cat;})))];
+  var mOrder = JSON.parse(localStorage.getItem('plantao_cats_minhas_order') || 'null');
+  if (mOrder && mOrder.length) {
+    CATS_MINHAS.sort((a,b) => {
+      var ia = mOrder.indexOf(a), ib = mOrder.indexOf(b);
+      if (ia===-1) return 1; if (ib===-1) return -1;
+      return ia - ib;
+    });
+  }
   const el = document.getElementById('cats-minhas');
   el.innerHTML = '';
-  CATS_MINHAS.forEach(c => {
+  CATS_MINHAS.forEach((c,i) => {
     const btn = document.createElement('button');
-    btn.className = 'cat-btn' + (c === STATE.activeCatMinhas ? ' active' : '');
+    btn.className = 'cat-btn draggable-item' + (c === STATE.activeCatMinhas ? ' active' : '');
     btn.textContent = c;
+    btn.setAttribute('draggable','true');
+    btn.setAttribute('data-idx', i);
     btn.onclick = () => { STATE.activeCatMinhas = c; buildCatsMinhas(); renderMinhas(); };
     el.appendChild(btn);
+  });
+  initDrag(el, CATS_MINHAS, function(arr) {
+    localStorage.setItem('plantao_cats_minhas_order', JSON.stringify(arr));
   });
 }
 
@@ -3441,6 +3492,7 @@ function renderMinhas() {
 
     const card = document.createElement('div');
     card.className = 'card';
+    const isExtra = item.id.startsWith('c_') || item.id.startsWith('cm_');
     card.innerHTML = `
       <div class="card-header" onclick="toggleMinhas('${item.id}')">
         <div class="card-title-wrap">
@@ -3448,6 +3500,7 @@ function renderMinhas() {
           <span class="card-tag tag-vo">${item.cat}</span>
         </div>
         <div class="header-right">
+          ${isExtra ? `<button class="fav-btn" style="color:var(--pulse);font-size:14px;" onclick="event.stopPropagation();deleteMinhasExtra('${item.id}')" title="Excluir">✕</button>` : ''}
           <span class="chevron ${isOpen ? 'open' : ''}">▼</span>
         </div>
       </div>
@@ -4023,9 +4076,12 @@ const SCORES = [
 
 function renderScores() {
   const grid = document.getElementById('scores-grid');
-  if (grid.innerHTML.trim()) return; // já renderizado
-  grid.innerHTML = SCORES.map(sc => `
-    <div class="panel">
+  var order = JSON.parse(localStorage.getItem('plantao_scores_order') || 'null');
+  if (order && order.length === SCORES.length) {
+    SCORES.sort((a,b) => order.indexOf(a.id) - order.indexOf(b.id));
+  }
+  grid.innerHTML = SCORES.map((sc,idx) => `
+    <div class="panel draggable-item" draggable="true" data-idx="${idx}" data-sid="${sc.id}">
       <h2>${sc.title}</h2>
       <div class="desc">${sc.desc}</div>
       <div id="score-items-${sc.id}">
@@ -4040,6 +4096,10 @@ function renderScores() {
       <div class="result" id="result-${sc.id}"><strong>0</strong> pontos</div>
     </div>
   `).join('');
+  // Drag scores
+  initDrag(grid, SCORES, function(arr) {
+    localStorage.setItem('plantao_scores_order', JSON.stringify(arr.map(s=>s.id)));
+  });
 }
 
 function calcScore(id) {
@@ -4099,6 +4159,45 @@ async function apiCall(params) {
     console.error('API offline:', e);
     return null;
   }
+}
+
+// =================== APPS SCRIPT URL ===================
+const AS_URL = 'https://script.google.com/macros/s/AKfycbwGFuTR8mrZgWNTaKozOdh9rQvhJhTnlJUaWOvN_-uBKcBIK4869FPYK-rhCfE1-4K2Ig/exec';
+
+// =================== SYNC ANAMNESE MODELS (Google Sheets) ===================
+async function syncAnamToCloud() {
+  try {
+    await fetch(AS_URL, { method:'POST', body: JSON.stringify({ action:'saveAnamModels', data: ANAM_MODELS }) });
+  } catch(e) { console.warn('sync anam falhou', e); }
+}
+async function loadAnamFromCloud() {
+  try {
+    var r = await fetch(AS_URL + '?action=getAnamModels');
+    var j = await r.json();
+    if (j && j.data && j.data.length) {
+      ANAM_MODELS = j.data;
+      localStorage.setItem('plantao_anam_models', JSON.stringify(ANAM_MODELS));
+      renderCustomAnamBtns();
+    }
+  } catch(e) { console.warn('load anam falhou', e); }
+}
+
+// =================== SYNC CONDUTA MODELS (Google Sheets) ===================
+async function syncCondutaToCloud() {
+  try {
+    await fetch(AS_URL, { method:'POST', body: JSON.stringify({ action:'saveCondutaModels', data: CONDUTA_MODELS }) });
+  } catch(e) { console.warn('sync conduta falhou', e); }
+}
+async function loadCondutaFromCloud() {
+  try {
+    var r = await fetch(AS_URL + '?action=getCondutaModels');
+    var j = await r.json();
+    if (j && j.data && j.data.length) {
+      CONDUTA_MODELS = j.data;
+      localStorage.setItem('plantao_conduta_models', JSON.stringify(CONDUTA_MODELS));
+      renderCondutaModelBtns();
+    }
+  } catch(e) { console.warn('load conduta falhou', e); }
 }
 
 // =================== PERFIL MÉDICO (cloud + localStorage fallback) ===================
@@ -4577,13 +4676,22 @@ let favRx = {};
 function buildCatsRx() {
   const el = document.getElementById('cats-rx');
   if (!el) return;
+  var rxOrd = JSON.parse(localStorage.getItem('plantao_cats_rx_order') || 'null');
+  if (rxOrd && rxOrd.length === CATS_RX.length) {
+    CATS_RX.sort((a,b) => rxOrd.indexOf(a) - rxOrd.indexOf(b));
+  }
   el.innerHTML = '';
-  CATS_RX.forEach(c => {
+  CATS_RX.forEach((c,i) => {
     const btn = document.createElement('button');
-    btn.className = 'cat-btn' + (c === activeCatRx ? ' active' : '');
+    btn.className = 'cat-btn draggable-item' + (c === activeCatRx ? ' active' : '');
     btn.textContent = c;
+    btn.setAttribute('draggable','true');
+    btn.setAttribute('data-idx', i);
     btn.onclick = () => { activeCatRx = c; buildCatsRx(); renderRx(); };
     el.appendChild(btn);
+  });
+  initDrag(el, CATS_RX, function(arr) {
+    localStorage.setItem('plantao_cats_rx_order', JSON.stringify(arr));
   });
 }
 
@@ -4687,13 +4795,22 @@ let openPed = {};
 function buildCatsPed() {
   const el = document.getElementById('cats-ped');
   if (!el) return;
+  var pedOrd = JSON.parse(localStorage.getItem('plantao_cats_ped_order') || 'null');
+  if (pedOrd && pedOrd.length === CATS_PED.length) {
+    CATS_PED.sort((a,b) => pedOrd.indexOf(a) - pedOrd.indexOf(b));
+  }
   el.innerHTML = '';
-  CATS_PED.forEach(c => {
+  CATS_PED.forEach((c,i) => {
     const btn = document.createElement('button');
-    btn.className = 'cat-btn' + (c === activeCatPed ? ' active' : '');
+    btn.className = 'cat-btn draggable-item' + (c === activeCatPed ? ' active' : '');
     btn.textContent = c;
+    btn.setAttribute('draggable','true');
+    btn.setAttribute('data-idx', i);
     btn.onclick = () => { activeCatPed = c; buildCatsPed(); renderPed(); };
     el.appendChild(btn);
+  });
+  initDrag(el, CATS_PED, function(arr) {
+    localStorage.setItem('plantao_cats_ped_order', JSON.stringify(arr));
   });
 }
 
@@ -5070,8 +5187,9 @@ function renderCondutaModelBtns() {
   var boxes = document.getElementById('conduta-model-boxes');
   if (!bar || !boxes) return;
 
-  bar.innerHTML = CONDUTA_MODELS.map(function(m) {
-    return '<div style="display:flex;align-items:center;gap:2px;">' +
+  bar.innerHTML = CONDUTA_MODELS.map(function(m, i) {
+    return '<div class="draggable-item" draggable="true" data-idx="' + i + '" data-type="cond" style="display:flex;align-items:center;gap:2px;">' +
+      '<span style="color:var(--txt-4);font-size:12px;cursor:grab;padding:0 4px;" title="Arrastar">⠿</span>' +
       '<button class="anam-btn" style="border-left-color:var(--vital);" data-cid="' + m.id + '" data-action="open">' + m.name + '</button>' +
       '<button style="background:none;border:none;color:var(--pulse);cursor:pointer;font-size:14px;padding:0 4px;" data-cid="' + m.id + '" data-action="del" title="Excluir">✕</button>' +
       '</div>';
@@ -5081,6 +5199,11 @@ function renderCondutaModelBtns() {
   });
   bar.querySelectorAll('[data-action="del"]').forEach(function(btn) {
     btn.onclick = function() { deleteCondutaModel(btn.getAttribute('data-cid')); };
+  });
+  initDrag(bar, CONDUTA_MODELS, function(newArr) {
+    CONDUTA_MODELS = newArr;
+    localStorage.setItem('plantao_conduta_models', JSON.stringify(CONDUTA_MODELS));
+    renderCondutaModelBtns();
   });
 
   boxes.innerHTML = CONDUTA_MODELS.map(function(m) {
@@ -5107,6 +5230,7 @@ function saveCondutaModel() {
   var model = { id: id, name: nome, text: texto };
   CONDUTA_MODELS.push(model);
   localStorage.setItem('plantao_conduta_models', JSON.stringify(CONDUTA_MODELS));
+  syncCondutaToCloud();
   // Também adiciona em CUSTOM (aparece na lista Minhas)
   var customItem = { id: id, title: nome, cat: 'CONDUTA', rx: texto };
   CUSTOM.push(customItem);
@@ -5501,6 +5625,136 @@ function saveEditFormToMinhas(id) {
 }
 
 
+
+function deleteMinhasExtra(id) {
+  if (!confirm('Remover esta conduta de Minhas?')) return;
+  var extras = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]');
+  extras = extras.filter(function(e) { return e.id !== id; });
+  localStorage.setItem('plantao_minhas_extra', JSON.stringify(extras));
+  buildCatsMinhas();
+  renderMinhas();
+}
+
+// =================== IOT SEQUÊNCIA RÁPIDA ===================
+function calcIOT() {
+  var peso = parseFloat(document.getElementById('iot-peso').value);
+  var opio  = document.getElementById('iot-opio').value;
+  var hipno = document.getElementById('iot-hipno').value;
+  var relax = document.getElementById('iot-relax').value;
+  var el = document.getElementById('iot-result');
+  if (!peso || peso <= 0) { el.innerHTML = 'Preencha o peso'; return; }
+
+  function row(n, label, dose, unit, ml, ampInfo, obs) {
+    return '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;padding:8px 10px;background:rgba(0,212,255,0.04);border-radius:8px;border-left:3px solid var(--cyan-dim);">' +
+      '<span style="font-family:var(--font-mono);font-size:13px;font-weight:800;color:var(--cyan);min-width:20px;">' + n + '</span>' +
+      '<div style="flex:1;">' +
+        '<div style="font-weight:700;font-size:13px;margin-bottom:2px;">' + label + ' <span style="color:var(--cyan);font-size:15px;">→ ' + ml + ' mL</span></div>' +
+        '<div style="font-size:11px;color:var(--txt-3);">' + dose + ' ' + unit + ' | ' + ampInfo + '</div>' +
+        (obs ? '<div style="font-size:10px;color:var(--warn);margin-top:3px;">⚠️ ' + obs + '</div>' : '') +
+      '</div></div>';
+  }
+
+  // PRÉ-ANESTÉSICO
+  var lidoDose = (peso * 1.5).toFixed(1);
+  var lidoMl   = (peso * 1.5 / 20).toFixed(1);
+  var pre = '<div style="font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:2px;color:var(--vital);margin-bottom:8px;">● PRÉ-ANESTÉSICO</div>';
+  pre += '<div style="font-size:12px;color:var(--txt-2);margin-bottom:8px;padding:6px 10px;background:rgba(0,232,150,0.05);border-radius:6px;">O₂ 100% — 10-12 L/min por 3-5 min</div>';
+  pre += '<div style="font-size:12px;color:var(--txt-2);margin-bottom:12px;padding:6px 10px;background:rgba(0,232,150,0.05);border-radius:6px;">Lidocaína 2% (20mg/ml): ' + lidoDose + 'mg → <strong>' + lidoMl + ' mL</strong> EV bolus</div>';
+
+  // INDUÇÃO — OPIÓIDE
+  var opioTxt = '';
+  if (opio === 'fentanil') {
+    var d1 = (peso*1).toFixed(0), d2 = (peso*2).toFixed(0);
+    var m1 = (peso*1/50).toFixed(1), m2 = (peso*2/50).toFixed(1);
+    opioTxt = row('1', 'Fentanil', d1+'-'+d2+'mcg', '', m1+'-'+m2, 'Amp 50mcg/mL (10mL=500mcg)', 'Durante pré-oxigenação, EV lento');
+  } else if (opio === 'alfentanil') {
+    var d1 = (peso*10).toFixed(0), d2 = (peso*30).toFixed(0);
+    var m1 = (d1/55.4).toFixed(1), m2 = (d2/55.4).toFixed(1);
+    opioTxt = row('1', 'Alfentanila', d1+'-'+d2+'mcg', '', m1+'-'+m2, 'Amp 55,4mcg/mL', 'EV bolus lento');
+  } else {
+    var d1 = (peso*0.5).toFixed(1), d2 = (peso*1).toFixed(1);
+    var m1 = (d1/50).toFixed(2), m2 = (d2/50).toFixed(2);
+    opioTxt = row('1', 'Remifentanila', d1+'-'+d2+'mcg', '', m1+'-'+m2, 'Amp 50mcg/mL', 'EV bolus lento');
+  }
+
+  // HIPNÓTICO
+  var hipnoTxt = '';
+  if (hipno === 'propofol') {
+    var d1 = (peso*1).toFixed(0), d2 = (peso*2).toFixed(0);
+    var m1 = (d1/10).toFixed(1), m2 = (d2/10).toFixed(1);
+    hipnoTxt = row('2', 'Propofol', d1+'-'+d2+'mg', '', m1+'-'+m2, 'Amp 10mg/mL', 'EV bolus — hipotensão possível');
+  } else if (hipno === 'etomidato') {
+    var d = (peso*0.3).toFixed(1), m = (d/2).toFixed(1);
+    hipnoTxt = row('2', 'Etomidato', d+'mg', '', m, 'Amp 2mg/mL', '');
+  } else if (hipno === 'cetamina') {
+    var d1 = (peso*0.5).toFixed(1), d2 = (peso*2).toFixed(1);
+    var m1 = (d1/50).toFixed(2), m2 = (d2/50).toFixed(2);
+    hipnoTxt = row('2', 'Cetamina', d1+'-'+d2+'mg', '', m1+'-'+m2, 'Amp 50mg/mL', 'Bom no broncoespasmo/instável');
+  } else {
+    var d = (peso*0.2).toFixed(1), m = (d/5).toFixed(1);
+    hipnoTxt = row('2', 'Midazolam', d+'mg', '', m, 'Amp 5mg/mL', 'Risco hipotensão');
+  }
+
+  // BLOQUEADOR NM
+  var bnmTxt = '';
+  if (relax === 'succinil') {
+    var d1 = (peso*1).toFixed(0), d2 = (peso*1.5).toFixed(0);
+    var m1 = (d1/10).toFixed(1), m2 = (d2/10).toFixed(1);
+    bnmTxt = row('3', 'Succinilcolina', d1+'-'+d2+'mg', '', m1+'-'+m2, 'Sol 10mg/mL — diluir 100mg em 10mL AD', 'EV lento + 10mL AD — fasciculações → intubar 45-60s');
+  } else {
+    var d = (peso*1.2).toFixed(0), m = (d/10).toFixed(1);
+    bnmTxt = row('3', 'Rocurônio', d+'mg', '', m, 'Amp 10mg/mL (50mg/5mL)', 'Apenas se Sugamadex disponível');
+  }
+
+  el.className = 'result';
+  el.innerHTML =
+    '<div style="font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:2px;color:var(--cyan);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--line);">⚖️ PESO: ' + peso + ' kg — SEQUÊNCIA RÁPIDA IOT</div>' +
+    pre +
+    '<div style="font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:2px;color:var(--pulse);margin-bottom:8px;">● INDUÇÃO</div>' +
+    opioTxt + hipnoTxt + bnmTxt +
+    '<div style="font-size:10px;color:var(--txt-4);margin-top:6px;">Administrar nesta ordem, em bolus. Confirmar via aérea antes de iniciar.</div>';
+}
+
+
+// =================== DRAG AND DROP REORDENAR ===================
+function initDrag(container, arr, onReorder) {
+  var items = container.querySelectorAll('.draggable-item');
+  var dragSrc = null;
+
+  items.forEach(function(item) {
+    item.addEventListener('dragstart', function(e) {
+      dragSrc = item;
+      e.dataTransfer.effectAllowed = 'move';
+      item.style.opacity = '0.5';
+    });
+    item.addEventListener('dragend', function() {
+      item.style.opacity = '1';
+      container.querySelectorAll('.draggable-item').forEach(function(i) {
+        i.classList.remove('drag-over');
+      });
+    });
+    item.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (item !== dragSrc) item.classList.add('drag-over');
+    });
+    item.addEventListener('dragleave', function() {
+      item.classList.remove('drag-over');
+    });
+    item.addEventListener('drop', function(e) {
+      e.preventDefault();
+      if (item === dragSrc) return;
+      var fromIdx = parseInt(dragSrc.getAttribute('data-idx'));
+      var toIdx = parseInt(item.getAttribute('data-idx'));
+      // Reordenar array
+      var moved = arr.splice(fromIdx, 1)[0];
+      arr.splice(toIdx, 0, moved);
+      onReorder(arr);
+    });
+  });
+}
+
+
 // =================== ANAMNESE CUSTOM JS ===================
 let ANAM_MODELS = JSON.parse(localStorage.getItem('plantao_anam_models') || '[]');
 
@@ -5508,12 +5762,24 @@ function renderCustomAnamBtns() {
   const bar = document.getElementById('custom-anam-btns');
   const boxes = document.getElementById('custom-anam-boxes');
   if (!bar || !boxes) return;
-  bar.innerHTML = ANAM_MODELS.map(m =>
-    `<div style="display:flex;align-items:center;gap:2px;">
-      <button class="anam-btn" onclick="toggleAnamCustom('${m.id}')">${m.name}</button>
-      <button style="background:none;border:none;color:var(--pulse);cursor:pointer;font-size:14px;padding:0 4px;" onclick="deleteAnamModel('${m.id}')" title="Excluir">✕</button>
+  bar.innerHTML = ANAM_MODELS.map((m, i) =>
+    `<div class="draggable-item" draggable="true" data-idx="${i}" style="display:flex;align-items:center;gap:2px;">
+      <span style="color:var(--txt-4);font-size:12px;cursor:grab;padding:0 4px;" title="Arrastar">⠿</span>
+      <button class="anam-btn" data-cid="${m.id}" data-action="open">${m.name}</button>
+      <button style="background:none;border:none;color:var(--pulse);cursor:pointer;font-size:14px;padding:0 4px;" data-cid="${m.id}" data-action="del" title="Excluir">✕</button>
     </div>`
   ).join('');
+  bar.querySelectorAll('[data-action="open"]').forEach(btn => {
+    btn.onclick = () => toggleAnamCustom(btn.getAttribute('data-cid'));
+  });
+  bar.querySelectorAll('[data-action="del"]').forEach(btn => {
+    btn.onclick = () => deleteAnamModel(btn.getAttribute('data-cid'));
+  });
+  initDrag(bar, ANAM_MODELS, newArr => {
+    ANAM_MODELS = newArr;
+    localStorage.setItem('plantao_anam_models', JSON.stringify(ANAM_MODELS));
+    renderCustomAnamBtns();
+  });
   boxes.innerHTML = ANAM_MODELS.map(m => `
     <div class="anam-box" id="anam-${m.id}">
       <button class="anam-copy" onclick="copyAnamCustom('${m.id}', this)">Copiar</button>
@@ -5548,6 +5814,7 @@ function saveAnamModel() {
   const model = { id: 'am_' + Date.now(), name: nome, text: texto };
   ANAM_MODELS.push(model);
   localStorage.setItem('plantao_anam_models', JSON.stringify(ANAM_MODELS));
+  syncAnamToCloud();
   document.getElementById('anam-editor-nome').value = '';
   document.getElementById('anam-editor-texto').value = '';
   document.getElementById('anam-editor-box').style.display = 'none';
@@ -5564,6 +5831,8 @@ function deleteAnamModel(id) {
 // =================== INIT ===================
 loadPerfil();
 loadCustom();
+loadAnamFromCloud();
+loadCondutaFromCloud();
 // Seção Minhas
 buildCats();
 renderList();
@@ -5578,6 +5847,75 @@ renderRx();
 // Seção Pediatria
 buildCatsPed();
 renderPed();
+// =================== DRAG CALCULADORAS ===================
+(function initCalcDrag() {
+  var grid = document.querySelector('#section-calc .calc-grid');
+  if (!grid) return;
+  var panels = Array.from(grid.querySelectorAll('.panel'));
+  // Restaurar ordem salva
+  var order = JSON.parse(localStorage.getItem('plantao_calc_order') || 'null');
+  if (order && order.length) {
+    order.forEach(function(h2txt) {
+      var found = panels.find(function(p){ return p.querySelector('h2') && p.querySelector('h2').textContent.trim() === h2txt; });
+      if (found) grid.appendChild(found);
+    });
+    panels = Array.from(grid.querySelectorAll('.panel'));
+  }
+  panels.forEach(function(p, i) {
+    p.setAttribute('draggable','true');
+    p.setAttribute('data-idx', i);
+    p.classList.add('draggable-item');
+    p.style.cursor = 'grab';
+  });
+  initDrag(grid, panels, function() {
+    var newOrder = Array.from(grid.querySelectorAll('.panel')).map(function(p) {
+      return p.querySelector('h2') ? p.querySelector('h2').textContent.trim() : '';
+    });
+    localStorage.setItem('plantao_calc_order', JSON.stringify(newOrder));
+  });
+})();
+
+// =================== DRAG TABS (ordem do menu) ===================
+(function initTabDrag() {
+  var tabBar = document.querySelector('.tabs.no-print');
+  if (!tabBar) return;
+  var tabs = Array.from(tabBar.querySelectorAll('.tab'));
+  var order = JSON.parse(localStorage.getItem('plantao_tabs_order') || 'null');
+  if (order && order.length) {
+    order.forEach(function(sec) {
+      var found = tabs.find(function(t){ return t.dataset.section === sec; });
+      if (found) tabBar.insertBefore(found, tabBar.querySelector('.tab-actions'));
+    });
+  }
+  tabs.forEach(function(t, i) {
+    t.setAttribute('draggable','true');
+    t.setAttribute('data-idx', i);
+  });
+  tabs.forEach(function(tab) {
+    tab.addEventListener('dragstart', function(e) {
+      e.dataTransfer.effectAllowed = 'move';
+      tab.style.opacity = '0.5';
+      tabBar._dragTab = tab;
+    });
+    tab.addEventListener('dragend', function() {
+      tab.style.opacity = '1';
+    });
+    tab.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      if (tab !== tabBar._dragTab && tab.classList.contains('tab')) tab.style.outline = '2px dashed var(--cyan)';
+    });
+    tab.addEventListener('dragleave', function() { tab.style.outline = ''; });
+    tab.addEventListener('drop', function(e) {
+      e.preventDefault();
+      tab.style.outline = '';
+      if (tab === tabBar._dragTab) return;
+      tabBar.insertBefore(tabBar._dragTab, tab);
+      var newOrder = Array.from(tabBar.querySelectorAll('.tab')).map(function(t){ return t.dataset.section; });
+      localStorage.setItem('plantao_tabs_order', JSON.stringify(newOrder));
+    });
+  });
+})();
+
 // Definir data inicial do atestado
 // inicializar seletores de data do atestado
 function initAtestadoData() {
