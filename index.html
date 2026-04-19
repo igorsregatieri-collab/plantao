@@ -4153,7 +4153,8 @@ document.addEventListener('keydown', (e) => {
 });
 
 // =================== API SYNC ===================
-const API_URL = 'https://script.google.com/macros/s/AKfycbzSak8fVQwus47y-5S7C1S6b0l3M7oPARZ_NWj98TT7u8w-xj_aDmnK6T4QePhnwyZCaw/exec';
+// =================== APPS SCRIPT URL ===================
+const AS_URL = 'https://script.google.com/macros/s/AKfycbwGFuTR8mrZgWNTaKozOdh9rQvhJhTnlJUaWOvN_-uBKcBIK4869FPYK-rhCfE1-4K2Ig/exec';
 
 async function apiCall(params) {
   const qs = new URLSearchParams(params).toString();
@@ -4186,9 +4187,6 @@ async function apiPost(body) {
     return null;
   }
 }
-
-// =================== APPS SCRIPT URL ===================
-const AS_URL = 'https://script.google.com/macros/s/AKfycbwGFuTR8mrZgWNTaKozOdh9rQvhJhTnlJUaWOvN_-uBKcBIK4869FPYK-rhCfE1-4K2Ig/exec';
 
 // =================== SYNC ANAMNESE MODELS (Google Sheets) ===================
 async function syncAnamToCloud() {
@@ -4287,6 +4285,7 @@ function loadCustom() {
 async function syncFromCloud() {
   updateSyncBadge('syncing', 'sincronizando...');
   const r = await apiCall({ action: 'list' });
+  console.log('syncFromCloud response:', JSON.stringify(r));
   if (r && r.items) {
     CUSTOM = r.items.map(c => ({
       id: c.id,
