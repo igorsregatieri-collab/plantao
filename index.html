@@ -4161,14 +4161,35 @@ async function apiCall(params) {
   try {
     const res = await fetch(AS_URL + '?' + qs, {
       redirect: 'follow',
-      credentials: 'omit'
+      credentials: 'omit',
+      mode: 'cors'
     });
     const txt = await res.text();
+    console.log('apiCall raw (' + params.action + '):', txt.substring(0, 200));
+    if (txt.startsWith('<!')) { console.error('Resposta HTML — URL errada ou deploy desatualizado'); return null; }
     return JSON.parse(txt);
   } catch(e) {
     console.error('API offline:', e);
     return null;
   }
+}
+
+// apiCall via JSONP fallback para contornar CORS do Apps Script
+function apiCallJsonp(params) {
+  return new Promise(function(resolve) {
+    var cb = '_cb' + Date.now();
+    var qs = new URLSearchParams(params).toString();
+    window[cb] = function(data) {
+      resolve(data);
+      delete window[cb];
+      document.body.removeChild(script);
+    };
+    var script = document.createElement('script');
+    script.src = AS_URL + '?' + qs + '&callback=' + cb;
+    script.onerror = function() { resolve(null); delete window[cb]; };
+    document.body.appendChild(script);
+    setTimeout(function() { if(window[cb]) { resolve(null); delete window[cb]; } }, 10000);
+  });
 }
 
 async function apiPost(body) {
@@ -4196,8 +4217,8 @@ async function syncAnamToCloud() {
 }
 async function loadAnamFromCloud() {
   try {
-    var r = await fetch(AS_URL + '?action=getAnamModels');
-    var j = await r.json();
+    var j = await apiCall({ action: 'getAnamModels' });
+    console.log('loadAnam response:', JSON.stringify(j));
     if (j && j.data && j.data.length) {
       ANAM_MODELS = j.data;
       localStorage.setItem('plantao_anam_models', JSON.stringify(ANAM_MODELS));
@@ -4214,8 +4235,8 @@ async function syncCondutaToCloud() {
 }
 async function loadCondutaFromCloud() {
   try {
-    var r = await fetch(AS_URL + '?action=getCondutaModels');
-    var j = await r.json();
+    var j = await apiCall({ action: 'getCondutaModels' });
+    console.log('loadConduta response:', JSON.stringify(j));
     if (j && j.data && j.data.length) {
       CONDUTA_MODELS = j.data;
       localStorage.setItem('plantao_conduta_models', JSON.stringify(CONDUTA_MODELS));
