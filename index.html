@@ -2192,7 +2192,21 @@ RETORNO SE NECESSARIO
       <div class="field"><label>CID-10</label><input type="text" id="at-cid" placeholder="Ex: J00 — Resfriado comum"></div>
     </div>
     <div class="field-row">
-      <div class="field"><label>Data de início do afastamento</label><input type="date" id="at-data-ini"></div>
+      <div class="field">
+        <label>Data de início do afastamento</label>
+        <div style="display:flex;gap:6px;margin-top:4px;">
+          <select id="at-dia" style="flex:1;padding:10px 8px;font-family:var(--font-mono);font-size:13px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);">
+          </select>
+          <select id="at-mes" style="flex:2;padding:10px 8px;font-family:var(--font-mono);font-size:13px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);">
+            <option value="1">Janeiro</option><option value="2">Fevereiro</option><option value="3">Março</option>
+            <option value="4">Abril</option><option value="5">Maio</option><option value="6">Junho</option>
+            <option value="7">Julho</option><option value="8">Agosto</option><option value="9">Setembro</option>
+            <option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option>
+          </select>
+          <select id="at-ano" style="flex:1;padding:10px 8px;font-family:var(--font-mono);font-size:13px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);">
+          </select>
+        </div>
+      </div>
       <div class="field"><label>Observação (opcional)</label><input type="text" id="at-obs" placeholder="Recomendações adicionais"></div>
     </div>
     <div style="display:flex;gap:8px;margin-top:14px;">
@@ -3261,7 +3275,9 @@ const STATE = {
 };
 
 const CATS = ['Todas', '⭐ Favoritos', ...Array.from(new Set(DATA.map(d => d.cat)))];
-const CATS_MINHAS = ['TODAS', ...Array.from(new Set(MINHAS.map(d => d.cat)))];
+var _minhasExtras = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]');
+const CATS_MINHAS_BASE = ['TODAS', ...Array.from(new Set(MINHAS.concat(_minhasExtras).map(d => d.cat)))];
+var CATS_MINHAS = CATS_MINHAS_BASE;
 
 // =================== TEMA ===================
 function toggleTheme() {
@@ -3377,6 +3393,9 @@ function toggle(id) {
 
 // =================== MINHAS CONDUTAS RENDER ===================
 function buildCatsMinhas() {
+  // Recalcular categorias incluindo extras
+  var extras2 = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]');
+  CATS_MINHAS = ['TODAS', ...Array.from(new Set(MINHAS.concat(extras2).map(function(d){return d.cat;})))];
   const el = document.getElementById('cats-minhas');
   el.innerHTML = '';
   CATS_MINHAS.forEach(c => {
@@ -3393,7 +3412,10 @@ function renderMinhas() {
   const el = document.getElementById('list-minhas');
   el.innerHTML = '';
 
-  let filtered = MINHAS;
+  // Incluir extras salvos pelo editor
+  var extras = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]');
+  var todosMinhas = MINHAS.concat(extras);
+  let filtered = todosMinhas;
   if (STATE.activeCatMinhas !== 'TODAS') {
     filtered = filtered.filter(d => d.cat === STATE.activeCatMinhas);
   }
@@ -4249,8 +4271,9 @@ function showEditForm(item) {
       <input type="text" id="ef-cat" placeholder="Ex: IVAS, DOR, ITU..." value="${escapeHtml(item.cat || '')}">
       <label>Prescrição (livre)</label>
       <textarea id="ef-rx" placeholder="Cole ou digite a receita inteira...">${escapeHtml(item.rx)}</textarea>
-      <div style="display:flex;gap:8px;">
-        <button class="btn-primary" onclick="saveEditForm('${item.id}')">SALVAR</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-primary" onclick="saveEditForm('${item.id}')">SALVAR NO EDITOR</button>
+        <button class="btn-primary" style="background:rgba(0,232,150,0.1);color:var(--vital);border-color:var(--vital);" onclick="saveEditFormToMinhas('${item.id}')">📌 SALVAR EM MINHAS</button>
         <button class="btn-secondary" onclick="document.getElementById('editor-form-area').innerHTML=''">CANCELAR</button>
       </div>
     </div>
@@ -4763,50 +4786,53 @@ function printAtestado() {
   const dias = document.getElementById('at-dias').value.trim();
   const cid = document.getElementById('at-cid').value.trim();
   const obs = document.getElementById('at-obs').value.trim();
-  const dataIni = document.getElementById('at-data-ini').value;
+  const dia = parseInt(document.getElementById('at-dia').value);
+  const mes = parseInt(document.getElementById('at-mes').value);
+  const ano = parseInt(document.getElementById('at-ano').value);
   
   if (!dias) { alert('Preencha os dias de afastamento.'); return; }
 
-  const dataFormatada = dataIni ? new Date(dataIni + 'T00:00:00').toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR');
-  
-  const dataFim = dataIni ? (() => {
-    const d = new Date(dataIni + 'T00:00:00');
-    d.setDate(d.getDate() + parseInt(dias) - 1);
-    return d.toLocaleDateString('pt-BR');
-  })() : '';
+  const dataIniObj = new Date(ano, mes - 1, dia);
+  const dataFormatada = dataIniObj.toLocaleDateString('pt-BR');
+  const dataFimObj = new Date(ano, mes - 1, dia + parseInt(dias) - 1);
+  const dataFim = parseInt(dias) > 1 ? dataFimObj.toLocaleDateString('pt-BR') : '';
+  const dataIni = true; // sempre tem data
 
-  const area = document.getElementById('print-area');
-  area.innerHTML = `
-    <div class="print-receita">
-      <div class="print-header">
-        <h2>${escapeHtml(perfil.header || 'PREFEITURA MUNICIPAL DE TAQUARITINGA/SP')}</h2>
-        <h3>ATESTADO MÉDICO</h3>
-      </div>
-      <div style="font-size:11pt;line-height:2;margin-bottom:20px;padding:10px 0;">
-        <p>Atesto para os devidos fins que o(a) paciente:</p>
-        <p><strong>Nome:</strong> ${escapeHtml(nome)}${cpf ? `&emsp;<strong>CPF:</strong> ${escapeHtml(cpf)}` : ''}</p>
-        <br>
-        <p>esteve sob meus cuidados médicos e necessita de <strong>${dias} dia(s)</strong> de afastamento${dataIni ? `, a partir de ${dataFormatada}${dataFim && dias > 1 ? ` a ${dataFim}` : ''}` : ''}.</p>
-        ${cid ? `<br><p><strong>CID-10:</strong> ${escapeHtml(cid)}</p>` : ''}
-        ${obs ? `<br><p><strong>Obs:</strong> ${escapeHtml(obs)}</p>` : ''}
-      </div>
-      <div class="print-footer">
-        <div>${escapeHtml(perfil.cidade || 'Taquaritinga')}, ${new Date().toLocaleDateString('pt-BR')}</div>
-        <div class="print-sig">
-          ${escapeHtml(perfil.nome || '')}${perfil.nome ? '<br>' : ''}${escapeHtml(perfil.crm || '')}
-        </div>
-      </div>
-    </div>
-  `;
-  area.style.display = 'block';
-  setTimeout(() => { window.print(); area.style.display = 'none'; }, 100);
+  var css = 'body{font-family:"Times New Roman",Times,serif;background:white;color:black;margin:0;padding:40px}' +
+    'h2{font-size:14pt;font-weight:bold;letter-spacing:1px;margin-bottom:2px;text-align:center}' +
+    'h3{font-size:13pt;font-weight:bold;margin-bottom:8px;text-align:center}' +
+    '.footer{display:flex;justify-content:space-between;align-items:flex-end;font-size:10pt;margin-top:40px}' +
+    '.sig{border-top:1px solid #000;width:50%;padding-top:4px;text-align:center;font-size:9pt}' +
+    '@page{size:A4;margin:1.5cm 2cm}';
+
+  var corpo = '<h2>' + escapeHtml(perfil.header || 'PREFEITURA MUNICIPAL DE TAQUARITINGA/SP') + '</h2>' +
+    '<h3>ATESTADO MÉDICO</h3>' +
+    '<div style="font-size:11pt;line-height:2;margin:20px 0;">' +
+    '<p>Atesto para os devidos fins que o(a) paciente:</p>' +
+    '<p><strong>Nome:</strong> ' + escapeHtml(nome) + (cpf ? '&emsp;<strong>CPF:</strong> ' + escapeHtml(cpf) : '') + '</p><br>' +
+    '<p>esteve sob meus cuidados m&eacute;dicos e necessita de <strong>' + dias + ' dia(s)</strong> de afastamento' +
+    (dataIni ? ', a partir de ' + dataFormatada + (dataFim && parseInt(dias) > 1 ? ' a ' + dataFim : '') : '') + '.</p>' +
+    (cid ? '<br><p><strong>CID-10:</strong> ' + escapeHtml(cid) + '</p>' : '') +
+    (obs ? '<br><p><strong>Obs:</strong> ' + escapeHtml(obs) + '</p>' : '') +
+    '</div>' +
+    '<div class="footer">' +
+    '<div>' + escapeHtml(perfil.cidade || 'Taquaritinga') + ', ' + new Date().toLocaleDateString('pt-BR') + '</div>' +
+    '<div class="sig">' + escapeHtml(perfil.nome || '') + (perfil.nome ? '<br>' : '') + escapeHtml(perfil.crm || '') + '</div>' +
+    '</div>';
+
+  var win = window.open('', '_blank', 'width=820,height=960,toolbar=0,menubar=0,location=0,status=0,scrollbars=1');
+  win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title> </title><style>' + css + '</style></head><body>' + corpo + '</body></html>');
+  win.document.close();
+  win.focus();
+  setTimeout(function() { win.print(); win.close(); }, 400);
 }
 
 function limparAtestado() {
-  ['at-nome','at-cpf','at-dias','at-cid','at-obs','at-data-ini'].forEach(id => {
+  ['at-nome','at-cpf','at-dias','at-cid','at-obs'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
+  initAtestadoData();
 }
 
 
@@ -5443,6 +5469,38 @@ function printMinhaRx(id) {
 }
 
 
+
+function saveEditFormToMinhas(id) {
+  var title = document.getElementById('ef-title').value.trim();
+  var cat = document.getElementById('ef-cat').value.trim().toUpperCase() || 'CUSTOM';
+  var rx = document.getElementById('ef-rx').value.trim();
+  if (!title || !rx) { alert('Preencha título e prescrição.'); return; }
+  
+  // Salvar no CUSTOM (lista do editor) também
+  var idx2 = CUSTOM.findIndex(function(c) { return c.id === id; });
+  var obj = { id: id, title: title, cat: cat, rx: rx };
+  if (idx2 >= 0) CUSTOM[idx2] = obj;
+  else CUSTOM.push(obj);
+  saveCustomLocal();
+  renderCustom();
+
+  // Salvar em MINHAS_EXTRA (localStorage) para aparecer na lista Minhas
+  var extras = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]');
+  var idx3 = extras.findIndex(function(e) { return e.id === id; });
+  var extraObj = { id: id, cat: cat, title: title, rx: rx };
+  if (idx3 >= 0) extras[idx3] = extraObj;
+  else extras.push(extraObj);
+  localStorage.setItem('plantao_minhas_extra', JSON.stringify(extras));
+  
+  // Re-renderizar Minhas
+  buildCatsMinhas();
+  renderMinhas();
+  
+  document.getElementById('editor-form-area').innerHTML = '';
+  alert('✅ Salvo em Minhas na categoria "' + cat + '"!');
+}
+
+
 // =================== ANAMNESE CUSTOM JS ===================
 let ANAM_MODELS = JSON.parse(localStorage.getItem('plantao_anam_models') || '[]');
 
@@ -5521,7 +5579,31 @@ renderRx();
 buildCatsPed();
 renderPed();
 // Definir data inicial do atestado
-try { document.getElementById('at-data-ini').valueAsDate = new Date(); } catch(e){}
+// inicializar seletores de data do atestado
+function initAtestadoData() {
+  var hoje = new Date();
+  var diaEl = document.getElementById('at-dia');
+  var anoEl = document.getElementById('at-ano');
+  if (!diaEl || !anoEl) return;
+  diaEl.innerHTML = '';
+  for (var d = 1; d <= 31; d++) {
+    var opt = document.createElement('option');
+    opt.value = d;
+    opt.textContent = d < 10 ? '0' + d : d;
+    if (d === hoje.getDate()) opt.selected = true;
+    diaEl.appendChild(opt);
+  }
+  anoEl.innerHTML = '';
+  for (var y = hoje.getFullYear(); y >= hoje.getFullYear() - 1; y--) {
+    var opt2 = document.createElement('option');
+    opt2.value = y;
+    opt2.textContent = y;
+    if (y === hoje.getFullYear()) opt2.selected = true;
+    anoEl.appendChild(opt2);
+  }
+  document.getElementById('at-mes').value = hoje.getMonth() + 1;
+}
+try { initAtestadoData(); } catch(e){}
 
 </script>
 </div><!-- /.container -->
