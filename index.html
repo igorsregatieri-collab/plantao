@@ -4158,10 +4158,31 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzSak8fVQwus47y-5S7C1S6
 async function apiCall(params) {
   const qs = new URLSearchParams(params).toString();
   try {
-    const res = await fetch(API_URL + '?' + qs);
-    return await res.json();
+    const res = await fetch(AS_URL + '?' + qs, {
+      redirect: 'follow',
+      credentials: 'omit'
+    });
+    const txt = await res.text();
+    return JSON.parse(txt);
   } catch(e) {
     console.error('API offline:', e);
+    return null;
+  }
+}
+
+async function apiPost(body) {
+  try {
+    const res = await fetch(AS_URL, {
+      method: 'POST',
+      redirect: 'follow',
+      credentials: 'omit',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(body)
+    });
+    const txt = await res.text();
+    return JSON.parse(txt);
+  } catch(e) {
+    console.error('apiPost offline:', e);
     return null;
   }
 }
@@ -4172,7 +4193,7 @@ const AS_URL = 'https://script.google.com/macros/s/AKfycbwGFuTR8mrZgWNTaKozOdh9r
 // =================== SYNC ANAMNESE MODELS (Google Sheets) ===================
 async function syncAnamToCloud() {
   try {
-    await fetch(AS_URL, { method:'POST', body: JSON.stringify({ action:'saveAnamModels', data: ANAM_MODELS }) });
+    await apiPost({ action:'saveAnamModels', data: ANAM_MODELS });
   } catch(e) { console.warn('sync anam falhou', e); }
 }
 async function loadAnamFromCloud() {
@@ -4190,7 +4211,7 @@ async function loadAnamFromCloud() {
 // =================== SYNC CONDUTA MODELS (Google Sheets) ===================
 async function syncCondutaToCloud() {
   try {
-    await fetch(AS_URL, { method:'POST', body: JSON.stringify({ action:'saveCondutaModels', data: CONDUTA_MODELS }) });
+    await apiPost({ action:'saveCondutaModels', data: CONDUTA_MODELS });
   } catch(e) { console.warn('sync conduta falhou', e); }
 }
 async function loadCondutaFromCloud() {
@@ -4234,7 +4255,7 @@ function savePerfil() {
     header: document.getElementById('perfil-header').value
   };
   try { localStorage.setItem('plantao_perfil', JSON.stringify(p)); } catch(e) {}
-  apiCall({ action: 'savePerfil', ...p });
+  apiPost({ action: 'savePerfil', ...p });
 }
 function getPerfil() {
   try { return JSON.parse(localStorage.getItem('plantao_perfil') || '{}'); } catch(e) { return {}; }
@@ -4266,12 +4287,12 @@ function loadCustom() {
 async function syncFromCloud() {
   updateSyncBadge('syncing', 'sincronizando...');
   const r = await apiCall({ action: 'list' });
-  if (r && r.condutas) {
-    CUSTOM = r.condutas.map(c => ({
+  if (r && r.items) {
+    CUSTOM = r.items.map(c => ({
       id: c.id,
-      cat: c.categoria,
-      title: c.titulo,
-      rx: c.prescricao
+      cat: c.cat || c.categoria || 'GERAL',
+      title: c.title || c.titulo || '',
+      rx: c.rx || c.prescricao || ''
     }));
     saveCustomLocal();
     renderCustom();
@@ -4287,12 +4308,12 @@ function saveCustomLocal() {
 
 async function saveCustomCloud(item) {
   updateSyncBadge('syncing', 'salvando...');
-  const r = await apiCall({
+  const r = await apiPost({
     action: 'save',
     id: item.id,
-    categoria: item.cat,
-    titulo: item.title,
-    prescricao: item.rx
+    cat: item.cat,
+    title: item.title,
+    rx: item.rx
   });
   if (r && r.ok) {
     updateSyncBadge('synced', 'salvo na nuvem');
@@ -4303,7 +4324,7 @@ async function saveCustomCloud(item) {
 
 async function deleteCustomCloud(id) {
   updateSyncBadge('syncing', 'deletando...');
-  const r = await apiCall({ action: 'delete', id });
+  const r = await apiPost({ action: 'delete', id: id });
   if (r && r.ok) {
     updateSyncBadge('synced', 'deletado da nuvem');
   } else {
