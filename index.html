@@ -3489,7 +3489,8 @@ function renderMinhas() {
   filtered.forEach(item => {
     const isOpen = STATE.openMinhas[item.id];
     const isPed = item.title.toUpperCase().includes('PED') || item.title.toUpperCase().includes('PEDIÁT') || item.cat === 'PEDIATRIA';
-    const hasSeki = item.rx.toUpperCase().includes('SEKI') || item.rx.toUpperCase().includes('XAROPE');
+    const rxStr = Array.isArray(item.rx) ? item.rx.map(r=>r.n+' '+r.p).join(' ') : (item.rx||'');
+    const hasSeki = rxStr.toUpperCase().includes('SEKI') || rxStr.toUpperCase().includes('XAROPE');
     const showPeso = isPed || hasSeki;
     const pesoId = 'peso-min-' + item.id;
     const rxId = 'rx-min-' + item.id;
