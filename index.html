@@ -1079,7 +1079,7 @@
       font-family: Arial, sans-serif;
     }
     .no-print { display: none !important; }
-    @page { size: A4; margin: 1.5cm 2cm; }
+    @page { size: A4; margin: 1.5cm 2cm; } @page :first { margin-top: 1cm; }
   }
   #print-area {
     display: none;
@@ -1766,48 +1766,6 @@
     <button class="diag-pill" onclick="jumpDiag('minhas','CONJUNTIVITE')">👁 CONJUNT.</button>
     <button class="diag-pill" onclick="jumpDiag('minhas','TAG')">😰 TAG</button>
   </div>
-  <!-- MODELOS DE CONDUTA -->
-  <div class="anam-models-bar">
-    <button class="anam-btn" style="border-left-color:var(--vital);" onclick="toggleCondutaBox('m_c1')">1 - SEM NADA</button>
-    <button class="anam-btn" style="border-left-color:var(--vital);" onclick="toggleCondutaBox('m_c2')">2 - ATB</button>
-    <button class="anam-btn" style="border-left-color:var(--vital);" onclick="toggleCondutaBox('m_c3')">3 - DENGUE GECA</button>
-    <div id="custom-conduta-btns"></div>
-    <button class="anam-btn" style="border-left-color:var(--vital);flex:0;padding:12px 14px;font-size:18px;" onclick="toggleCondutaEditor()" title="Novo modelo de conduta">＋</button>
-  </div>
-
-  <div id="conduta-editor-box" style="display:none;background:var(--bg-1);border:1px solid var(--vital);border-radius:10px;padding:16px;margin-bottom:12px;">
-    <div style="font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:2px;color:var(--vital);margin-bottom:10px;">✏️ NOVO MODELO DE CONDUTA</div>
-    <input type="text" id="conduta-editor-nome" placeholder="Nome do modelo" style="width:100%;padding:9px 12px;font-family:var(--font-mono);font-size:13px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);margin-bottom:8px;">
-    <textarea id="conduta-editor-texto" placeholder="Texto da conduta..." style="width:100%;min-height:100px;padding:10px 12px;font-family:var(--font-mono);font-size:12px;line-height:1.7;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);resize:vertical;text-transform:uppercase;"></textarea>
-    <div style="display:flex;gap:8px;margin-top:8px;">
-      <button class="btn-primary" onclick="saveCondutaModel()">SALVAR</button>
-      <button class="btn-secondary" onclick="document.getElementById('conduta-editor-box').style.display='none'">CANCELAR</button>
-    </div>
-  </div>
-
-  <div class="anam-box" id="cbox-m_c1" style="border-color:var(--vital);box-shadow:0 4px 20px rgba(0,232,150,0.08);">
-    <button class="anam-copy" onclick="copyCondutaBox('m_c1', this)">Copiar</button>
-PRESCREVO MEDICAÇÃO SINTOMATICA
-ORIENTO SINAIS DE ALARME
-RECEITA PARA CASA COM SINTOMATICOS
-  </div>
-  <div class="anam-box" id="cbox-m_c2" style="border-color:var(--vital);box-shadow:0 4px 20px rgba(0,232,150,0.08);">
-    <button class="anam-copy" onclick="copyCondutaBox('m_c2', this)">Copiar</button>
-PRESCREVO MEDICAÇÃO SINTOMATICA
-ORIENTO SINAIS DE ALARME
-RECEITA PARA CASA COM SINTOMATICOS
-ATB PARA CASA
-  </div>
-  <div class="anam-box" id="cbox-m_c3" style="border-color:var(--vital);box-shadow:0 4px 20px rgba(0,232,150,0.08);">
-    <button class="anam-copy" onclick="copyCondutaBox('m_c3', this)">Copiar</button>
-ANALGESIA
-HIDRATAÇÃO NA UNIDADE
-MEDICAÇÃO PARA CASA COM SINTOMATICOS
-ORIENTO SINAIS DE ALARME
-RETORNO SE NECESSARIO
-  </div>
-  <div id="conduta-model-boxes"></div>
-
   <!-- MODELOS DE ANAMNESE -->  <!-- MODELOS DE ANAMNESE -->  <!-- MODELOS DE ANAMNESE -->
   <div class="anam-models-bar" id="anam-models-bar">
     <button class="anam-btn" onclick="toggleAnam('ms')">📋 SIMPLES</button>
@@ -2064,6 +2022,48 @@ PIFR SEM DEFICTS FOCAIS, FORÇA MOTORA PRESERVADA EM MEMBROS, MIMICA FACIAL RPES
   </div>
   <div id="custom-anam-boxes"></div>
 
+  <!-- MODELOS DE CONDUTA -->
+  <div class="anam-models-bar">
+    <button class="anam-btn" style="border-left-color:var(--vital);" onclick="toggleCondutaBox('m_c1')">1 - SEM NADA</button>
+    <button class="anam-btn" style="border-left-color:var(--vital);" onclick="toggleCondutaBox('m_c2')">2 - ATB</button>
+    <button class="anam-btn" style="border-left-color:var(--vital);" onclick="toggleCondutaBox('m_c3')">3 - DENGUE GECA</button>
+    <div id="custom-conduta-btns"></div>
+    <button class="anam-btn" style="border-left-color:var(--vital);flex:0;padding:12px 14px;font-size:18px;" onclick="toggleCondutaEditor()" title="Novo modelo de conduta">＋</button>
+  </div>
+
+  <div id="conduta-editor-box" style="display:none;background:var(--bg-1);border:1px solid var(--vital);border-radius:10px;padding:16px;margin-bottom:12px;">
+    <div style="font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:2px;color:var(--vital);margin-bottom:10px;">✏️ NOVO MODELO DE CONDUTA</div>
+    <input type="text" id="conduta-editor-nome" placeholder="Nome do modelo" style="width:100%;padding:9px 12px;font-family:var(--font-mono);font-size:13px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);margin-bottom:8px;">
+    <textarea id="conduta-editor-texto" placeholder="Texto da conduta..." style="width:100%;min-height:100px;padding:10px 12px;font-family:var(--font-mono);font-size:12px;line-height:1.7;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);resize:vertical;text-transform:uppercase;"></textarea>
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button class="btn-primary" onclick="saveCondutaModel()">SALVAR</button>
+      <button class="btn-secondary" onclick="document.getElementById('conduta-editor-box').style.display='none'">CANCELAR</button>
+    </div>
+  </div>
+
+  <div class="anam-box" id="cbox-m_c1" style="border-color:var(--vital);box-shadow:0 4px 20px rgba(0,232,150,0.08);">
+    <button class="anam-copy" onclick="copyCondutaBox('m_c1', this)">Copiar</button>
+PRESCREVO MEDICAÇÃO SINTOMATICA
+ORIENTO SINAIS DE ALARME
+RECEITA PARA CASA COM SINTOMATICOS
+  </div>
+  <div class="anam-box" id="cbox-m_c2" style="border-color:var(--vital);box-shadow:0 4px 20px rgba(0,232,150,0.08);">
+    <button class="anam-copy" onclick="copyCondutaBox('m_c2', this)">Copiar</button>
+PRESCREVO MEDICAÇÃO SINTOMATICA
+ORIENTO SINAIS DE ALARME
+RECEITA PARA CASA COM SINTOMATICOS
+ATB PARA CASA
+  </div>
+  <div class="anam-box" id="cbox-m_c3" style="border-color:var(--vital);box-shadow:0 4px 20px rgba(0,232,150,0.08);">
+    <button class="anam-copy" onclick="copyCondutaBox('m_c3', this)">Copiar</button>
+ANALGESIA
+HIDRATAÇÃO NA UNIDADE
+MEDICAÇÃO PARA CASA COM SINTOMATICOS
+ORIENTO SINAIS DE ALARME
+RETORNO SE NECESSARIO
+  </div>
+  <div id="conduta-model-boxes"></div>
+
   <div class="cats" id="cats-minhas"></div>
   <div id="list-minhas"></div>
 </div>
@@ -2074,12 +2074,13 @@ PIFR SEM DEFICTS FOCAIS, FORÇA MOTORA PRESERVADA EM MEMBROS, MIMICA FACIAL RPES
     <input type="text" id="search-rx" placeholder="Buscar diagnóstico, CID ou medicação..." oninput="renderRx()">
   </div>
 
+
   <div class="diag-bar">
+    <button class="diag-pill ivas" onclick="jumpDiag('rx','Cabeça/Olhos')">🧠 CABEÇA</button>
     <button class="diag-pill ivas" onclick="jumpDiag('rx','Respiratório')">🤧 RESPIRAT.</button>
     <button class="diag-pill geca" onclick="jumpDiag('rx','Gastrointestinal')">🤮 GASTRO</button>
     <button class="diag-pill itu" onclick="jumpDiag('rx','Genitourinário')">🦠 GENITURIN.</button>
-    <button class="diag-pill dor" onclick="jumpDiag('rx','Cabeça/Olhos')">🧠 CABEÇA</button>
-    <button class="diag-pill" onclick="jumpDiag('rx','Osteoarticular')">🦴 OSTEOART.</button>
+    <button class="diag-pill dor" onclick="jumpDiag('rx','Osteoarticular')">🦴 OSTEOART.</button>
     <button class="diag-pill" onclick="jumpDiag('rx','Dermatologia')">🩹 DERMAT.</button>
     <button class="diag-pill" onclick="jumpDiag('rx','Cardiologia')">🫀 CARDIO</button>
     <button class="diag-pill" onclick="jumpDiag('rx','Neurologia')">🧠 NEURO</button>
@@ -2087,6 +2088,7 @@ PIFR SEM DEFICTS FOCAIS, FORÇA MOTORA PRESERVADA EM MEMBROS, MIMICA FACIAL RPES
     <button class="diag-pill gin" onclick="jumpDiag('rx','Gestante')">🤰 GESTANTE</button>
     <button class="diag-pill" onclick="jumpDiag('rx','Infectologia')">🦠 INFECTO</button>
     <button class="diag-pill" onclick="jumpDiag('rx','IOT/Sedação')">💉 IOT/SED.</button>
+    <button class="diag-pill" onclick="jumpDiag('rx','Todas')">📋 TODAS</button>
   </div>
   <div class="peso-row">
     <label>⚖️ Peso pediátrico:</label>
@@ -2108,6 +2110,13 @@ PIFR SEM DEFICTS FOCAIS, FORÇA MOTORA PRESERVADA EM MEMBROS, MIMICA FACIAL RPES
     <input type="text" id="search-ped" placeholder="Buscar medicação ou diagnóstico pediátrico..." oninput="renderPed()">
   </div>
 
+  <div class="diag-bar">
+    <button class="diag-pill ivas" onclick="jumpDiagPed('ATB Pediátrico')">💊 ATB</button>
+    <button class="diag-pill geca" onclick="jumpDiagPed('Gastro')">🤮 GASTRO</button>
+    <button class="diag-pill ivas" onclick="jumpDiagPed('Respiratório')">🤧 RESP.</button>
+    <button class="diag-pill dor" onclick="jumpDiagPed('Analgesia')">💉 ANALGESIA</button>
+    <button class="diag-pill" onclick="jumpDiagPed('Todas')">📋 TODAS</button>
+  </div>
   <div class="peso-row">
     <label>⚖️ Peso da criança:</label>
     <input type="number" id="peso-ped" placeholder="kg" oninput="renderPed()" min="0" max="80" step="0.5">
@@ -2200,6 +2209,40 @@ PIFR SEM DEFICTS FOCAIS, FORÇA MOTORA PRESERVADA EM MEMBROS, MIMICA FACIAL RPES
 <!-- =================== SEÇÃO CALCULADORAS =================== -->
 <div class="section" id="section-calc">
   <div class="calc-grid">
+
+
+    <div class="panel">
+      <h2>🩺 Gasometria Arterial</h2>
+      <div class="desc">Interpretação sistemática: pH → PaCO2 → HCO3 → compensação</div>
+      <div class="field-row">
+        <div class="field"><label>pH</label><input type="number" id="g-ph" oninput="calcGaso()" placeholder="7.40" step="0.01"></div>
+        <div class="field"><label>PaCO₂ (mmHg)</label><input type="number" id="g-co2" oninput="calcGaso()" placeholder="40"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>HCO₃ (mEq/L)</label><input type="number" id="g-hco3" oninput="calcGaso()" placeholder="24"></div>
+        <div class="field"><label>PaO₂ (mmHg)</label><input type="number" id="g-po2" oninput="calcGaso()" placeholder="90"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>FiO₂ (%)</label><input type="number" id="g-fio2" oninput="calcGaso()" placeholder="21"></div>
+        <div class="field"><label>Na⁺ (mEq/L)</label><input type="number" id="g-na" oninput="calcGaso()" placeholder="140"></div>
+      </div>
+      <div class="result" id="g-result">Preencha os campos</div>
+    </div>
+
+
+    <div class="panel">
+      <h2>⏰ Divisão de Plantão</h2>
+      <div class="desc">Divide o plantão entre 2 pessoas. Fim padrão: 07:00 do dia seguinte</div>
+      <div class="field-row">
+        <div class="field"><label>Início do plantão</label><input type="time" id="pt-inicio" oninput="calcPlantao()" value="19:00"></div>
+        <div class="field"><label>Fim do plantão</label><input type="time" id="pt-fim" oninput="calcPlantao()" value="07:00"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Nome Pessoa 1</label><input type="text" id="pt-nome1" oninput="calcPlantao()" placeholder="Dr(a). 1"></div>
+        <div class="field"><label>Nome Pessoa 2</label><input type="text" id="pt-nome2" oninput="calcPlantao()" placeholder="Dr(a). 2"></div>
+      </div>
+      <div class="result" id="pt-result">Preencha os campos</div>
+    </div>
 
     <div class="panel">
       <h2>💧 Gotejamento de soro</h2>
@@ -3445,6 +3488,11 @@ function copyRx(id, btn) {
 }
 
 function toggleAnam(t) {
+  // fecha todos os outros antes de abrir
+  var allBoxes = document.querySelectorAll('.anam-box');
+  allBoxes.forEach(function(b) {
+    if (b.id !== 'anam-' + t) b.classList.remove('open');
+  });
   document.getElementById('anam-' + t).classList.toggle('open');
 }
 
@@ -3762,6 +3810,26 @@ const SCORES = [
     interpret: (s) => {
       if (s < 2) return { txt: 'Baixo risco', cls: '' };
       return { txt: 'Alto risco — investigar sepse e considerar UTI', cls: 'result-danger' };
+    }
+  },
+  {
+    id: 'alvarado',
+    title: 'Alvarado (Apendicite)',
+    desc: 'MANTRELS — Score para apendicite aguda. ≥7 = alta probabilidade cirúrgica',
+    items: [
+      { label: 'Migração da dor para FID', pts: 1 },
+      { label: 'Anorexia', pts: 1 },
+      { label: 'Náuseas / Vômitos', pts: 1 },
+      { label: 'Dor em FID à palpação', pts: 2 },
+      { label: 'Descompressão brusca (Blumberg)', pts: 1 },
+      { label: 'Temperatura > 37,3°C', pts: 1 },
+      { label: 'Leucocitose > 10.000', pts: 2 },
+      { label: 'Desvio à esquerda', pts: 1 }
+    ],
+    interpret: (s) => {
+      if (s <= 3) return { txt: 'Baixa probabilidade — alta com orientações', cls: '' };
+      if (s <= 6) return { txt: 'Moderada — observação e reexame', cls: 'result-warn' };
+      return { txt: 'Alta probabilidade — avaliação cirúrgica imediata', cls: 'result-danger' };
     }
   },
   {
@@ -4313,7 +4381,14 @@ function printReceita(title, rx) {
     </div>
   `;
   area.style.display = 'block';
-  setTimeout(() => { window.print(); area.style.display = 'none'; }, 100);
+  // Esconder título e URL do navegador via document.title temporário
+  var oldTitle = document.title;
+  document.title = ' ';
+  setTimeout(() => {
+    window.print();
+    document.title = oldTitle;
+    area.style.display = 'none';
+  }, 100);
 }
 
 function printCustom(id) {
@@ -4717,6 +4792,22 @@ function limparAtestado() {
 
 
 // =================== JUMP DIAGNÓSTICO ===================
+function jumpDiagPed(cat) {
+  if (cat === 'Todas') {
+    activeCatPed = 'Todas';
+  } else {
+    // filtrar por categoria parcial
+    var found = CATS_PED.find(function(c) { return c.toLowerCase().indexOf(cat.toLowerCase()) >= 0; });
+    activeCatPed = found || 'Todas';
+  }
+  buildCatsPed();
+  renderPed();
+  document.getElementById('search-ped').value = '';
+  setTimeout(function() {
+    document.getElementById('list-ped').scrollIntoView({behavior:'smooth', block:'start'});
+  }, 100);
+}
+
 function jumpDiag(tipo, cat) {
   if (tipo === 'minhas') {
     STATE.activeCatMinhas = cat;
@@ -4822,6 +4913,8 @@ function efClearQuads() {
 }
 
 function toggleAnamCirurgia() {
+  // fecha todos os anam-box abertos
+  document.querySelectorAll('.anam-box').forEach(function(b) { b.classList.remove('open'); });
   var box = document.getElementById('anam-cirurgia-box');
   box.style.display = box.style.display === 'none' ? 'block' : 'none';
 }
@@ -4965,9 +5058,15 @@ function saveCondutaModel() {
   var nome = document.getElementById('conduta-editor-nome').value.trim().toUpperCase();
   var texto = document.getElementById('conduta-editor-texto').value.trim().toUpperCase();
   if (!nome || !texto) { alert('Preencha nome e texto.'); return; }
-  var model = { id: 'cm_' + Date.now(), name: nome, text: texto };
+  var id = 'cm_' + Date.now();
+  var model = { id: id, name: nome, text: texto };
   CONDUTA_MODELS.push(model);
   localStorage.setItem('plantao_conduta_models', JSON.stringify(CONDUTA_MODELS));
+  // Também adiciona em CUSTOM (aparece na lista Minhas)
+  var customItem = { id: id, title: nome, cat: 'CONDUTA', rx: texto };
+  CUSTOM.push(customItem);
+  saveCustomLocal();
+  renderCustom();
   document.getElementById('conduta-editor-nome').value = '';
   document.getElementById('conduta-editor-texto').value = '';
   document.getElementById('conduta-editor-box').style.display = 'none';
@@ -5000,6 +5099,10 @@ function deleteCondutaModel(id) {
 
 
 function toggleCondutaBox(id) {
+  var allBoxes = document.querySelectorAll('.anam-box');
+  allBoxes.forEach(function(b) {
+    if (b.id !== 'cbox-' + id) b.classList.remove('open');
+  });
   var box = document.getElementById('cbox-' + id);
   if (box) box.classList.toggle('open');
 }
@@ -5014,6 +5117,130 @@ function copyCondutaBox(id, btn) {
     STATE.history.unshift({ title: id, content: txt, time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) });
   });
 }
+
+
+
+// =================== GASOMETRIA ARTERIAL ===================
+function calcGaso() {
+  var ph = parseFloat(document.getElementById('g-ph').value);
+  var co2 = parseFloat(document.getElementById('g-co2').value);
+  var hco3 = parseFloat(document.getElementById('g-hco3').value);
+  var po2 = parseFloat(document.getElementById('g-po2').value);
+  var fio2 = parseFloat(document.getElementById('g-fio2').value) || 21;
+  var na = parseFloat(document.getElementById('g-na').value);
+  var el = document.getElementById('g-result');
+  if (!ph || !co2 || !hco3) { el.innerHTML = 'Preencha pH, PaCO₂ e HCO₃'; return; }
+
+  var lines = [];
+  var cls = '';
+
+  // 1. pH
+  var distAcBas = ph < 7.35 ? 'ACIDOSE' : ph > 7.45 ? 'ALCALOSE' : 'pH NORMAL';
+  lines.push('<strong>' + distAcBas + '</strong> (pH ' + ph.toFixed(2) + ')');
+
+  // 2. Componente primário
+  var tipo = '';
+  if (ph < 7.35) {
+    if (co2 > 45) { tipo = 'Respiratória'; }
+    else if (hco3 < 22) { tipo = 'Metabólica'; }
+    else { tipo = 'Mista/Indefinida'; }
+  } else if (ph > 7.45) {
+    if (co2 < 35) { tipo = 'Respiratória'; }
+    else if (hco3 > 26) { tipo = 'Metabólica'; }
+    else { tipo = 'Mista/Indefinida'; }
+  }
+  if (tipo) lines.push('Componente: <strong>' + tipo + '</strong>');
+
+  // 3. Compensação esperada
+  if (distAcBas !== 'pH NORMAL') {
+    var comp = '';
+    if (tipo === 'Metabólica' && distAcBas === 'ACIDOSE') {
+      var co2esp = 1.5 * hco3 + 8;
+      comp = 'PaCO₂ esperado: ' + (co2esp - 2).toFixed(0) + '-' + (co2esp + 2).toFixed(0) + ' mmHg';
+      comp += co2 < co2esp - 2 ? ' — <span style="color:var(--pulse)">Alcalose resp. adicional</span>' : co2 > co2esp + 2 ? ' — <span style="color:var(--pulse)">Acidose resp. adicional</span>' : ' ✓';
+    } else if (tipo === 'Metabólica' && distAcBas === 'ALCALOSE') {
+      var co2esp2 = 0.7 * hco3 + 21;
+      comp = 'PaCO₂ esperado: ' + (co2esp2 - 2).toFixed(0) + '-' + (co2esp2 + 2).toFixed(0) + ' mmHg';
+      comp += co2 < co2esp2 - 2 ? ' — <span style="color:var(--pulse)">Alcalose resp. adicional</span>' : co2 > co2esp2 + 2 ? ' — <span style="color:var(--pulse)">Acidose resp. adicional</span>' : ' ✓';
+    } else if (tipo === 'Respiratória' && distAcBas === 'ACIDOSE') {
+      var hco3agudo = 24 + (co2 - 40) * 0.1;
+      var hco3cronico = 24 + (co2 - 40) * 0.35;
+      comp = 'HCO₃ esperado: agudo ' + hco3agudo.toFixed(1) + ' / crônico ' + hco3cronico.toFixed(1);
+      comp += hco3 < hco3agudo - 2 ? ' — <span style="color:var(--pulse)">Acidose metab. adicional</span>' : hco3 > hco3cronico + 2 ? ' — <span style="color:var(--pulse)">Alcalose metab. adicional</span>' : ' ✓';
+    } else if (tipo === 'Respiratória' && distAcBas === 'ALCALOSE') {
+      var hco3agudo2 = 24 - (40 - co2) * 0.2;
+      var hco3cronico2 = 24 - (40 - co2) * 0.5;
+      comp = 'HCO₃ esperado: agudo ' + hco3agudo2.toFixed(1) + ' / crônico ' + hco3cronico2.toFixed(1);
+      comp += hco3 > hco3agudo2 + 2 ? ' — <span style="color:var(--pulse)">Alcalose metab. adicional</span>' : hco3 < hco3cronico2 - 2 ? ' — <span style="color:var(--pulse)">Acidose metab. adicional</span>' : ' ✓';
+    }
+    if (comp) lines.push(comp);
+  }
+
+  // 4. Anion Gap
+  if (na) {
+    var ag = na - (parseFloat(document.getElementById('ag-cl') && document.getElementById('ag-cl').value || 0) + hco3);
+    var ag2 = na - hco3 - 24; // estimativa sem Cl
+    lines.push('Ânion Gap estimado: ~' + (na - hco3 - 24).toFixed(0) + ' mEq/L (sem Cl⁻)');
+  }
+
+  // 5. Oxigenação
+  if (po2 && fio2) {
+    var pafi = po2 / (fio2 / 100);
+    var pafiStr = pafi.toFixed(0);
+    var pafiCls = pafi < 200 ? '<span style="color:var(--pulse)">SDRA grave</span>' : pafi < 300 ? '<span style="color:var(--warn)">SDRA moderada</span>' : pafi < 400 ? '<span style="color:var(--warn)">comprometida</span>' : '<span style="color:var(--vital)">normal</span>';
+    lines.push('PaFi: <strong>' + pafiStr + '</strong> — ' + pafiCls);
+    if (fio2 === 21) {
+      var aa = (713 * 0.21) - (co2 / 0.8) - po2;
+      lines.push('Gradiente A-a: ' + aa.toFixed(0) + ' mmHg' + (aa > 15 ? ' (<span style="color:var(--warn)">elevado</span>)' : ' (normal)'));
+    }
+  }
+
+  // cor do resultado
+  if (distAcBas === 'ACIDOSE') cls = 'result-danger';
+  else if (distAcBas === 'ALCALOSE') cls = 'result-warn';
+
+  el.className = 'result ' + cls;
+  el.innerHTML = lines.join('<br>');
+}
+
+// =================== DIVISÃO DE PLANTÃO ===================
+function calcPlantao() {
+  var inicio = document.getElementById('pt-inicio').value;
+  var fim = document.getElementById('pt-fim').value;
+  var nome1 = document.getElementById('pt-nome1').value.trim() || 'Pessoa 1';
+  var nome2 = document.getElementById('pt-nome2').value.trim() || 'Pessoa 2';
+  var el = document.getElementById('pt-result');
+  if (!inicio || !fim) { el.innerHTML = 'Preencha os horários'; return; }
+
+  function toMin(t) {
+    var p = t.split(':');
+    return parseInt(p[0]) * 60 + parseInt(p[1]);
+  }
+  function toHHMM(m) {
+    var h = Math.floor(((m % 1440) + 1440) % 1440 / 60);
+    var min = ((m % 1440) + 1440) % 1440 % 60;
+    return (h < 10 ? '0' : '') + h + ':' + (min < 10 ? '0' : '') + min;
+  }
+
+  var minInicio = toMin(inicio);
+  var minFim = toMin(fim);
+
+  // Se fim <= início, fim é no dia seguinte
+  var duracao = minFim > minInicio ? minFim - minInicio : (1440 - minInicio) + minFim;
+  var metade = Math.floor(duracao / 2);
+  var meioMin = (minInicio + metade) % 1440;
+
+  var horas = Math.floor(duracao / 60);
+  var mins = duracao % 60;
+
+  el.className = 'result';
+  el.innerHTML = '<strong>' + nome1 + '</strong>: ' + inicio + ' → ' + toHHMM(meioMin) + '<br>' +
+    '<strong>' + nome2 + '</strong>: ' + toHHMM(meioMin) + ' → ' + fim + '<br>' +
+    '<span style="font-size:12px;color:var(--txt-2)">Duração total: ' + horas + 'h' + (mins ? mins + 'min' : '') + ' | Cada um: ' + Math.floor(metade/60) + 'h' + (metade%60 ? (metade%60) + 'min' : '') + '</span>';
+}
+
+// Inicializar plantão
+try { calcPlantao(); } catch(e) {}
 
 
 // =================== ANAMNESE CUSTOM JS ===================
