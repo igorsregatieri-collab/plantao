@@ -3,52 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Plantão 2.0 — Condutas</title>
+<title>Plantão 3.0 // Sistema Operacional</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
+  
   :root {
     /* Dark futurista médico */
-    --bg: #050810;
-    --bg-1: #0a0f1a;
-    --bg-2: #0f1523;
-    --bg-3: #141b2d;
-    --bg-4: #1a2338;
+    --bg: #060912;
+    --bg-1: #0c1120;
+    --bg-2: #111827;
+    --bg-3: #162035;
+    --bg-4: #1c2a45;
 
-    --line: #1e2840;
-    --line-2: #2a3556;
-    --line-hot: #3b4a7a;
+    --line: #1e2d4a;
+    --line-2: #2a3f6a;
+    --line-hot: #3b5490;
 
-    --txt: #e8edfa;
-    --txt-2: #a8b3d1;
-    --txt-3: #6b7a9e;
-    --txt-4: #455172;
+    --txt: #edf2ff;
+    --txt-2: #a8b8d8;
+    --txt-3: #6b80a8;
+    --txt-4: #3d5070;
 
     /* Acentos neon */
-    --cyan: #00e5ff;
-    --cyan-dim: #0891a8;
-    --cyan-glow: rgba(0, 229, 255, 0.15);
+    --cyan: #00d4ff;
+    --cyan-dim: #0080a0;
+    --cyan-glow: rgba(0, 212, 255, 0.18);
 
-    --pulse: #ff3355;
-    --pulse-dim: #a82033;
-    --pulse-glow: rgba(255, 51, 85, 0.18);
+    --pulse: #ff2d55;
+    --pulse-dim: #a01030;
+    --pulse-glow: rgba(255, 45, 85, 0.2);
 
-    --vital: #00ff9c;
-    --vital-dim: #059669;
-    --vital-glow: rgba(0, 255, 156, 0.15);
+    --vital: #00e896;
+    --vital-dim: #00805a;
+    --vital-glow: rgba(0, 232, 150, 0.18);
 
-    --warn: #ffaa00;
-    --warn-dim: #b87700;
-    --warn-glow: rgba(255, 170, 0, 0.15);
+    --warn: #ffb800;
+    --warn-dim: #a07000;
+    --warn-glow: rgba(255, 184, 0, 0.18);
 
-    --violet: #a78bfa;
-    --violet-glow: rgba(167, 139, 250, 0.15);
+    --violet: #b07efa;
+    --violet-glow: rgba(176, 126, 250, 0.18);
 
     /* Tipografia */
     --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
     --font-sans: 'Space Grotesk', -apple-system, sans-serif;
+
+    /* Glass */
+    --glass: rgba(12, 17, 32, 0.7);
+    --glass-border: rgba(0, 212, 255, 0.12);
   }
 
   [data-theme="light"] {
@@ -1101,6 +1106,402 @@
     .perfil-grid { grid-template-columns: 1fr; }
     body::before { background-size: 32px 32px; }
   }
+
+  /* ===== DROPDOWN DIAGNÓSTICOS ===== */
+  .diag-bar {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    background: linear-gradient(135deg, rgba(0,212,255,0.05), rgba(176,126,250,0.05));
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    backdrop-filter: blur(8px);
+    position: relative;
+  }
+  .diag-bar::before {
+    content: 'ACESSO RÁPIDO';
+    position: absolute;
+    top: -7px; left: 12px;
+    font-family: var(--font-mono);
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    background: var(--bg);
+    padding: 0 8px;
+    color: var(--cyan);
+    opacity: 0.7;
+  }
+  .diag-pill {
+    padding: 5px 11px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    border: 1px solid var(--line-2);
+    border-radius: 20px;
+    background: var(--bg-2);
+    color: var(--txt-3);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .diag-pill:hover {
+    border-color: var(--cyan);
+    color: var(--cyan);
+    background: rgba(0,212,255,0.08);
+    box-shadow: 0 0 12px rgba(0,212,255,0.15);
+    transform: translateY(-1px);
+  }
+  .diag-pill.ivas { border-color: rgba(0,212,255,0.4); color: var(--cyan); }
+  .diag-pill.geca { border-color: rgba(255,184,0,0.4); color: var(--warn); }
+  .diag-pill.itu  { border-color: rgba(0,232,150,0.4); color: var(--vital); }
+  .diag-pill.dor  { border-color: rgba(255,45,85,0.4); color: var(--pulse); }
+  .diag-pill.gin  { border-color: rgba(176,126,250,0.4); color: var(--violet); }
+  .diag-pill.atb  { border-color: rgba(255,184,0,0.4); color: var(--warn); }
+
+  /* Cards mais modernos */
+  .card {
+    background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 100%);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    overflow: hidden;
+    transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+    position: relative;
+    backdrop-filter: blur(4px);
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--line-2), transparent);
+    border-radius: 10px 0 0 10px;
+    transition: all 0.2s;
+  }
+  .card:hover {
+    border-color: var(--glass-border);
+    background: linear-gradient(135deg, var(--bg-2) 0%, var(--bg-3) 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 1px rgba(0,212,255,0.06);
+  }
+  .card:hover::before { background: linear-gradient(180deg, var(--cyan), var(--violet)); box-shadow: 0 0 8px var(--cyan); }
+  .card.fav::before { background: linear-gradient(180deg, var(--warn), var(--pulse)); }
+  .card.selected { border-color: var(--cyan); box-shadow: 0 0 20px var(--cyan-glow); }
+  .card.selected::before { background: var(--cyan); }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px 14px 20px;
+    cursor: pointer;
+    user-select: none;
+    gap: 10px;
+  }
+  .card-title {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--txt);
+    letter-spacing: -0.3px;
+  }
+  .card-tag {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+    border: 1px solid;
+    background: transparent;
+  }
+
+  /* Tabs modernas */
+  .tab {
+    flex: 1;
+    min-width: 90px;
+    padding: 12px 12px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border: none;
+    border-right: 1px solid var(--line);
+    background: transparent;
+    color: var(--txt-3);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .tab:last-child { border-right: none; }
+  .tab:hover { color: var(--txt); background: rgba(0,212,255,0.04); }
+  .tab.active { color: var(--cyan); background: rgba(0,212,255,0.07); }
+  .tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 10%; right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    box-shadow: 0 0 8px var(--cyan);
+    border-radius: 2px;
+  }
+
+  /* Header moderno */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, var(--bg-2) 0%, rgba(0,212,255,0.04) 100%);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 30px rgba(0,0,0,0.4);
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--cyan), var(--violet));
+    box-shadow: 0 0 12px var(--cyan);
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    opacity: 0.4;
+  }
+
+  /* Copy btn moderno */
+  .copy-btn {
+    width: 100%;
+    margin-top: 12px;
+    padding: 11px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border: 1px solid var(--cyan);
+    border-radius: 8px;
+    background: rgba(0,212,255,0.06);
+    color: var(--cyan);
+    cursor: pointer;
+    transition: all 0.15s cubic-bezier(0.4,0,0.2,1);
+  }
+  .copy-btn:hover {
+    background: var(--cyan);
+    color: var(--bg);
+    box-shadow: 0 4px 20px rgba(0,212,255,0.3);
+    transform: translateY(-1px);
+  }
+  .copy-btn.copied { background: var(--vital); color: var(--bg); border-color: var(--vital); }
+
+  /* Panel moderno */
+  .panel {
+    background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 100%);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(4px);
+  }
+  .panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    opacity: 0.25;
+  }
+
+  /* Cat btns modernos */
+  .cat-btn {
+    padding: 6px 14px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background: var(--bg-2);
+    color: var(--txt-3);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .cat-btn:hover { border-color: var(--cyan); color: var(--cyan); background: rgba(0,212,255,0.06); }
+  .cat-btn.active {
+    background: rgba(0,212,255,0.12);
+    color: var(--cyan);
+    border-color: var(--cyan);
+    box-shadow: 0 0 14px rgba(0,212,255,0.2);
+  }
+
+  /* Tabs container */
+  .tabs {
+    display: flex;
+    gap: 0;
+    background: var(--bg-1);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    position: relative;
+  }
+
+  /* Input mais moderno */
+  #search, #search-minhas, #search-rx, #search-ped {
+    width: 100%;
+    padding: 13px 18px 13px 44px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--bg-1) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%2300d4ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='8'/><line x1='21' y1='21' x2='16.65' y2='16.65'/></svg>") no-repeat 14px center;
+    color: var(--txt);
+    transition: all 0.2s;
+  }
+  #search:focus, #search-minhas:focus, #search-rx:focus, #search-ped:focus {
+    outline: none;
+    border-color: var(--cyan);
+    box-shadow: 0 0 0 2px rgba(0,212,255,0.12), 0 4px 20px rgba(0,0,0,0.3);
+  }
+
+  /* Anam btn moderno */
+  .anam-btn {
+    flex: 1;
+    padding: 12px 14px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--cyan);
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--bg-1), rgba(0,212,255,0.03));
+    color: var(--txt);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+  }
+  .anam-btn:hover {
+    border-color: var(--cyan);
+    background: rgba(0,212,255,0.07);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    transform: translateY(-1px);
+  }
+  .anam-box {
+    display: none;
+    background: linear-gradient(135deg, var(--bg-1), rgba(0,212,255,0.03));
+    border: 1px solid var(--cyan);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.8;
+    white-space: pre-line;
+    position: relative;
+    color: var(--txt);
+    box-shadow: 0 4px 20px rgba(0,212,255,0.1);
+  }
+  .anam-box.open { display: block; }
+
+  /* Result moderno */
+  .result {
+    background: rgba(0,212,255,0.04);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-left: 3px solid var(--cyan);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-top: 14px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--txt);
+    line-height: 1.8;
+    position: relative;
+  }
+
+  /* Icon btns modernos */
+  .icon-btn {
+    width: 38px; height: 38px;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    color: var(--txt-3);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    transition: all 0.15s;
+  }
+  .icon-btn:hover {
+    color: var(--cyan);
+    border-color: var(--cyan);
+    background: rgba(0,212,255,0.08);
+    box-shadow: 0 0 14px rgba(0,212,255,0.2);
+    transform: translateY(-1px);
+  }
+
+  /* Logo moderno */
+  .logo {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(176,126,250,0.1));
+    border: 1px solid var(--cyan);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cyan);
+    font-weight: 800;
+    font-family: var(--font-mono);
+    font-size: 16px;
+    box-shadow: 0 0 16px rgba(0,212,255,0.2), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+
+  .field input, .field select {
+    padding: 10px 12px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--txt);
+    transition: all 0.15s;
+  }
+  .field input:focus, .field select:focus {
+    outline: none;
+    border-color: var(--cyan);
+    box-shadow: 0 0 0 2px rgba(0,212,255,0.1);
+  }
+
+  .btn-primary { background: rgba(0,212,255,0.08); color: var(--cyan); border-color: var(--cyan); border-radius: 8px; }
+  .btn-primary:hover { background: var(--cyan); color: var(--bg); box-shadow: 0 4px 20px rgba(0,212,255,0.3); }
+  .btn-secondary { background: var(--bg-1); color: var(--txt-2); border-color: var(--line); border-radius: 8px; }
+  .btn-danger { background: transparent; color: var(--pulse); border-color: var(--pulse); border-radius: 8px; }
+
+  .edit-form { border-radius: 12px; }
+  .cats { border-radius: 10px; }
+  .combo-bar { border-radius: 10px; }
+  .peso-row { border-radius: 10px; }
+
 </style>
 </head>
 <body>
@@ -1110,7 +1511,7 @@
   <div class="brand">
     <div class="logo">Rx</div>
     <div class="brand-text">
-      <h1>PLANTÃO // 2.3</h1>
+      <h1>PLANTÃO // 3.0</h1>
       <div class="sub"><span class="live-dot"></span>SISTEMA OPERACIONAL</div>
     </div>
   </div>
@@ -1132,8 +1533,10 @@
 
 <div class="tabs no-print">
   <button class="tab active" data-section="minhas" onclick="setSection('minhas')">📘 Minhas</button>
-  <button class="tab" data-section="condutas" onclick="setSection('condutas')">📚 Expandidas</button>
+  <button class="tab" data-section="prescricoes" onclick="setSection('prescricoes')">📋 Prescrições</button>
+  <button class="tab" data-section="ped" onclick="setSection('ped')">👶 Pediatria</button>
   <button class="tab" data-section="editor" onclick="setSection('editor')">✏️ Editor</button>
+  <button class="tab" data-section="atestado" onclick="setSection('atestado')">📄 Atestado</button>
   <button class="tab" data-section="calc" onclick="setSection('calc')">🧮 Calc</button>
   <button class="tab" data-section="scores" onclick="setSection('scores')">📊 Scores</button>
   <button class="tab" data-section="hist" onclick="setSection('hist')">🕘 Hist</button>
@@ -1149,6 +1552,32 @@
     <div style="font-size:12px;color:var(--text);"><strong>📘 Bloco original</strong> — suas condutas exatamente como no GUYTFG.txt. Sem alterações de nome, dose ou prescrição.</div>
   </div>
 
+  <div class="diag-bar">
+    <button class="diag-pill ivas" onclick="jumpDiag('minhas','IVAS')">🤧 IVAS</button>
+    <button class="diag-pill geca" onclick="jumpDiag('minhas','GECA')">🤮 GECA</button>
+    <button class="diag-pill itu" onclick="jumpDiag('minhas','ITU')">🦠 ITU</button>
+    <button class="diag-pill dor" onclick="jumpDiag('minhas','DOR')">💊 DOR</button>
+    <button class="diag-pill gin" onclick="jumpDiag('minhas','GINECO')">🔬 GINECO</button>
+    <button class="diag-pill atb" onclick="jumpDiag('minhas','ATBS')">💉 ATBs</button>
+    <button class="diag-pill" onclick="jumpDiag('minhas','ASMA')">🫁 ASMA</button>
+    <button class="diag-pill" onclick="jumpDiag('minhas','OTITE')">👂 OTITE</button>
+    <button class="diag-pill" onclick="jumpDiag('minhas','VERTIGEM')">🌀 VERTIGEM</button>
+    <button class="diag-pill" onclick="jumpDiag('minhas','ENXAQUECA')">🧠 ENXAQUECA</button>
+    <button class="diag-pill" onclick="jumpDiag('minhas','ALERGIA')">🌸 ALERGIA</button>
+    <button class="diag-pill" onclick="jumpDiag('minhas','HERPES')">🔴 HERPES</button>
+    <button class="diag-pill" onclick="jumpDiag('minhas','HEMORROIDA')">🩸 HEMORR.</button>
+    <button class="diag-pill" onclick="jumpDiag('minhas','PELE')">🩹 PELE</button>
+    <button class="diag-pill" onclick="jumpDiag('minhas','ORTOPEDICO')">🦴 ORTO</button>
+    <button class="diag-pill" onclick="jumpDiag('minhas','SUTURA')">🧵 SUTURA</button>
+    <button class="diag-pill" onclick="jumpDiag('minhas','COLICA NEFRETICA')">🫘 CÓL.REN.</button>
+    <button class="diag-pill" onclick="jumpDiag('minhas','DRGE')">🔥 DRGE</button>
+    <button class="diag-pill" onclick="jumpDiag('minhas','HORDEOLO')">👁️ HORDÉOLO</button>
+    <button class="diag-pill" onclick="jumpDiag('minhas','AVC')">🫀 AVC</button>
+    <button class="diag-pill" onclick="jumpDiag('minhas','GESTANTE')">🤰 GESTANTE</button>
+    <button class="diag-pill" onclick="jumpDiag('minhas','GOTA')">💎 GOTA</button>
+    <button class="diag-pill" onclick="jumpDiag('minhas','CONJUNTIVITE')">👁 CONJUNT.</button>
+    <button class="diag-pill" onclick="jumpDiag('minhas','TAG')">😰 TAG</button>
+  </div>
   <div class="anam-row">
     <button class="anam-btn" onclick="toggleAnam('ms')">📋 ANAMNESE-1 SIMPLES</button>
     <button class="anam-btn" onclick="toggleAnam('mc')">📋 ANAM-2-COMPLETA</button>
@@ -1177,6 +1606,58 @@ PIFR SEM DEFICTS FOCAIS, FORÇA MOTORA PRESERVADA EM MEMBROS, MIMICA FACIAL RPES
 
   <div class="cats" id="cats-minhas"></div>
   <div id="list-minhas"></div>
+</div>
+
+<!-- =================== SEÇÃO PRESCRIÇÕES =================== -->
+<div class="section" id="section-prescricoes">
+  <div class="search-row">
+    <input type="text" id="search-rx" placeholder="Buscar diagnóstico, CID ou medicação..." oninput="renderRx()">
+  </div>
+
+  <div class="diag-bar">
+    <button class="diag-pill ivas" onclick="jumpDiag('rx','Respiratório')">🤧 RESPIRAT.</button>
+    <button class="diag-pill geca" onclick="jumpDiag('rx','Gastrointestinal')">🤮 GASTRO</button>
+    <button class="diag-pill itu" onclick="jumpDiag('rx','Genitourinário')">🦠 GENITURIN.</button>
+    <button class="diag-pill dor" onclick="jumpDiag('rx','Dor/Analgesia')">💊 DOR</button>
+    <button class="diag-pill gin" onclick="jumpDiag('rx','Cabeça/Olhos')">🧠 CABEÇA</button>
+    <button class="diag-pill" onclick="jumpDiag('rx','Osteoarticular')">🦴 OSTEOART.</button>
+    <button class="diag-pill" onclick="jumpDiag('rx','Cardiovascular')">🫀 CARDIO</button>
+    <button class="diag-pill" onclick="jumpDiag('rx','Dermatologia')">🩹 DERMAT.</button>
+    <button class="diag-pill" onclick="jumpDiag('rx','Psiquiatria')">🧠 PSIQ.</button>
+    <button class="diag-pill" onclick="jumpDiag('rx','Endócrino')">⚗️ ENDÓCR.</button>
+  </div>
+  <div class="peso-row">
+    <label>⚖️ Peso pediátrico:</label>
+    <input type="number" id="peso-rx" placeholder="kg" oninput="renderRx()" min="0" max="100" step="0.5">
+    <span class="peso-info">Doses pediátricas calculadas automaticamente quando disponível</span>
+  </div>
+
+  <div class="info-banner cyan" style="margin-bottom:12px;">
+    <strong>📋 PRESCRIÇÕES PRONTAS</strong> — baseadas em protocolos clínicos. PS = pronto-socorro (IV/IM). Casa = receita para o paciente.
+  </div>
+
+  <div class="cats" id="cats-rx"></div>
+  <div id="list-rx"></div>
+</div>
+
+<!-- =================== SEÇÃO PEDIATRIA =================== -->
+<div class="section" id="section-ped">
+  <div class="search-row">
+    <input type="text" id="search-ped" placeholder="Buscar medicação ou diagnóstico pediátrico..." oninput="renderPed()">
+  </div>
+
+  <div class="peso-row">
+    <label>⚖️ Peso da criança:</label>
+    <input type="number" id="peso-ped" placeholder="kg" oninput="renderPed()" min="0" max="80" step="0.5">
+    <span class="peso-info">Digite o peso para calcular doses automaticamente</span>
+  </div>
+
+  <div class="info-banner warn" style="margin-bottom:12px;">
+    <strong>👶 PEDIATRIA</strong> — ATBs, analgésicos e principais drogas pediátricas com doses por kg.
+  </div>
+
+  <div class="cats" id="cats-ped"></div>
+  <div id="list-ped"></div>
 </div>
 
 <!-- =================== SEÇÃO EDITOR =================== -->
@@ -1225,52 +1706,33 @@ PIFR SEM DEFICTS FOCAIS, FORÇA MOTORA PRESERVADA EM MEMBROS, MIMICA FACIAL RPES
 <!-- =================== ÁREA DE IMPRESSÃO (OCULTA) =================== -->
 <div id="print-area"></div>
 
-<!-- =================== SEÇÃO CONDUTAS EXPANDIDAS =================== -->
-<div class="section" id="section-condutas">
-  <div class="search-row">
-    <input type="text" id="search" placeholder="Buscar diagnóstico ou medicação..." oninput="renderList()">
+<!-- =================== SEÇÃO ATESTADO =================== -->
+<div class="section" id="section-atestado">
+  <div class="panel">
+    <h2>📄 GERADOR DE ATESTADO</h2>
+    <div class="desc">Preencha os campos abaixo e clique em imprimir</div>
+
+    <div class="field-row" style="margin-top:14px;">
+      <div class="field"><label>Nome do paciente</label><input type="text" id="at-nome" placeholder="Nome completo"></div>
+      <div class="field"><label>CPF (opcional)</label><input type="text" id="at-cpf" placeholder="000.000.000-00"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Dias de afastamento</label><input type="number" id="at-dias" placeholder="2" min="1"></div>
+      <div class="field"><label>CID-10</label><input type="text" id="at-cid" placeholder="Ex: J00 — Resfriado comum"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Data de início do afastamento</label><input type="date" id="at-data-ini"></div>
+      <div class="field"><label>Observação (opcional)</label><input type="text" id="at-obs" placeholder="Recomendações adicionais"></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px;">
+      <button class="btn-primary" onclick="printAtestado()">🖨️ Imprimir Atestado</button>
+      <button class="btn-secondary" onclick="limparAtestado()">Limpar</button>
+    </div>
   </div>
 
-  <div class="peso-row">
-    <label>⚖️ Peso pediátrico:</label>
-    <input type="number" id="peso" placeholder="kg" oninput="renderList()" min="0" max="100" step="0.5">
-    <span class="peso-info">Doses pediátricas serão calculadas automaticamente</span>
+  <div class="info-banner cyan" style="margin-top:12px;">
+    <strong>LEMBRETE</strong> — O atestado será gerado com seu cabeçalho e dados cadastrados na aba ✏️ Editor → Perfil do médico.
   </div>
-
-  <div class="panel" style="background:var(--purple-bg);border-color:var(--purple);padding:12px 16px;margin-bottom:12px;">
-    <div style="font-size:12px;color:var(--text);"><strong>📚 Condutas expandidas</strong> — emergência, pediatria, gineco/obst, endócrino, psiquiatria, trauma. Referências clínicas atualizadas.</div>
-  </div>
-
-  <div class="anam-row">
-    <button class="anam-btn" onclick="toggleAnam('s')">📋 Anamnese Simples</button>
-    <button class="anam-btn" onclick="toggleAnam('c')">📋 Anamnese Completa</button>
-  </div>
-
-  <div class="anam-box" id="anam-s">
-    <button class="anam-copy" onclick="copyAnam('s', this)">Copiar</button>
-BEG, corada, hidratada, afebril, acianótica, anictérica, LOTE.
-AC: BRNF 2T.
-AP: MV presente bilateral sem RA.
-AB: RHA presente, sem peritonite.
-NEUROLÓGICO: pupilas isofotorreagentes, sem focais, Glasgow 15.
-EXT: bem perfundidas, sem edemas ou empastamento, pulsos simétricos.
-PIFR sem déficits focais, força motora preservada em membros, mímica facial preservada, coordenação preservada sem ataxias.
-  </div>
-
-  <div class="anam-box" id="anam-c">
-    <button class="anam-copy" onclick="copyAnam('c', this)">Copiar</button>
-BEG, corada, hidratada, afebril, acianótica, anictérica, LOTE.
-AR: MV+ bilateral sem RA.
-ACV: BRNF 2T sem sopros.
-ABD: RHA+, flácido, indolor à palpação superficial e profunda, sem visceromegalias. DB negativo. Murphy negativo. Giordano negativo. Ausência de peritonite.
-EXT: bem perfundidas, sem edemas ou empastamento, pulsos simétricos.
-PIFR sem déficits focais, força motora preservada em membros, mímica facial preservada, coordenação preservada sem ataxias.
-  </div>
-
-  <textarea class="conduta-livre" id="conduta-livre" placeholder="Conduta livre (anotações do paciente)..."></textarea>
-
-  <div class="cats" id="cats"></div>
-  <div id="list"></div>
 </div>
 
 <!-- =================== SEÇÃO CALCULADORAS =================== -->
@@ -1444,827 +1906,462 @@ PIFR sem déficits focais, força motora preservada em membros, mímica facial p
   </div>
 </div>
 
+<!-- ÁREA DE IMPRESSÃO -->
+<div id="print-area"></div>
+
 <script>
-// =================== DADOS DAS CONDUTAS ===================
-// Doses pediátricas: ped = { mgkg: dose mg/kg/dose, freq: doses/dia (informativo), conc: mg/ml, max: dose máxima mg/dose, unit: 'ml'|'gt' }
-// Gotas/ml padrão: 20 gotas = 1 ml
-const DATA = [
+// =================== PRESCRIÇÕES (baseadas no PDF de referência) ===================
+// Estrutura: { id, cat, cid, tag, tagClass, title, ps: [{n,p}], casa: [{n,p}] }
+// ps = prescrições pronto-socorro (EV/IM/urgência)
+// casa = receitas para casa
+// rx = usado pelo renderizador genérico (concatena ps+casa)
 
-  // ===== EMERGÊNCIA =====
-  { id:'em1', cat:'Emergência', tag:'PCR', tagClass:'tag-emerg', title:'PCR — Adulto (ACLS)',
-    rx:[
-      {n:'1) Adrenalina 1 mg IV', p:'A cada 3-5 min durante RCP'},
-      {n:'2) Amiodarona 300 mg IV (1ª dose)', p:'Em FV/TV sem pulso refratária. 2ª dose: 150 mg'},
-      {n:'3) RCP de alta qualidade', p:'100-120 compressões/min, profundidade 5-6 cm, retorno completo do tórax'},
-      {n:'4) Vias aéreas avançadas', p:'IOT ou supraglótico. Capnografia obrigatória.'}
-    ]},
-  { id:'em2', cat:'Emergência', tag:'SEPSE', tagClass:'tag-emerg', title:'Sepse — Bundle 1ª hora',
-    rx:[
-      {n:'1) Lactato sérico', p:'Coletar imediatamente. Repetir se >2 mmol/L em 2-4h'},
-      {n:'2) Hemoculturas (2 amostras)', p:'Antes do ATB, sem atrasar > 45 min'},
-      {n:'3) ATB de amplo espectro', p:'Na 1ª hora. Ex: Piperacilina-tazobactam 4.5g IV ou Meropenem 1g IV'},
-      {n:'4) Cristaloide 30 ml/kg', p:'Em hipotensão (PAM <65) ou lactato ≥4. Reavaliar em 3h'},
-      {n:'5) Vasopressor se PAM <65', p:'Noradrenalina é primeira escolha (ver calculadora)'}
-    ]},
-  { id:'em3', cat:'Emergência', tag:'AVCi', tagClass:'tag-emerg', title:'AVC isquêmico agudo',
-    rx:[
-      {n:'1) Avaliação NIHSS + TC crânio', p:'Janela trombólise: até 4.5h. Trombectomia: até 24h em casos selecionados'},
-      {n:'2) Alteplase 0.9 mg/kg IV', p:'Máx 90 mg. 10% bolus em 1 min, restante em 1h. Se elegível.'},
-      {n:'3) PA alvo <185/110', p:'Antes da trombólise. Após: <180/105 por 24h'},
-      {n:'4) Glicemia 140-180 mg/dL', p:'Evitar hipo e hiper'},
-      {n:'5) AAS 300 mg VO', p:'Após 24h da trombólise OU imediato se não trombolisar'}
-    ]},
-  { id:'em4', cat:'Emergência', tag:'IAM', tagClass:'tag-emerg', title:'IAM com supra (STEMI)',
-    rx:[
-      {n:'1) MOV + ECG em 10 min', p:'O₂ apenas se SatO₂ <90%'},
-      {n:'2) AAS 300 mg mastigado', p:'Dose de ataque'},
-      {n:'3) Clopidogrel 600 mg ou Ticagrelor 180 mg', p:'Dose de ataque do 2º antiagregante'},
-      {n:'4) Morfina 2-4 mg IV se dor', p:'Cuidado com hipotensão'},
-      {n:'5) Heparina não-fracionada 60 UI/kg IV (máx 4000)', p:'Manutenção: 12 UI/kg/h (máx 1000/h)'},
-      {n:'6) Reperfusão: ICP primária <90 min OU trombólise <30 min', p:'Encaminhar urgente para hemodinâmica'}
-    ]},
-  { id:'em5', cat:'Emergência', tag:'EAP', tagClass:'tag-emerg', title:'Edema Agudo de Pulmão',
-    rx:[
-      {n:'1) Posição sentada + O₂', p:'Manter SatO₂ >90%'},
-      {n:'2) Furosemida 40-80 mg IV', p:'Ou 2x dose habitual se em uso crônico'},
-      {n:'3) Nitroglicerina 5-10 mcg/min IV', p:'Se PAS >100. Titular até alívio'},
-      {n:'4) Morfina 2-4 mg IV (controverso)', p:'Apenas se ansiedade extrema'},
-      {n:'5) VNI (CPAP/BiPAP)', p:'Se SatO₂ <90% ou trabalho respiratório elevado'}
-    ]},
-  { id:'em6', cat:'Emergência', tag:'ANAF', tagClass:'tag-emerg', title:'Anafilaxia',
-    rx:[
-      {n:'1) ADRENALINA 0,5 mg IM (vasto lateral)', p:'1ª LINHA. Repetir a cada 5-15 min se necessário. Pediátrico: 0.01 mg/kg (máx 0.5)'},
-      {n:'2) Cristaloide 1-2 L IV rápido', p:'Se hipotensão. Pediátrico: 20 ml/kg'},
-      {n:'3) Hidrocortisona 200 mg IV', p:'Adjuvante. Pediátrico: 5 mg/kg'},
-      {n:'4) Difenidramina 25-50 mg IV', p:'Adjuvante para sintomas cutâneos'},
-      {n:'5) Salbutamol inalatório', p:'Se broncoespasmo'}
-    ]},
-  { id:'em7', cat:'Emergência', tag:'CONV', tagClass:'tag-emerg', title:'Estado de Mal Epiléptico',
-    rx:[
-      {n:'1) Diazepam 10 mg IV (0.15 mg/kg)', p:'Ou Midazolam 10 mg IM. Repetir após 5 min se persistir'},
-      {n:'2) Fenitoína 20 mg/kg IV', p:'Diluir em SF, infundir 50 mg/min máx (cuidado bradicardia)'},
-      {n:'3) Glicemia capilar imediata', p:'Se <60: Glicose 50% 40-50 ml IV'},
-      {n:'4) Tiamina 100 mg IV', p:'Se etilismo ou desnutrição (antes da glicose)'},
-      {n:'5) Refratário: IOT + Midazolam contínuo', p:'Ver calculadora'}
-    ]},
-  { id:'em8', cat:'Emergência', tag:'CRIS HTA', tagClass:'tag-emerg', title:'Emergência Hipertensiva',
-    rx:[
-      {n:'1) Nitroprussiato 0.25-10 mcg/kg/min IV', p:'1ª escolha em encefalopatia hipertensiva'},
-      {n:'2) Nitroglicerina 5-100 mcg/min IV', p:'1ª escolha em SCA/EAP'},
-      {n:'3) Esmolol 250-500 mcg/kg bolus + 50 mcg/kg/min', p:'1ª escolha em dissecção de aorta'},
-      {n:'4) Meta: ↓ PAM em 25% na 1ª hora', p:'Não normalizar rapidamente. Exceto AVCh, dissecção aorta'}
+const DATA_RX = [
+
+  // ===== CABEÇA E OLHOS =====
+  { id:'rx1', cat:'Cabeça/Olhos', cid:'R51/G43', tag:'CEFALEIA', tagClass:'tag-vo',
+    title:'Cefaleia / Enxaqueca',
+    ps:[
+      {n:'Dipirona 1 amp + Plasil 1 amp + Decadron 4mg + SF 100ml', p:'EV lento'},
+      {n:'Dramin B6 DL 1 amp + Tramadol 100mg + SF 250ml', p:'EV lento (se refratária)'},
+      {n:'Clorpromazina (Amplictil) ½-1 amp + SF 100ml', p:'EV em 1h — acompanhar PA'}
+    ],
+    casa:[
+      {n:'Dipirona 500mg ——— 1 cx', p:'1 cp VO 6/6h se dor'},
+      {n:'Dramin 100mg ——— 1 cx', p:'1 cp 6/6h ou 40 gotas 6/6h'},
+      {n:'Sumatriptano (Sumax) 25mg ——— 1 cx', p:'1 cp por dose, repetir em 2h se necessário (enxaqueca)'},
+      {n:'Neosaldina ——— 1 cx', p:'2 cp VO 6/6h até melhora (enxaqueca tensional)'}
     ]},
 
-  // ===== ENDÓCRINO =====
-  { id:'end1', cat:'Endócrino', tag:'CAD', tagClass:'tag-emerg', title:'Cetoacidose Diabética',
-    rx:[
-      {n:'1) Hidratação: SF 0.9% 1L na 1ª hora', p:'Após: 250-500 ml/h. Se Na+ corrigido alto: trocar para SF 0.45%'},
-      {n:'2) Insulina regular 0.1 U/kg/h IV contínua', p:'NÃO fazer bolus. Iniciar APÓS K+ ≥3.3'},
-      {n:'3) Reposição de potássio', p:'K <3.3: repor antes da insulina. K 3.3-5.3: 20-30 mEq/L. K >5.3: não repor'},
-      {n:'4) Bicarbonato APENAS se pH <6.9', p:'100 mEq em 400ml AD em 2h'},
-      {n:'5) Glicose alvo 200-250 → trocar SF por SG5%', p:'Manter insulina até HCO₃ >18 e pH >7.3'}
+  { id:'rx2', cat:'Cabeça/Olhos', cid:'H81.1', tag:'VERTIGEM', tagClass:'tag-vo',
+    title:'Vertigem / Labirintite',
+    ps:[
+      {n:'Dramin B6 DL 1 amp + SF 100ml', p:'EV lento'},
+      {n:'Diazepam 5mg 1 cp VO', p:'Ou Clonazepam 10 gotas VO'}
+    ],
+    casa:[
+      {n:'Dramin 100mg ——— 1 cx', p:'1 cp 6/6h por 3 dias'},
+      {n:'Vonau (Ondansetrona) 8mg ——— 1 cx', p:'1 cp 12/12h se náuseas'},
+      {n:'Cinarizina (Stugeron) 75mg ——— 1 cx', p:'1 cp ao deitar por 30 dias'}
     ]},
-  { id:'end2', cat:'Endócrino', tag:'EHH', tagClass:'tag-emerg', title:'Estado Hiperosmolar Hiperglicêmico',
-    rx:[
-      {n:'1) Hidratação agressiva (mais que CAD)', p:'SF 0.9% 1-1.5L/h. Déficit médio 9L'},
-      {n:'2) Insulina regular 0.05-0.1 U/kg/h IV', p:'Após reposição volêmica inicial e K corrigido'},
-      {n:'3) K+: similar à CAD', p:'Reposição precoce'},
-      {n:'4) Meta: glicemia 250-300 mg/dL', p:'Reduzir gradualmente para evitar edema cerebral'}
+
+  { id:'rx3', cat:'Cabeça/Olhos', cid:'H10.9', tag:'CONJUNTIVITE', tagClass:'tag-top',
+    title:'Conjuntivite',
+    ps:[],
+    casa:[
+      {n:'Tobramicina (Tobrex) colírio ——— 1 frasco', p:'1 gota 4/4h por 7 dias (bacteriana)'},
+      {n:'Lacrima Plus / Fresh Tears ——— 1 frasco', p:'1 gota 4x/dia por 5 dias (viral)'},
+      {n:'Lavagem com SF 0,9%', p:'Compressa fria várias vezes ao dia'}
     ]},
-  { id:'end3', cat:'Endócrino', tag:'HIPO', tagClass:'tag-emerg', title:'Hipoglicemia',
-    rx:[
-      {n:'1) Consciente: 15g glicose VO', p:'150 ml suco, 1 colher sopa açúcar, 3 balas. Repetir em 15 min se necessário'},
-      {n:'2) Inconsciente: Glicose 50% 40-60 ml IV', p:'Ou Glucagon 1 mg IM/SC se sem acesso'},
-      {n:'3) Manutenção: SG 10% 100 ml/h', p:'Se sulfonilureia, manter por 24-48h'},
-      {n:'4) Tiamina 100 mg IV antes', p:'Se etilismo ou desnutrição'}
+
+  // ===== RESPIRATÓRIO =====
+  { id:'rx4', cat:'Respiratório', cid:'J00', tag:'RESFRIADO', tagClass:'tag-vo',
+    title:'Resfriado Comum',
+    ps:[],
+    casa:[
+      {n:'Dipirona 500mg ——— 1 cx', p:'1 cp VO 6/6h se dor ou febre'},
+      {n:'Lavagem nasal com SF 0,9%', p:'4-6x ao dia'},
+      {n:'Afrin (descongestionante) ——— 1 frasco', p:'3 gotas em cada narina 12/12h por max 3 dias (se muita coriza)'}
     ]},
-  { id:'end4', cat:'Endócrino', tag:'TIRE', tagClass:'tag-emerg', title:'Crise Tireotóxica',
-    rx:[
-      {n:'1) Propranolol 60-80 mg VO 4/4h', p:'Ou 0.5-1 mg IV. Controla sintomas adrenérgicos'},
-      {n:'2) Propiltiouracil (PTU) 200 mg VO 4/4h', p:'Bloqueia síntese e conversão T4→T3'},
-      {n:'3) Lugol 8 gotas VO 6/6h', p:'1h APÓS PTU. Bloqueia liberação hormonal'},
-      {n:'4) Hidrocortisona 100 mg IV 8/8h', p:'Bloqueia conversão e suporte adrenal'},
-      {n:'5) Tratar gatilho', p:'Infecção é o mais comum'}
+
+  { id:'rx5', cat:'Respiratório', cid:'J11', tag:'GRIPE', tagClass:'tag-vo',
+    title:'Gripe (Influenza)',
+    ps:[],
+    casa:[
+      {n:'Dipirona 500mg ——— 1 cx', p:'1 cp VO 6/6h se febre'},
+      {n:'Diclofenaco 50mg ——— 1 cx', p:'1 cp VO 8/8h por 3 dias'},
+      {n:'Oseltamivir (Tamiflu) 75mg ——— 10 cps', p:'1 cp 12/12h por 5 dias (grupos de risco: >65a, gestante, cardiopata, DM)'}
+    ]},
+
+  { id:'rx6', cat:'Respiratório', cid:'J01.9', tag:'SINUSITE', tagClass:'tag-vo',
+    title:'Sinusite',
+    ps:[],
+    casa:[
+      {n:'Lavagem nasal SF 0,9%', p:'3-4x ao dia'},
+      {n:'Dipirona 500mg ——— 1 cx', p:'1 cp 6/6h se dor ou febre'},
+      {n:'Amoxicilina 500mg ——— 21 cps', p:'1 cp 8/8h por 14 dias (se bacteriana: >10 dias ou piora)'},
+      {n:'Budesonida spray nasal 50mcg ——— 1 frasco', p:'2 puffs em cada narina 2x/dia por 5 dias'}
+    ]},
+
+  { id:'rx7', cat:'Respiratório', cid:'J30.4', tag:'RINITE', tagClass:'tag-vo',
+    title:'Rinite Alérgica',
+    ps:[
+      {n:'Dexametasona (Decadron) 4-8mg IM', p:'Dose única'}
+    ],
+    casa:[
+      {n:'Loratadina 10mg ——— 1 cx', p:'1 cp 1x/dia por 10 dias'},
+      {n:'Budesonida aerossol nasal 50mcg ——— 1 frasco', p:'2 jatos em cada narina 12/12h por 5 dias'},
+      {n:'Prednisolona 20mg ——— 5 cps', p:'1 cp pela manhã por 5 dias (se necessário)'}
+    ]},
+
+  { id:'rx8', cat:'Respiratório', cid:'J03.9', tag:'AMIGDALITE', tagClass:'tag-vo',
+    title:'Amigdalite Bacteriana',
+    ps:[
+      {n:'Benzetacil 1.200.000 UI IM', p:'Dose única'}
+    ],
+    casa:[
+      {n:'Amoxicilina 500mg ——— 21 cps', p:'1 cp 8/8h por 10 dias'},
+      {n:'Ibuprofeno 300mg ——— 1 cx', p:'1 cp 8/8h por 5 dias'},
+      {n:'Dipirona 500mg ——— 1 cx', p:'1 cp 6/6h se dor ou febre'}
+    ]},
+
+  { id:'rx9', cat:'Respiratório', cid:'H66.9', tag:'OTITE', tagClass:'tag-top',
+    title:'Otite Média Aguda',
+    ps:[],
+    casa:[
+      {n:'Amoxicilina 500mg ——— 21 cps', p:'1 cp 8/8h por 10 dias'},
+      {n:'Amoxicilina+Clavulanato 500/125mg ——— 21 cps', p:'1 cp 8/8h por 7-10 dias (2ª linha)'},
+      {n:'Ibuprofeno 300mg ——— 1 cx', p:'1 cp 8/8h por 3 dias'}
+    ]},
+
+  { id:'rx10', cat:'Respiratório', cid:'H60.9', tag:'OT EXT', tagClass:'tag-top',
+    title:'Otite Externa',
+    ps:[],
+    casa:[
+      {n:'Otociriax (ciprofloxacino+dexa) ——— 1 frasco', p:'3 gotas no ouvido 2x/dia por 7 dias (NÃO usar se MT perfurada)'},
+      {n:'Cefalexina 500mg ——— 28 cps', p:'1 cp 6/6h por 7-14 dias (se celulite periauricular)'}
+    ]},
+
+  { id:'rx11', cat:'Respiratório', cid:'R05', tag:'TOSSE', tagClass:'tag-vo',
+    title:'Tosse',
+    ps:[],
+    casa:[
+      {n:'Notuss xarope ——— 1 frasco', p:'15ml 12/12h por 10 dias (tosse seca)'},
+      {n:'Fluimucil xarope 40mg/ml ——— 1 frasco', p:'15ml 1x/dia à noite por 5 dias (tosse secretiva)'},
+      {n:'Budesonida 2 jatos 2x/dia', p:'+ Lavagem nasal com SF (tosse secretiva)'}
+    ]},
+
+  { id:'rx12', cat:'Respiratório', cid:'J45.9', tag:'ASMA', tagClass:'tag-inal',
+    title:'Asma / Broncoespasmo',
+    ps:[
+      {n:'O₂ cateter nasal — manter SatO₂ >92%', p:''},
+      {n:'Inalação: SF 5ml + Atrovent 40gts + Berotec 10gts', p:'Repetir 3x a cada 20 min'},
+      {n:'Hidrocortisona 300mg + SF 100ml EV', p:'(ou Solumedrol 40mg + SF 100ml EV 6/6h)'},
+      {n:'Se refratário: Terbutalina ½ amp SC', p:'Repetir 3x a cada 30 min'}
+    ],
+    casa:[
+      {n:'Salbutamol 100mcg spray ——— 1 frasco', p:'2-3 jatos 4/4h'},
+      {n:'Prednisona 40-60mg/dia ——— 1 cx', p:'Por 7 dias'},
+      {n:'Inalação: SF 5ml + Atrovent 20gts + Berotec 6gts', p:'4/4h por 5 dias'}
+    ]},
+
+  // ===== GASTROINTESTINAL =====
+  { id:'rx13', cat:'Gastrointestinal', cid:'K30/K21.9', tag:'DRGE', tagClass:'tag-vo',
+    title:'Dispepsia / Gastrite / DRGE',
+    ps:[
+      {n:'Buscopan Composto 1 amp + Dramin B6 DL 1 amp + Ranitidina 1 amp + SF 100ml', p:'EV'}
+    ],
+    casa:[
+      {n:'Omeprazol 20mg ——— contínuo', p:'1 cp em jejum pela manhã por 30 dias'},
+      {n:'Domperidona 10mg ——— 1 cx', p:'1 cp 8/8h 30 min antes das refeições'},
+      {n:'Buscopan Composto ——— 1 cx', p:'40 gotas 8/8h se cólica'}
+    ]},
+
+  { id:'rx14', cat:'Gastrointestinal', cid:'R11', tag:'VÔMITOS', tagClass:'tag-vo',
+    title:'Vômitos / Náuseas',
+    ps:[
+      {n:'Dramin B6 DL 1 amp EV/IM', p:''},
+      {n:'Ondansetrona 4mg + AD 8ml EV lento', p:''},
+      {n:'SF 0,9% 250ml EV', p:'Se desidratado'}
+    ],
+    casa:[
+      {n:'Dramin 100mg ——— 1 cx', p:'1 cp 6/6h por 3 dias'},
+      {n:'Vonau 8mg ——— 1 cx', p:'1 cp 12/12h por 5 dias (alternativa)'}
+    ]},
+
+  { id:'rx15', cat:'Gastrointestinal', cid:'A09', tag:'GECA', tagClass:'tag-vo',
+    title:'Diarreia / GECA',
+    ps:[
+      {n:'Buscopan Composto 1 amp + Plasil 1 amp + SF 100ml EV', p:''},
+      {n:'SF 0,9% 500ml EV', p:'Se desidratado'}
+    ],
+    casa:[
+      {n:'Floratil 200mg ——— 1 cx', p:'1 cp 12/12h por 5 dias'},
+      {n:'Buscopan Composto ——— 1 cx', p:'40 gotas 8/8h se cólica'},
+      {n:'SRO ——— 1 frasco', p:'Diluir 1 envelope em 1L água. Tomar ½ copo 1/1h'},
+      {n:'Bactrim 800/160 1cp 12/12h por 5 dias', p:'Se febre, sangue ou muco (possível infecção bacteriana)'}
+    ]},
+
+  { id:'rx16', cat:'Gastrointestinal', cid:'K59.0', tag:'CONSTIPAÇÃO', tagClass:'tag-vo',
+    title:'Constipação',
+    ps:[
+      {n:'Enteroclisma glicerinado 500ml', p:'6/6h via retal'}
+    ],
+    casa:[
+      {n:'Lactulona 10-40ml ——— 1 frasco', p:'Até 3x/dia'},
+      {n:'Bisacodil (Dulcolax) 2 cps ——— 1 cx', p:'Ao deitar'},
+      {n:'PEG 4000 ——— 1 frasco', p:'10ml 1x/dia'}
+    ]},
+
+  { id:'rx17', cat:'Gastrointestinal', cid:'I84.9', tag:'HEMORROIDA', tagClass:'tag-top',
+    title:'Hemorroida',
+    ps:[],
+    casa:[
+      {n:'Proctyl pomada ——— 1 bisnaga', p:'3x/dia'},
+      {n:'Lactulona 15ml 12/12h', p:'Fibras, 2L água, ducha higiênica'}
+    ]},
+
+  // ===== GENITOURINÁRIO =====
+  { id:'rx18', cat:'Genitourinário', cid:'N39.0', tag:'ITU BAIXA', tagClass:'tag-vo',
+    title:'ITU Baixa / Cistite',
+    ps:[],
+    casa:[
+      {n:'Nitrofurantoína 100mg ——— 28 cps', p:'1 cp 6/6h por 5-7 dias'},
+      {n:'Fosfomicina (Monuril) 3g ——— 1 cx', p:'Dose única'},
+      {n:'Cystex ——— 1 cx', p:'1 cp 8/8h por 7 dias (sintomático)'},
+      {n:'Dipirona 500mg ——— 1 cx', p:'1 cp 6/6h se dor'}
+    ]},
+
+  { id:'rx19', cat:'Genitourinário', cid:'N11.0', tag:'PIELONEFRITE', tagClass:'tag-vo',
+    title:'ITU Alta / Pielonefrite',
+    ps:[
+      {n:'Ceftriaxona 1g ——— 7 doses', p:'1g IV 12/12h ou 2g 1x/dia'},
+      {n:'Ciprofloxacino 400mg EV', p:'12/12h — alternativa'},
+      {n:'Urina I + Urocultura', p:'Coletar antes do ATB'}
+    ],
+    casa:[
+      {n:'Ciprofloxacino 500mg ——— 14 cps', p:'1 cp 12/12h por 14 dias'},
+      {n:'Levofloxacino 500mg ——— 14 cps', p:'1 cp 1x/dia por 14 dias (alternativa)'}
+    ]},
+
+  { id:'rx20', cat:'Genitourinário', cid:'N23', tag:'CÓLICA RENAL', tagClass:'tag-vo',
+    title:'Cólica Renal',
+    ps:[
+      {n:'Cetoprofeno 1 amp + Buscopan Composto 1 amp + Plasil 1 amp + SF 100ml', p:'EV lento'},
+      {n:'Diclofenaco 75mg IM', p:'Alternativa'},
+      {n:'Tramadol 100mg + Plasil 1 amp + SF 100ml', p:'EV 40min se refratário'}
+    ],
+    casa:[
+      {n:'Tramadol 50mg ——— 1 cx', p:'1 cp 6/6h por 3 dias'},
+      {n:'Cetoprofeno 100mg ——— 1 cx', p:'1 cp 8/8h por 5 dias'},
+      {n:'Tansulosina 0,4mg ——— 1 cx', p:'1 cp à noite por 30 dias (cálculo distal)'}
+    ]},
+
+  { id:'rx21', cat:'Genitourinário', cid:'N34.1', tag:'GONORREIA', tagClass:'tag-im',
+    title:'Gonorreia / Cervicite',
+    ps:[],
+    casa:[
+      {n:'Ceftriaxona 500mg IM ——— dose única', p:''},
+      {n:'Azitromicina 1g (2 cps 500mg) VO ——— dose única', p:'(cobertura Clamídia)'},
+      {n:'Notificar parceiro', p:''}
+    ]},
+
+  { id:'rx22', cat:'Genitourinário', cid:'N93.9', tag:'SANGR VAGINAL', tagClass:'tag-vo',
+    title:'Sangramento Vaginal/Uterino',
+    ps:[
+      {n:'Transamin 5ml EV (1ml/min)', p:''},
+      {n:'Vitamina K 1 amp IM', p:''}
+    ],
+    casa:[
+      {n:'Ácido Tranexâmico 250mg ——— 1 cx', p:'2 cps 6/6h por 5 dias'},
+      {n:'Ácido Mefenâmico 500mg ——— 1 cx', p:'1 cp 8/8h por 3 dias'},
+      {n:'Primosiston ——— 1 cx', p:'1 cp 8/8h por 7 dias'}
+    ]},
+
+  { id:'rx23', cat:'Genitourinário', cid:'B37.3', tag:'CANDIDÍASE', tagClass:'tag-top',
+    title:'Candidíase Vaginal',
+    ps:[],
+    casa:[
+      {n:'Fluconazol 150mg ——— 1 cp', p:'Dose única VO'},
+      {n:'Miconazol creme vaginal ——— 1 bisnaga', p:'1 aplicador à noite por 7 dias'}
+    ]},
+
+  // ===== OSTEOARTICULAR =====
+  { id:'rx24', cat:'Osteoarticular', cid:'M54.9', tag:'LOMBALGIA', tagClass:'tag-vo',
+    title:'Lombalgia / Cervicalgia / Mialgia',
+    ps:[
+      {n:'Cetoprofeno 1 amp IM', p:'Ou Diclofenaco 75mg IM'},
+      {n:'Betametasona (Celestone Soluspan) 1 amp IM', p:'Se hérnia de disco'},
+      {n:'Tramadol 100mg + Plasil 1 amp + SF 100ml EV lento', p:'Se refratário'}
+    ],
+    casa:[
+      {n:'Diclofenaco 50mg ——— 1 cx', p:'1 cp 8/8h por 5 dias'},
+      {n:'Ciclobenzaprina 5mg ——— 1 cx', p:'1 cp à noite por 5 dias'},
+      {n:'Tramadol 50mg ——— 1 cx', p:'1 cp 6/6h se dor forte (alternativa)'}
+    ]},
+
+  { id:'rx25', cat:'Osteoarticular', cid:'M10.9', tag:'GOTA', tagClass:'tag-vo',
+    title:'Gota — Crise Aguda',
+    ps:[
+      {n:'Diclofenaco 1 amp IM + Tramadol 2ml IM', p:''},
+      {n:'Dipirona 40 gotas VO', p:''}
+    ],
+    casa:[
+      {n:'Colchicina 0,5mg ——— 1 cx', p:'1 cp 12/12h por 3 dias'},
+      {n:'Dipirona 500mg ——— 1 cx', p:'1 cp 6/6h se dor'}
+    ]},
+
+  { id:'rx26', cat:'Osteoarticular', cid:'R52.0', tag:'DOR AGUDA', tagClass:'tag-vo',
+    title:'Dor Aguda / Inflamação',
+    ps:[],
+    casa:[
+      {n:'Dipirona 500mg ——— 1 cx', p:'1 cp ou 35 gotas 6/6h'},
+      {n:'Ibuprofeno 600mg ——— 1 cx', p:'1 cp 8/8h por 5 dias'},
+      {n:'Nimesulida 100mg ——— 1 cx', p:'1 cp 12/12h por 5 dias (alternativa)'}
+    ]},
+
+  // ===== PELE =====
+  { id:'rx27', cat:'Pele', cid:'A46', tag:'ERISIPELA', tagClass:'tag-im',
+    title:'Erisipela / Celulite',
+    ps:[
+      {n:'Ceftriaxona 1g EV 1x/dia por 10-14 dias', p:'Casos graves/toxêmicos'},
+      {n:'Penicilina G Procaína 600.000 UI IM 12/12h', p:'Casos leves-moderados por 10-14 dias'}
+    ],
+    casa:[
+      {n:'Cefalexina 500mg ——— 28 cps', p:'1 cp 6/6h por 7-10 dias'},
+      {n:'Clindamicina 300mg ——— 28 cps', p:'1 cp 6/6h por 7-10 dias (alternativa)'}
+    ]},
+
+  { id:'rx28', cat:'Pele', cid:'L03.9', tag:'CELULITE', tagClass:'tag-vo',
+    title:'Impetigo / Furunculose',
+    ps:[],
+    casa:[
+      {n:'Cefalexina 500mg ——— 28 cps', p:'1 cp 6/6h por 10 dias'},
+      {n:'Amoxicilina+Clavulanato 875/125mg ——— 14 cps', p:'1 cp 12/12h por 7-10 dias'}
+    ]},
+
+  { id:'rx29', cat:'Pele', cid:'T78.4', tag:'ALERGIA', tagClass:'tag-vo',
+    title:'Alergia / Urticária / Picada',
+    ps:[
+      {n:'Hidrocortisona 500mg EV bolus', p:''},
+      {n:'Prometazina 1 amp IM', p:''},
+      {n:'Adrenalina 0,5 amp IM', p:'Se necessário (anafilaxia)'}
+    ],
+    casa:[
+      {n:'Loratadina 10mg ——— 1 cx', p:'1 cp 12/12h por 10 dias'},
+      {n:'Prednisona 20mg ——— 1 cx', p:'1 cp/dia pela manhã por 5 dias'}
+    ]},
+
+  { id:'rx30', cat:'Pele', cid:'B86', tag:'SARNA', tagClass:'tag-vo',
+    title:'Escabiose / Pediculose',
+    ps:[],
+    casa:[
+      {n:'Ivermectina 6mg ——— 2 cps', p:'Dose por peso: 15-24kg=½cp; 25-35=1cp; 36-50=1,5cp; >65=2,5cp. Repetir após 1 semana'},
+      {n:'Permetrina 5% ——— 1 frasco', p:'Passar no corpo após banho à noite, remover cedo. 3-5 dias + repetir após 1 semana'},
+      {n:'Dexclorfeniramina 2mg ——— 1 cx', p:'1 cp 8/8h por 5 dias (prurido)'}
+    ]},
+
+  // ===== CARDIOLOGIA =====
+  { id:'rx31', cat:'Cardiologia', cid:'I10', tag:'CRISE HTA', tagClass:'tag-emerg',
+    title:'Crise Hipertensiva',
+    ps:[
+      {n:'Urgência (PA >160/90 sem lesão órgão-alvo):', p:''},
+      {n:'Captopril 25-50mg SL/VO', p:'Início: 15 min. Repetir até 4 cps'},
+      {n:'Nifedipina 10-20mg VO', p:'Início: 5-15 min'},
+      {n:'Emergência — Nitroprussiato de Sódio 50mg em 240ml SG 5%', p:'BIC: iniciar 3ml/h. Aferir PA a cada 2 min e aumentar 2ml/h'}
+    ],
+    casa:[
+      {n:'Captopril 25mg ——— contínuo', p:'12/12h (ajuste com cardiologista)'},
+      {n:'Losartana 50mg ——— contínuo', p:'1 cp pela manhã (BRA, alternativa)'}
+    ]},
+
+  { id:'rx32', cat:'Cardiologia', cid:'I21', tag:'IAM', tagClass:'tag-emerg',
+    title:'IAM — Protocolo MONABC',
+    ps:[
+      {n:'M — Morfina 2-4mg IV 5/5 min', p:'Se dor refratária ao nitrato'},
+      {n:'O — O₂ 2L/min (SatO₂ >94%)', p:''},
+      {n:'N — Nitrato (Isordil) 5mg SL 5/5 min até 3 doses', p:'CONTRAINDICADO com Viagra/sildenafila'},
+      {n:'A — AAS 300mg mastigado', p:''},
+      {n:'B — Metoprolol 25mg VO', p:'Não usar em IAM parede inferior'},
+      {n:'C — Clopidogrel 300mg VO', p:''},
+      {n:'H — Enoxaparina 30mg EV bolus + 1mg/kg SC 12/12h', p:''}
+    ],
+    casa:[]},
+
+  // ===== NEUROLÓGICO =====
+  { id:'rx33', cat:'Neurológico', cid:'R56.8', tag:'CONVULSÃO', tagClass:'tag-emerg',
+    title:'Convulsão / Estado de Mal',
+    ps:[
+      {n:'Diazepam 10mg + AD 8ml EV lento', p:'Ou Diazepam 10mg via retal. Pode repetir até 40mg'},
+      {n:'Fenitoína 250mg 5 amp + SF 250ml EV', p:'Correr em 30 min (após diazepam)'},
+      {n:'Fenobarbital 1 amp EV', p:'Se refratário'},
+      {n:'Glicemia capilar imediata', p:'Glicose 50% 3 amp EV se <70'},
+      {n:'Tiamina 100mg EV', p:'Se etilista ou desnutrido'}
+    ],
+    casa:[]},
+
+  { id:'rx34', cat:'Neurológico', cid:'G43', tag:'ENXAQUECA', tagClass:'tag-vo',
+    title:'Enxaqueca — Receita Casa',
+    ps:[],
+    casa:[
+      {n:'Sumatriptano 50mg ——— 1 cx', p:'1 cp na crise, repetir em 2h se necessário'},
+      {n:'Dipirona 1000mg ——— 1 cx', p:'1 cp 6/6h se dor'},
+      {n:'Bromoprida 10mg ——— 1 cx', p:'1 cp 8/8h se náusea'}
     ]},
 
   // ===== PSIQUIATRIA =====
-  { id:'ps1', cat:'Psiquiatria', tag:'AGIT', tagClass:'tag-emerg', title:'Agitação psicomotora',
-    rx:[
-      {n:'1) Haldol 5 mg + Prometazina 50 mg IM', p:'1ª escolha em agitação aguda. Repetir após 30 min se necessário'},
-      {n:'2) Midazolam 5-10 mg IM ou IV', p:'Alternativa em jovens, intoxicação simpaticomimética'},
-      {n:'3) Olanzapina 10 mg IM', p:'Alternativa, evitar com benzodiazepínico'},
-      {n:'4) Contenção mecânica', p:'Apenas se risco iminente, sempre com prescrição médica'}
-    ]},
-  { id:'ps2', cat:'Psiquiatria', tag:'ABS ALC', tagClass:'tag-emerg', title:'Abstinência alcoólica',
-    rx:[
-      {n:'1) Diazepam 10 mg VO 6/6h ou Lorazepam 2 mg', p:'Usar escala CIWA. Reduzir 25%/dia'},
-      {n:'2) Tiamina 300 mg IV/IM 1x/dia por 3 dias', p:'OBRIGATÓRIO antes de glicose. Previne Wernicke'},
-      {n:'3) Ácido fólico 5 mg VO/dia', p:'Reposição'},
-      {n:'4) Hidratação + eletrólitos', p:'Cuidado com Mg, K, P'},
-      {n:'5) Delirium tremens: Diazepam 10-20 mg IV', p:'Repetir até sedação leve. UTI'}
-    ]},
-  { id:'ps3', cat:'Psiquiatria', tag:'ANS', tagClass:'tag-vo', title:'Crise de ansiedade aguda',
-    rx:[
-      {n:'1) Alprazolam 0.5 mg VO ou SL', p:'Pode repetir após 30 min'},
-      {n:'2) Diazepam 5-10 mg VO', p:'Alternativa de meia-vida longa'},
-      {n:'3) Orientação calma + respiração diafragmática', p:'Ambiente tranquilo, baixa estimulação'},
-      {n:'4) Encaminhamento ambulatorial', p:'Para investigação de transtorno de base'}
-    ]},
-  { id:'ps4', cat:'Psiquiatria', tag:'INS', tagClass:'tag-vo', title:'Insônia',
-    rx:[
-      {n:'1) Zolpidem 10 mg VO à noite ——— 1 cx', p:'30 min antes de deitar. Não usar >4 semanas'},
-      {n:'2) Trazodona 50 mg VO à noite ——— 1 cx', p:'Alternativa não-benzodiazepínica'},
-      {n:'3) Higiene do sono', p:'Evitar telas 1h antes, ambiente escuro, horário fixo'}
-    ]},
-  { id:'ps5', cat:'Psiquiatria', tag:'SUR PSIC', tagClass:'tag-emerg', title:'Surto psicótico',
-    rx:[
-      {n:'1) Haldol 5 mg + Prometazina 50 mg IM', p:'Repetir até controle. Máx 30 mg/dia haldol'},
-      {n:'2) Olanzapina 10 mg IM', p:'Alternativa, menos sintomas extrapiramidais'},
-      {n:'3) Risperidona 2 mg VO', p:'Se aceitar via oral'},
-      {n:'4) Avaliação psiquiátrica + internação', p:'Considerar leito psiquiátrico'}
+  { id:'rx35', cat:'Psiquiatria', cid:'R45.1', tag:'AGITAÇÃO', tagClass:'tag-emerg',
+    title:'Agitação Intensa',
+    ps:[
+      {n:'Haloperidol 5mg IM', p:'Repetir a cada 5 min se necessário; máx 80mg'},
+      {n:'Prometazina 50mg IM', p:''}
+    ],
+    casa:[]},
+
+  { id:'rx36', cat:'Psiquiatria', cid:'F45.3', tag:'ANSIEDADE', tagClass:'tag-vo',
+    title:'Crise de Ansiedade',
+    ps:[
+      {n:'Diazepam 10mg VO', p:''}
+    ],
+    casa:[
+      {n:'Diazepam 5mg ——— 1 cx', p:'1 cp se crise'},
+      {n:'Sertralina 50mg ——— contínuo', p:'1 cp/dia (TAG — iniciar com psiquiatra)'}
     ]},
 
-  // ===== GINECO/OBSTETRÍCIA =====
-  { id:'go1', cat:'Gineco/Obst', tag:'PE', tagClass:'tag-emerg', title:'Pré-eclâmpsia grave / Eclâmpsia',
-    rx:[
-      {n:'1) Sulfato de magnésio (Pritchard)', p:'Ataque: 4g IV em 20min + 10g IM (5g cada nádega). Manutenção: 5g IM 4/4h'},
-      {n:'2) Sulfato de magnésio (Zuspan)', p:'Ataque: 4g IV em 20min. Manutenção: 1-2g/h IV contínua'},
-      {n:'3) Hidralazina 5 mg IV', p:'Repetir 5-10 mg a cada 20 min. Meta PAS 140-150 / PAD 90-100'},
-      {n:'4) Nifedipina 10 mg VO (alternativa)', p:'Repetir após 30 min se PA mantida'},
-      {n:'5) Resolução da gestação', p:'Se ≥34 semanas ou eclâmpsia'}
-    ]},
-  { id:'go2', cat:'Gineco/Obst', tag:'HPP', tagClass:'tag-emerg', title:'Hemorragia Pós-Parto',
-    rx:[
-      {n:'1) Massagem uterina + esvaziamento vesical', p:'Primeira medida'},
-      {n:'2) Ocitocina 10 UI IM ou 20-40 UI em 1L SF IV', p:'1ª linha'},
-      {n:'3) Metilergometrina 0.2 mg IM', p:'Contraindicado em HAS'},
-      {n:'4) Misoprostol 800 mcg via retal', p:'Alternativa'},
-      {n:'5) Ácido tranexâmico 1g IV', p:'Em até 3h do parto. Pode repetir após 30 min'},
-      {n:'6) Compressão bimanual / balão de Bakri', p:'Se refratário'}
-    ]},
-  { id:'go3', cat:'Gineco/Obst', tag:'AMEAÇA', tagClass:'tag-vo', title:'Ameaça de aborto',
-    rx:[
-      {n:'1) Repouso relativo', p:'Abstinência sexual'},
-      {n:'2) Progesterona micronizada 200 mg VV ——— 1 cx', p:'1x à noite até estabilização'},
-      {n:'3) USG transvaginal', p:'Confirmar viabilidade e localização'},
-      {n:'4) Beta-hCG seriado', p:'Curva ascendente'}
-    ]},
-  { id:'go4', cat:'Gineco/Obst', tag:'DIPA', tagClass:'tag-vo', title:'DIP — Tratamento ambulatorial',
-    rx:[
-      {n:'1) Ceftriaxona 500 mg IM ——— 1 dose', p:'Dose única'},
-      {n:'2) Doxiciclina 100 mg ——— 14 cps', p:'Tomar 1 cp de 12/12h por 14 dias'},
-      {n:'3) Metronidazol 500 mg ——— 28 cps', p:'Tomar 1 cp de 12/12h por 14 dias'}
-    ]},
-  { id:'go5', cat:'Gineco/Obst', tag:'CAND', tagClass:'tag-vo', title:'Candidíase vaginal',
-    rx:[
-      {n:'1) Fluconazol 150 mg VO ——— 1 cp', p:'Dose única'},
-      {n:'2) Miconazol creme vaginal 2% ——— 1 bisnaga', p:'1 aplicador à noite por 7 dias'},
-      {n:'3) Em recorrente: Fluconazol 150 mg D1, D4, D7', p:'+ supressão semanal por 6 meses'}
-    ]},
-  { id:'go6', cat:'Gineco/Obst', tag:'ITU GEST', tagClass:'tag-vo', title:'ITU em gestante',
-    rx:[
-      {n:'1) Cefalexina 500 mg ——— 28 cps', p:'Tomar 1 cp de 6/6h por 7 dias'},
-      {n:'2) Nitrofurantoína 100 mg ——— 28 cps', p:'1 cp 6/6h por 7 dias. EVITAR no 3º trimestre'},
-      {n:'3) Fosfomicina 3g ——— 1 envelope', p:'Dose única em água. Cistite simples'},
-      {n:'4) Urocultura controle 7-14 dias após', p:'Confirmar erradicação'}
-    ]},
-  { id:'go7', cat:'Gineco/Obst', tag:'GEST', tagClass:'tag-vo', title:'Gestante — Sintomáticos seguros',
-    rx:[
-      {n:'1) Buscopan Simples ——— 1 cx', p:'Tomar 1 cp de 8/8h se cólica'},
-      {n:'2) Paracetamol 500 mg ——— 1 cx', p:'Tomar 1 cp de 6/6h se febre/dor'},
-      {n:'3) Dramin 50 mg ——— 1 cx', p:'Tomar 1 cp de 8/8h se náusea ou vômitos'},
-      {n:'4) EVITAR: AINEs, opioides, codeína, tetraciclinas', p:'Sempre checar categoria de risco'}
-    ]},
-  { id:'go8', cat:'Gineco/Obst', tag:'VO', tagClass:'tag-vo', title:'Sangramento uterino disfuncional',
-    rx:[
-      {n:'1) Ácido Tranexâmico 250 mg ——— 1 cx', p:'2 cp de 6/6h por 5 dias'},
-      {n:'2) Ácido Mefenâmico 500 mg ——— 1 cx', p:'1 cp de 8/8h por 5 dias quando iniciar menstruação'},
-      {n:'3) Primosiston ——— 1 cx', p:'1 cp de 8/8h por 7 dias'}
+  // ===== INFECTOLOGIA =====
+  { id:'rx37', cat:'Infectologia', cid:'A90', tag:'DENGUE', tagClass:'tag-emerg',
+    title:'Dengue — Estratificação',
+    ps:[
+      {n:'Grupo A (clínica sem alterações)', p:'Hidratação oral 80ml/kg/dia — alta'},
+      {n:'Grupo B (sinais de alerta leves)', p:'Hidratação supervisionada VO ou EV'},
+      {n:'Grupo C (sinais de alarme)', p:'Internação + SF 20ml/kg/h'},
+      {n:'Grupo D (choque)', p:'UTI + SF 20ml/kg em 20 min. Reavaliar a cada 30 min'}
+    ],
+    casa:[
+      {n:'Dipirona 500mg ——— 1 cx', p:'1 cp 6/6h se febre (NÃO usar AAS ou AINE)'},
+      {n:'Hidratação oral 80ml/kg/dia', p:'Retornar se piora'}
     ]},
 
-  // ===== TRAUMA / ORTOPEDIA =====
-  { id:'tr1', cat:'Trauma/Orto', tag:'PROT TRA', tagClass:'tag-emerg', title:'Politrauma — Avaliação primária ABCDE',
-    rx:[
-      {n:'A — Vias aéreas + coluna cervical', p:'Aspiração, chin lift/jaw thrust, colar cervical'},
-      {n:'B — Respiração', p:'O₂ alto fluxo, descomprimir pneumotórax hipertensivo'},
-      {n:'C — Circulação', p:'2 acessos calibrosos, controle de hemorragia, cristaloide até 1L'},
-      {n:'D — Disfunção neurológica', p:'Glasgow, pupilas, glicemia capilar'},
-      {n:'E — Exposição', p:'Despir totalmente, prevenir hipotermia'},
-      {n:'+ Ácido tranexâmico 1g IV', p:'Em até 3h do trauma se sangramento ativo'}
-    ]},
-  { id:'tr2', cat:'Trauma/Orto', tag:'TCE', tagClass:'tag-emerg', title:'TCE — Critérios de TC',
-    rx:[
-      {n:'TC obrigatória se:', p:'Glasgow <15 em 2h, suspeita fratura aberta/afundamento, sinais de fratura de base, vômitos ≥2x, ≥65 anos com perda de consciência'},
-      {n:'Manitol 0.25-1 g/kg IV', p:'Se sinais de HIC (anisocoria, postura)'},
-      {n:'Cabeceira 30°', p:'Otimiza drenagem venosa'},
-      {n:'Manter PaCO₂ 35-40', p:'Hiperventilação só se herniação iminente'},
-      {n:'Profilaxia anticonvulsivante', p:'Fenitoína 1ª semana se TCE grave'}
-    ]},
-  { id:'tr3', cat:'Trauma/Orto', tag:'VO', tagClass:'tag-vo', title:'Entorse de tornozelo',
-    rx:[
-      {n:'1) Dipirona 1000 mg ——— 1 cx', p:'1 cp 6/6h se dor'},
-      {n:'2) Nimesulida 100 mg ——— 1 cx', p:'1 cp 12/12h por 5 dias'},
-      {n:'3) PRICE: Repouso, gelo, compressão, elevação', p:'Gelo 15 min 4x/dia nas primeiras 48h'},
-      {n:'4) Imobilização + tornozeleira', p:'7-14 dias'},
-      {n:'5) RX se critérios de Ottawa', p:'Dor maléolo ± incapacidade de carga'}
-    ]},
-  { id:'tr4', cat:'Trauma/Orto', tag:'VO', tagClass:'tag-vo', title:'Lombalgia mecânica aguda',
-    rx:[
-      {n:'1) Dipirona 1000 mg ——— 1 cx', p:'1 cp 6/6h se dor'},
-      {n:'2) Diclofenaco 50 mg ——— 1 cx', p:'1 cp 8/8h por 5 dias'},
-      {n:'3) Ciclobenzaprina 5 mg ——— 1 cx', p:'1 cp à noite por 5 dias'},
-      {n:'4) Tramadol 100 mg ——— 1 cx', p:'1 cp 6/6h se dor refratária'},
-      {n:'5) Manter atividade leve', p:'Evitar repouso absoluto. Encaminhar fisio se >4 semanas'}
-    ]},
-  { id:'tr5', cat:'Trauma/Orto', tag:'IM', tagClass:'tag-im', title:'Lombalgia — Beta IM',
-    rx:[
-      {n:'Betametasona 5+2 mg/ml ——— 1 ampola', p:'Aplicar IM dose única'}
-    ]},
-  { id:'tr6', cat:'Trauma/Orto', tag:'VO', tagClass:'tag-vo', title:'Dor — Receita padrão',
-    rx:[
-      {n:'1) Dipirona 1000 mg ——— 1 cx', p:'1 cp 6/6h se dor ou febre'},
-      {n:'2) Voltaren (diclofenaco) 50 mg ——— 1 cx', p:'1 cp 8/8h por 5 dias'}
-    ]},
-  { id:'tr7', cat:'Trauma/Orto', tag:'VO', tagClass:'tag-vo', title:'Suplementação articular (osteoartrose)',
-    rx:[
-      {n:'Ácido Hialurônico 100 + UC2 40 + MSM 500 + Cúrcuma 400 ——— 90 cps', p:'1 dose por dia por 90 dias'}
-    ]},
-  { id:'tr8', cat:'Trauma/Orto', tag:'VO+TÓP', tagClass:'tag-vo', title:'Sutura — Pós-procedimento',
-    rx:[
-      {n:'1) Dipirona 500 mg ——— 1 cx', p:'1 cp 6/6h se dor'},
-      {n:'2) Nimesulida 100 mg ——— 1 cx', p:'1 cp 12/12h por 5 dias'},
-      {n:'3) Nebacetim pomada ——— 1 bisnaga', p:'Aplicar após higiene 2x ao dia'},
-      {n:'4) Profilaxia antitetânica', p:'Verificar status vacinal'}
-    ]},
-  { id:'tr9', cat:'Trauma/Orto', tag:'GOTA', tagClass:'tag-vo', title:'Crise de gota',
-    rx:[
-      {n:'1) Colchicina 0,5 mg ——— 1 cx', p:'2 cps no início + 1 cp após 1h. Depois 1 cp 12/12h até controle'},
-      {n:'2) Naproxeno 500 mg ——— 1 cx', p:'1 cp 12/12h por 5 dias (alternativa AINE)'},
-      {n:'3) Prednisona 30-40 mg/dia VO', p:'Se contraindicação a AINE/colchicina, reduzir em 5-10 dias'}
+  { id:'rx38', cat:'Infectologia', cid:'B82.9', tag:'PARASITAS', tagClass:'tag-vo',
+    title:'Antiparasitários',
+    ps:[],
+    casa:[
+      {n:'Albendazol 400mg ——— dose única', p:'Para giardíase, ancilostomíase, ascaridíase'},
+      {n:'Metronidazol 250mg ——— 15 cps', p:'1 cp 8/8h por 5 dias (giardíase) ou 500mg 6/6h por 7 dias (amebíase)'},
+      {n:'Nitazoxanida 500mg (Annita) ——— 1 cx', p:'1 cp 12/12h por 3 dias'}
     ]},
 
-  // ===== PEDIATRIA REFORÇADA =====
-  // Doses de referência (mg/kg/dose):
-  // Dipirona: 25 mg/kg (gotas 500mg/ml, 1 gota = 25 mg → 1 gt/kg)
-  // Paracetamol: 10-15 mg/kg (200mg/ml = 1 gt/kg)
-  // Ibuprofeno: 5-10 mg/kg
-  // Amoxicilina: 50 mg/kg/dia ÷ 3 doses (250mg/5ml = 50 mg/ml)
-  // Cefalexina: 50 mg/kg/dia ÷ 4 doses
-  // Azitromicina: 10 mg/kg/dia 1x ao dia (200mg/5ml = 40 mg/ml)
-  { id:'p1', cat:'Pediatria', tag:'PED FEB', tagClass:'tag-ped', title:'Pediátrico — Febre/Dor',
-    rx:[
-      {n:'1) Dipirona 500 mg/ml (gotas)', p:'1 gota/kg até 6/6h se dor ou febre. Máx 40 gotas', ped:{med:'dipirona', mgkg:25, conc:500, unit:'gt', max:1000}},
-      {n:'2) Paracetamol 200 mg/ml (gotas)', p:'1 gota/kg até 6/6h. Máx 35 gotas', ped:{med:'paracetamol', mgkg:10, conc:200, unit:'gt', max:750}},
-      {n:'3) Ibuprofeno 50 mg/ml (gotas)', p:'1 gota/kg até 8/8h. Máx 30 gotas', ped:{med:'ibuprofeno', mgkg:7, conc:50, unit:'gt', max:400}}
-    ]},
-  { id:'p2', cat:'Pediatria', tag:'PED IVAS', tagClass:'tag-ped', title:'Pediátrico — IVAS',
-    rx:[
-      {n:'1) Dipirona 500 mg/ml ——— 1 frasco', p:'1 gota/kg de 6/6h se dor ou febre', ped:{med:'dipirona', mgkg:25, conc:500, unit:'gt', max:1000}},
-      {n:'2) Prednisolona 3 mg/ml ——— 1 frasco', p:'1-2 mg/kg/dia 1x ao dia por 5 dias (se broncoespasmo/asma)', ped:{med:'prednisolona', mgkg:1, conc:3, unit:'ml', max:60}},
-      {n:'3) Lavagem nasal SF 0,9%', p:'4-6x ao dia'},
-      {n:'4) Hidratação + antitérmicos se necessário', p:'NÃO usar descongestionantes em <6 anos'}
-    ]},
-  { id:'p3', cat:'Pediatria', tag:'PED GECA', tagClass:'tag-ped', title:'Pediátrico — GECA',
-    rx:[
-      {n:'1) Soro de reidratação oral', p:'50-100 ml/kg em 4h se desidratação leve. Ofertar após cada evacuação'},
-      {n:'2) Ondansetrona 4 mg/5ml (0.15 mg/kg/dose)', p:'Dose única se vômitos. Máx 8 mg', ped:{med:'ondansetrona', mgkg:0.15, conc:0.8, unit:'ml', max:8}},
-      {n:'3) Zinco 20 mg/dia VO por 10-14 dias', p:'10 mg/dia se <6 meses. Reduz duração e gravidade'},
-      {n:'4) Probiótico (Floratil 200 mg)', p:'1 sachê 12/12h por 5 dias'},
-      {n:'5) NÃO usar antieméticos VO repetidos nem antidiarreicos', p:'Foco em hidratação'}
-    ]},
-  { id:'p4', cat:'Pediatria', tag:'PED ATB', tagClass:'tag-ped', title:'Amoxicilina 250 mg/5ml',
-    rx:[{n:'Amoxicilina 250 mg/5ml suspensão ——— 1 frasco', p:'50 mg/kg/dia ÷ 3 doses (8/8h) por 7-10 dias', ped:{med:'amoxicilina', mgkg:16.6, conc:50, unit:'ml', max:1000, freq:'8/8h'}}] },
-  { id:'p5', cat:'Pediatria', tag:'PED ATB', tagClass:'tag-ped', title:'Amoxicilina + Clavulanato 250+62.5/5ml',
-    rx:[{n:'Amoxicilina-clavulanato 250+62,5 mg/5ml ——— 1 frasco', p:'50 mg/kg/dia (de amoxi) ÷ 2 doses (12/12h) por 7-10 dias', ped:{med:'amoxiclav', mgkg:25, conc:50, unit:'ml', max:875, freq:'12/12h'}}] },
-  { id:'p6', cat:'Pediatria', tag:'PED ATB', tagClass:'tag-ped', title:'Cefalexina 250 mg/5ml',
-    rx:[{n:'Cefalexina 250 mg/5ml suspensão ——— 1 frasco', p:'50 mg/kg/dia ÷ 4 doses (6/6h) por 7 dias', ped:{med:'cefalexina', mgkg:12.5, conc:50, unit:'ml', max:500, freq:'6/6h'}}] },
-  { id:'p7', cat:'Pediatria', tag:'PED ATB', tagClass:'tag-ped', title:'Azitromicina 200 mg/5ml',
-    rx:[{n:'Azitromicina 200 mg/5ml suspensão ——— 1 frasco', p:'10 mg/kg 1x/dia por 5 dias (D1: 10 mg/kg, D2-D5: 5 mg/kg)', ped:{med:'azitromicina', mgkg:10, conc:40, unit:'ml', max:500, freq:'1x/dia'}}] },
-  { id:'p8', cat:'Pediatria', tag:'PED ATB', tagClass:'tag-ped', title:'Sulfametoxazol-Trimetoprima 200+40/5ml',
-    rx:[{n:'SMX-TMP 200+40 mg/5ml suspensão ——— 1 frasco', p:'8 mg/kg/dia (de TMP) ÷ 2 doses (12/12h) por 7 dias', ped:{med:'smx-tmp', mgkg:0.5, conc:8, unit:'ml', max:10, freq:'12/12h'}}] },
-  { id:'p9', cat:'Pediatria', tag:'PED INAL', tagClass:'tag-ped', title:'Crise asma pediátrica',
-    rx:[
-      {n:'1) Salbutamol spray 100 mcg + espaçador', p:'<5 anos: 4 jatos. ≥5 anos: 8 jatos. Repetir 20/20 min até 3x'},
-      {n:'2) Prednisolona 1-2 mg/kg/dia VO', p:'Por 3-5 dias. Máx 60 mg/dia', ped:{med:'prednisolona', mgkg:1, conc:3, unit:'ml', max:60}},
-      {n:'3) O₂ se SatO₂ <92%', p:'Máscara não-reinalante'},
-      {n:'4) Reavaliar em 1h', p:'Se sem melhora: nebulização contínua + ipratrópio'}
-    ]},
-  { id:'p10', cat:'Pediatria', tag:'PED CONV', tagClass:'tag-ped', title:'Convulsão febril simples',
-    rx:[
-      {n:'1) Posição lateral + via aérea', p:'Não introduzir objetos na boca'},
-      {n:'2) Se >5 min: Diazepam 0.3 mg/kg IV', p:'Ou retal 0.5 mg/kg. Máx 10 mg', ped:{med:'diazepam', mgkg:0.3, conc:5, unit:'ml', max:10}},
-      {n:'3) Antitérmico (não previne recorrência)', p:'Dipirona ou paracetamol'},
-      {n:'4) Investigar foco da febre', p:'TC/punção lombar não rotineiros se simples'}
-    ]},
-  { id:'p11', cat:'Pediatria', tag:'PED VO', tagClass:'tag-ped', title:'Loratadina pediátrica (alergia)',
-    rx:[{n:'Loratadina 1 mg/ml xarope ——— 1 frasco', p:'2-5 anos: 5 ml/dia. ≥6 anos: 10 ml/dia. <30 kg: 5 ml'}] },
-
-  // ===== INFECTOLOGIA / ITU =====
-  { id:'inf1', cat:'ITU', tag:'VO', tagClass:'tag-vo', title:'Cistite não complicada (mulher)',
-    rx:[
-      {n:'1) Nitrofurantoína 100 mg ——— 20 cps', p:'1 cp 6/6h por 5 dias'},
-      {n:'2) Fosfomicina 3g ——— 1 envelope', p:'Dose única em 200ml água'},
-      {n:'3) SMX-TMP 800/160 mg ——— 6 cps', p:'1 cp 12/12h por 3 dias (se sensibilidade local)'}
-    ]},
-  { id:'inf2', cat:'ITU', tag:'VO', tagClass:'tag-vo', title:'Pielonefrite ambulatorial',
-    rx:[
-      {n:'1) Ciprofloxacino 500 mg ——— 14 cps', p:'1 cp 12/12h por 7 dias'},
-      {n:'2) Ceftriaxona 1g IV/IM dose única', p:'Antes de iniciar VO (se possível)'},
-      {n:'3) Reavaliar em 48-72h', p:'Internar se piora ou intolerância oral'}
-    ]},
-  { id:'inf3', cat:'ITU', tag:'VO', tagClass:'tag-vo', title:'ITU — Cystex sintomático',
-    rx:[
-      {n:'Cystex ——— 1 cx', p:'1 cp 8/8h por 7 dias'}
+  // ===== OUTROS =====
+  { id:'rx39', cat:'Outros', cid:'Z48.0', tag:'SUTURA', tagClass:'tag-top',
+    title:'Sutura / Mordedura / Ferida',
+    ps:[],
+    casa:[
+      {n:'Cefalexina 500mg ——— 14 cps', p:'1 cp 6/6h por 7 dias'},
+      {n:'Dipirona 500mg ——— 1 cx', p:'1 cp 6/6h se dor'},
+      {n:'Nimesulida 100mg ——— 1 cx', p:'1 cp 12/12h por 5 dias'},
+      {n:'Nebacetim pomada ——— 1 bisnaga', p:'Aplicar 2x/dia. Profilaxia antitetânica se necessário'}
     ]},
 
-  // ===== ATBs =====
-  { id:'a1', cat:'ATB Adulto', tag:'VO', tagClass:'tag-vo', title:'Amoxicilina 500 mg',
-    rx:[{n:'Amoxicilina 500 mg ——— 21 cps', p:'1 cp 8/8h por 7 dias'}] },
-  { id:'a2', cat:'ATB Adulto', tag:'VO', tagClass:'tag-vo', title:'Amoxicilina 875 mg',
-    rx:[{n:'Amoxicilina 875 mg ——— 14 cps', p:'1 cp 12/12h por 7 dias'}] },
-  { id:'a3', cat:'ATB Adulto', tag:'VO', tagClass:'tag-vo', title:'Amoxicilina + Clavulanato 875/125',
-    rx:[{n:'Amoxicilina + Clavulanato 875/125 mg ——— 14 cps', p:'1 cp 12/12h por 7 dias'}] },
-  { id:'a4', cat:'ATB Adulto', tag:'VO', tagClass:'tag-vo', title:'Azitromicina 500 mg',
-    rx:[{n:'Azitromicina 500 mg ——— 5 cps', p:'1 cp ao dia por 5 dias'}] },
-  { id:'a5', cat:'ATB Adulto', tag:'IV', tagClass:'tag-iv', title:'Ceftriaxona 2g IV',
-    rx:[{n:'Ceftriaxona 2g ——— 7 doses', p:'1 dose IV em 100ml SF por 7 dias'}] },
-  { id:'a6', cat:'ATB Adulto', tag:'VO', tagClass:'tag-vo', title:'Cefalexina 500 mg (pele)',
-    rx:[{n:'Cefalexina 500 mg ——— 28 cps', p:'1 cp 6/6h por 7 dias'}] },
-  { id:'a7', cat:'ATB Adulto', tag:'VO', tagClass:'tag-vo', title:'Clindamicina 300 mg',
-    rx:[{n:'Clindamicina 300 mg ——— 28 cps', p:'1 cp 6/6h por 7 dias'}] },
-  { id:'a8', cat:'ATB Adulto', tag:'VO', tagClass:'tag-vo', title:'Doxiciclina 100 mg',
-    rx:[{n:'Doxiciclina 100 mg ——— 14 cps', p:'1 cp 12/12h por 7 dias'}] },
+  { id:'rx40', cat:'Outros', cid:'R04.4', tag:'EPISTAXE', tagClass:'tag-vo',
+    title:'Epistaxe',
+    ps:[
+      {n:'Comprimir base do nariz', p:'Estimular sangramento por narinas, não deglutir'},
+      {n:'Compressa gelada ou oximetazolina tópica', p:''},
+      {n:'Tamponamento nasal anterior/posterior', p:'Se não melhorar'}
+    ],
+    casa:[]},
 
-  // ===== CONDUTAS PADRÃO =====
-  { id:'co1', cat:'Conduta', tag:'TEXTO', tagClass:'tag-vo', title:'Conduta — Sintomático apenas',
-    rx:[{n:'Conduta', p:'Prescrevo medicação sintomática. Oriento sinais de alarme. Receita para casa com sintomáticos. Retorno se piora.'}] },
-  { id:'co2', cat:'Conduta', tag:'TEXTO', tagClass:'tag-vo', title:'Conduta — Com ATB',
-    rx:[{n:'Conduta', p:'Prescrevo medicação sintomática. Oriento sinais de alarme. Receita para casa com sintomáticos e antibiótico. Retorno se piora.'}] },
-  { id:'co3', cat:'Conduta', tag:'TEXTO', tagClass:'tag-vo', title:'Conduta — Hidratação na unidade',
-    rx:[{n:'Conduta', p:'Analgesia + hidratação na unidade. Medicação para casa com sintomáticos. Oriento sinais de alarme. Retorno se necessário.'}] },
+  { id:'rx41', cat:'Outros', cid:'R06.6', tag:'SOLUÇO', tagClass:'tag-vo',
+    title:'Soluço',
+    ps:[
+      {n:'Metoclopramida (Plasil) 1 amp IM', p:'Ou Prometazina 1 amp IM'}
+    ],
+    casa:[]},
 
-  // ===== IVAS / GECA / GENERALISTA =====
-  { id:'g1', cat:'IVAS/GECA', tag:'VO', tagClass:'tag-vo', title:'IVAS adulto — Padrão',
-    rx:[
-      {n:'1) Dipirona 500 mg ——— 1 cx', p:'1 cp 6/6h se dor ou febre'},
-      {n:'2) Nimesulida 100 mg ——— 1 cx', p:'1 cp 12/12h por 5 dias'},
-      {n:'3) Seki xarope ——— 1 frasco', p:'10 ml 8/8h se tosse'},
-      {n:'4) Bromoprida 10 mg ——— 1 cx', p:'1 cp 8/8h se náusea'}
-    ]},
-  { id:'g2', cat:'IVAS/GECA', tag:'VO', tagClass:'tag-vo', title:'IVAS adulto — Com Predisim',
-    rx:[
-      {n:'1) Dipirona 500 mg ——— 1 cx', p:'1 cp 6/6h se dor ou febre'},
-      {n:'2) Predisim 20 mg ——— 5 cps', p:'1 cp ao dia por 5 dias'},
-      {n:'3) Seki xarope ——— 1 frasco', p:'10 ml 8/8h se tosse'},
-      {n:'4) Bromoprida 10 mg ——— 1 cx', p:'1 cp 8/8h se náusea'}
-    ]},
-  { id:'g3', cat:'IVAS/GECA', tag:'VO', tagClass:'tag-vo', title:'GECA adulto',
-    rx:[
-      {n:'1) Dipirona 500 mg ——— 1 cx', p:'1 cp 6/6h se dor ou febre'},
-      {n:'2) Bromoprida 10 mg ——— 1 cx', p:'1 cp 8/8h se náusea'},
-      {n:'3) Soro de Reidratação Oral', p:'1.5 L/dia + toda quantidade de líquidos tolerada'},
-      {n:'4) Floratil 200 mg ——— 1 cx', p:'1 sachê 12/12h por 5 dias'}
-    ]},
-  { id:'g4', cat:'IVAS/GECA', tag:'NASAL', tagClass:'tag-top', title:'Sinusite',
-    rx:[
-      {n:'1) Budesonida spray nasal 100 mcg ——— 1 frasco', p:'3 jatos cada narina 12/12h por 7 dias'},
-      {n:'2) SF 0,9% lavagem nasal', p:'4x ao dia'},
-      {n:'3) Considerar Amoxicilina-clavulanato', p:'Se sintomas >10 dias ou piora'}
-    ]},
-  { id:'g5', cat:'IVAS/GECA', tag:'VO', tagClass:'tag-vo', title:'Faringite estreptocócica',
-    rx:[
-      {n:'1) Penicilina Benzatina 1.200.000 UI IM dose única', p:'<27 kg: 600.000 UI'},
-      {n:'2) Amoxicilina 500 mg ——— 21 cps', p:'1 cp 8/8h por 10 dias (alternativa VO)'},
-      {n:'3) Dipirona 500 mg ——— 1 cx', p:'1 cp 6/6h se dor/febre'},
-      {n:'4) Predisim 20 mg ——— 5 cps', p:'1 cp/dia por 5 dias se odinofagia importante'}
-    ]},
-
-  // ===== OUTROS DIAGNÓSTICOS =====
-  { id:'o1', cat:'Outros', tag:'VO', tagClass:'tag-vo', title:'Enxaqueca',
-    rx:[
-      {n:'1) Dipirona 1000 mg ——— 1 cx', p:'1 cp 6/6h se dor'},
-      {n:'2) Bromoprida 10 mg ——— 1 cx', p:'1 cp 8/8h se náusea'},
-      {n:'3) Sumatriptano 50 mg ——— 1 cx', p:'1 cp ao primeiro sinal de crise'}
-    ]},
-  { id:'o2', cat:'Outros', tag:'VO', tagClass:'tag-vo', title:'Cólica nefrética',
-    rx:[
-      {n:'1) Buscopan Composto ——— 1 cx', p:'1 cp 8/8h se cólica'},
-      {n:'2) Cetoprofeno 100 mg ——— 1 cx', p:'1 cp 8/8h por 5 dias'},
-      {n:'3) Bromoprida 10 mg ——— 1 cx', p:'1 cp 8/8h se náusea'},
-      {n:'4) Tansulosina 0,4 mg ——— 1 cx', p:'1 cp à noite por 30 dias (cálculo distal)'}
-    ]},
-  { id:'o3', cat:'Outros', tag:'VO', tagClass:'tag-vo', title:'DRGE',
-    rx:[
-      {n:'1) Pantoprazol 40 mg ——— contínuo', p:'1 cp pela manhã em jejum'},
-      {n:'2) Domperidona 10 mg ——— 1 cx', p:'1 cp antes de cada refeição'}
-    ]},
-  { id:'o4', cat:'Outros', tag:'VO', tagClass:'tag-vo', title:'Vertigem',
-    rx:[
-      {n:'1) Cinarizina 75 mg ——— 1 cx', p:'1 cp 8/8h se tontura'},
-      {n:'2) Bromoprida 10 mg ——— 1 cx', p:'1 cp 8/8h se náusea'}
-    ]},
-  { id:'o5', cat:'Outros', tag:'VO', tagClass:'tag-vo', title:'Herpes labial/genital',
-    rx:[
-      {n:'1) Aciclovir 400 mg ——— 21 cps', p:'2 cps 8/8h por 7 dias'},
-      {n:'2) Dipirona 1000 mg ——— 1 cx', p:'1 cp 6/6h se dor'},
-      {n:'3) Nistatina ——— 1 frasco (se oral)', p:'Bochechar 4 ml 6/6h por 7 dias'}
-    ]},
-  { id:'o6', cat:'Outros', tag:'OTOL', tagClass:'tag-top', title:'Otite externa',
-    rx:[
-      {n:'Otosporin (hidroc + neo + polimix B) ——— 1 frasco', p:'3 gotas no ouvido afetado 8/8h por 7 dias'}
-    ]},
-  { id:'o7', cat:'Outros', tag:'TÓP', tagClass:'tag-top', title:'Conjuntivite bacteriana',
-    rx:[
-      {n:'1) Tobramicina 0,3% colírio ——— 1 frasco', p:'1 gota 4x/dia em olho afetado por 7 dias'},
-      {n:'2) Hialuronato de sódio 1 mg/ml', p:'1 gota 4x/dia (lubrificante)'}
-    ]},
-  { id:'o8', cat:'Outros', tag:'VO', tagClass:'tag-vo', title:'Constipação',
-    rx:[
-      {n:'1) Lactulona xarope ——— 1 frasco', p:'15 ml/dia'},
-      {n:'2) PEG 4000 ——— 1 frasco', p:'10 ml 1x/dia'},
-      {n:'3) Supositório de glicerina', p:'Via retal SOS'}
-    ]},
-  { id:'o9', cat:'Outros', tag:'TÓP', tagClass:'tag-top', title:'Hemorroida',
-    rx:[
-      {n:'1) Proctyl pomada ——— 1 bisnaga', p:'Aplicar após higiene 2x ao dia'},
-      {n:'2) Lidocaína pomada 5% ——— 1 bisnaga', p:'Aplicar SOS para alívio'},
-      {n:'3) Banhos de assento mornos', p:'10-15 min, 2-3x/dia'}
-    ]},
-  { id:'o10', cat:'Outros', tag:'VO', tagClass:'tag-vo', title:'Sarna',
-    rx:[
-      {n:'Ivermectina 6 mg ——— 2 cps', p:'1 cp/15 kg, repetir após 7 dias'}
-    ]},
-  { id:'o11', cat:'Outros', tag:'VO', tagClass:'tag-vo', title:'Alergia adulto',
-    rx:[
-      {n:'Loratadina 10 mg ——— 1 cx', p:'1 cp ao dia se sintomas'}
-    ]},
-  { id:'o12', cat:'Outros', tag:'IM+VO', tagClass:'tag-im', title:'Gonorreia',
-    rx:[
-      {n:'1) Ceftriaxona 500 mg IM dose única', p:''},
-      {n:'2) Doxiciclina 100 mg ——— 14 cps', p:'1 cp 12/12h por 7 dias (cobertura clamídia)'}
-    ]},
-
-  // ===== DERMATOLOGIA =====
-  { id:'d1', cat:'Dermatologia', tag:'VO', tagClass:'tag-vo', title:'Herpes zoster',
-    rx:[
-      {n:'1) Aciclovir 800 mg ——— 35 cps', p:'1 cp 5x/dia (4/4h acordado) por 7 dias. Iniciar em até 72h das lesões'},
-      {n:'2) Valaciclovir 1g ——— 21 cps', p:'1 cp 8/8h por 7 dias (alternativa)'},
-      {n:'3) Pregabalina 75 mg ——— 1 cx', p:'1 cp 12/12h se neuralgia pós-herpética'},
-      {n:'4) Dipirona 1000 mg ——— 1 cx', p:'1 cp 6/6h se dor'}
-    ]},
-  { id:'d2', cat:'Dermatologia', tag:'TÓP', tagClass:'tag-top', title:'Dermatite atópica',
-    rx:[
-      {n:'1) Hidrocortisona 1% creme ——— 1 bisnaga', p:'Aplicar 2x/dia por 7 dias (face/pregas)'},
-      {n:'2) Dexametasona 0,1% creme ——— 1 bisnaga', p:'Aplicar 2x/dia por 7 dias (corpo)'},
-      {n:'3) Hidratante emoliente', p:'Aplicar 2-3x/dia, manter hidratação constante'},
-      {n:'4) Loratadina 10 mg ——— 1 cx', p:'1 cp/dia se prurido intenso'}
-    ]},
-  { id:'d3', cat:'Dermatologia', tag:'TÓP', tagClass:'tag-top', title:'Micose cutânea',
-    rx:[
-      {n:'1) Cetoconazol 2% creme ——— 1 bisnaga', p:'Aplicar 2x/dia por 3-4 semanas'},
-      {n:'2) Terbinafina 1% creme ——— 1 bisnaga', p:'Aplicar 1-2x/dia por 2-4 semanas'},
-      {n:'3) Fluconazol 150 mg VO ——— 1 cp', p:'Dose única ou semanal se extenso'}
-    ]},
-  { id:'d4', cat:'Dermatologia', tag:'TÓP', tagClass:'tag-top', title:'Pitiríase versicolor',
-    rx:[
-      {n:'1) Cetoconazol 2% xampu ——— 1 frasco', p:'Aplicar em todo o corpo, deixar 5 min, enxaguar. 1x/dia por 7-14 dias'},
-      {n:'2) Itraconazol 100 mg ——— 10 cps', p:'2 cps/dia por 5-7 dias (extenso)'}
-    ]},
-  { id:'d5', cat:'Dermatologia', tag:'TÓP', tagClass:'tag-top', title:'Pediculose',
-    rx:[
-      {n:'1) Permetrina 1% loção ——— 1 frasco', p:'Aplicar nos cabelos secos, deixar 10 min, enxaguar. Repetir em 7 dias'},
-      {n:'2) Ivermectina 6 mg ——— 2 cps', p:'1 cp/15 kg, repetir em 7 dias (refratário)'}
-    ]},
-
-  // ===== REUMATOLOGIA =====
-  { id:'r1', cat:'Reumato', tag:'VO', tagClass:'tag-vo', title:'Artrite gotosa — Manutenção',
-    rx:[
-      {n:'1) Alopurinol 100 mg ——— contínuo', p:'Iniciar 100 mg/dia, titular até ácido úrico <6. Não iniciar em crise aguda'},
-      {n:'2) Colchicina 0,5 mg ——— contínuo', p:'1 cp/dia profilático nos primeiros 3-6 meses do alopurinol'},
-      {n:'3) Dieta pobre em purinas', p:'Evitar frutos do mar, vísceras, álcool (cerveja)'}
-    ]},
-  { id:'r2', cat:'Reumato', tag:'VO', tagClass:'tag-vo', title:'Fibromialgia',
-    rx:[
-      {n:'1) Amitriptilina 25 mg ——— contínuo', p:'1 cp à noite. Iniciar com 12,5 mg e titular'},
-      {n:'2) Pregabalina 75 mg ——— contínuo', p:'1 cp 12/12h. Titular até 150-300 mg 12/12h'},
-      {n:'3) Duloxetina 30 mg ——— contínuo', p:'1 cp/dia pela manhã. Pode aumentar para 60 mg'},
-      {n:'4) Atividade física regular + terapia cognitiva', p:'Pilar do tratamento'}
-    ]},
-
-  // ===== UROLOGIA =====
-  { id:'u1', cat:'Urologia', tag:'VO', tagClass:'tag-vo', title:'HPB — Sintomático',
-    rx:[
-      {n:'1) Tansulosina 0,4 mg ——— contínuo', p:'1 cp à noite (alfa-bloqueador, início rápido)'},
-      {n:'2) Finasterida 5 mg ——— contínuo', p:'1 cp/dia (inibidor 5-alfa, efeito em 3-6 meses)'},
-      {n:'3) Associação em sintomas moderados-graves', p:'Tansulosina + Finasterida'}
-    ]},
-  { id:'u2', cat:'Urologia', tag:'VO', tagClass:'tag-vo', title:'Prostatite aguda',
-    rx:[
-      {n:'1) Ciprofloxacino 500 mg ——— 28 cps', p:'1 cp 12/12h por 14 dias (casos mais leves) ou 28 dias'},
-      {n:'2) SMX-TMP 800/160 mg ——— 28 cps', p:'1 cp 12/12h por 14 dias (alternativa)'},
-      {n:'3) Dipirona + AINE', p:'Sintomáticos'}
-    ]},
-  { id:'u3', cat:'Urologia', tag:'VO', tagClass:'tag-vo', title:'Disfunção erétil',
-    rx:[
-      {n:'1) Sildenafila 50 mg ——— 4 cps', p:'1 cp 30-60 min antes da relação. Máx 1x/dia'},
-      {n:'2) Tadalafila 20 mg ——— 4 cps', p:'1 cp sob demanda ou 5 mg/dia uso contínuo'},
-      {n:'3) CONTRAINDICAÇÃO: uso de nitratos', p:'Risco de hipotensão grave'}
-    ]},
-
-  // ===== CARDIOLOGIA AMBULATORIAL =====
-  { id:'card1', cat:'Cardiologia', tag:'VO', tagClass:'tag-vo', title:'HAS — Início de tratamento',
-    rx:[
-      {n:'1) Losartana 50 mg ——— contínuo', p:'1 cp pela manhã. Pode aumentar até 100 mg/dia'},
-      {n:'2) Hidroclorotiazida 25 mg ——— contínuo', p:'1 cp pela manhã (associar se necessário)'},
-      {n:'3) Anlodipino 5 mg ——— contínuo', p:'1 cp/dia. Pode aumentar até 10 mg (alternativa)'},
-      {n:'4) Metas: <140/90 em geral', p:'<130/80 em DM, DRC, risco cardiovascular alto'}
-    ]},
-  { id:'card2', cat:'Cardiologia', tag:'VO', tagClass:'tag-vo', title:'Dislipidemia',
-    rx:[
-      {n:'1) Sinvastatina 40 mg ——— contínuo', p:'1 cp à noite. Meta LDL depende do risco'},
-      {n:'2) Atorvastatina 20-40 mg ——— contínuo', p:'1 cp à noite. Mais potente'},
-      {n:'3) Rosuvastatina 10-20 mg ——— contínuo', p:'1 cp/dia. Mais potente (alta intensidade)'}
-    ]},
-  { id:'card3', cat:'Cardiologia', tag:'VO', tagClass:'tag-vo', title:'Fibrilação atrial — Controle de FC',
-    rx:[
-      {n:'1) Metoprolol 25-100 mg ——— contínuo', p:'1 cp 12/12h. Meta FC 60-80 em repouso'},
-      {n:'2) Diltiazem 60 mg ——— contínuo', p:'1 cp 8/8h (alternativa se intolerância a BB)'},
-      {n:'3) Anticoagular conforme CHA₂DS₂-VASc', p:'Ver aba de scores'}
-    ]},
-
-  // ===== ENDÓCRINO AMBULATORIAL =====
-  { id:'end5', cat:'Endócrino', tag:'VO', tagClass:'tag-vo', title:'DM2 — Início de tratamento',
-    rx:[
-      {n:'1) Metformina 500 mg ——— contínuo', p:'1 cp jantar por 1 semana, depois 1 cp 12/12h, até 2g/dia'},
-      {n:'2) Empagliflozina 10-25 mg ——— contínuo', p:'1 cp/dia (benefício CV e renal)'},
-      {n:'3) Dieta + atividade física', p:'Pilares do tratamento'},
-      {n:'4) Meta HbA1c <7% (geral)', p:'<6,5% se jovem, <8% em idoso frágil'}
-    ]},
-  { id:'end6', cat:'Endócrino', tag:'VO', tagClass:'tag-vo', title:'Hipotireoidismo',
-    rx:[
-      {n:'1) Levotiroxina 25-50 mcg ——— contínuo', p:'1 cp em jejum, 30-60 min antes do café. Titular pelo TSH'},
-      {n:'2) Dose inicial idoso/cardiopata: 12,5-25 mcg', p:'Aumentar a cada 4-6 semanas'},
-      {n:'3) Meta TSH 0,5-4,5 mUI/L', p:'Controle a cada 6-8 semanas até estabilizar'}
-    ]},
-
-  // ===== OFTALMOLOGIA =====
-  { id:'oft1', cat:'Oftalmo', tag:'TÓP', tagClass:'tag-top', title:'Olho seco',
-    rx:[
-      {n:'1) Carmelose 0,5% (Fresh Tears) ——— 1 frasco', p:'1 gota em cada olho 4-6x/dia'},
-      {n:'2) Hialuronato de sódio 1 mg/ml ——— 1 frasco', p:'1 gota em cada olho 4x/dia'},
-      {n:'3) Polietilenoglicol gel noturno', p:'Aplicar antes de dormir se muito sintomático'}
-    ]},
-  { id:'oft2', cat:'Oftalmo', tag:'TÓP', tagClass:'tag-top', title:'Blefarite',
-    rx:[
-      {n:'1) Compressas mornas 5-10 min 2x/dia', p:'Pedra angular do tratamento'},
-      {n:'2) Higiene palpebral com xampu baby diluído', p:'Massagear borda palpebral'},
-      {n:'3) Pomada tobramicina oftálmica', p:'Aplicar à noite na borda palpebral por 7 dias'}
-    ]},
-
-  // ===== HEMATO =====
-  { id:'h1', cat:'Hemato', tag:'VO', tagClass:'tag-vo', title:'Anemia ferropriva',
-    rx:[
-      {n:'1) Sulfato ferroso 40 mg Fe++ ——— 60 cps', p:'1-2 cps/dia longe das refeições, com vitamina C'},
-      {n:'2) Ferrocoplex / Noripurum', p:'Alternativas com melhor tolerância'},
-      {n:'3) Hemograma + ferritina em 30 dias', p:'Manter por 3 meses após normalização'},
-      {n:'4) Investigar causa', p:'Perda digestiva/menstrual é causa comum'}
-    ]},
-
-  // ===== PNEUMO AMBULATORIAL =====
-  { id:'pn1', cat:'Pneumo', tag:'INAL', tagClass:'tag-inal', title:'Asma — Manutenção (GINA)',
-    rx:[
-      {n:'1) Budesonida-formoterol 200/6 mcg (Symbicort) ——— contínuo', p:'1 jato 12/12h + SOS. Estratégia MART'},
-      {n:'2) Salbutamol 100 mcg ——— resgate', p:'2 jatos se sintomas, antes de exercício'},
-      {n:'3) Prednisona 40 mg/dia por 5-7 dias', p:'Em exacerbações moderadas-graves'}
-    ]},
-  { id:'pn2', cat:'Pneumo', tag:'INAL', tagClass:'tag-inal', title:'DPOC — Estável',
-    rx:[
-      {n:'1) Tiotrópio (Spiriva) 18 mcg ——— contínuo', p:'1 inalação/dia (LABA)'},
-      {n:'2) Salbutamol 100 mcg ——— resgate', p:'2 jatos se dispneia'},
-      {n:'3) Vacina influenza anual + pneumocócica', p:'Reduz exacerbações'},
-      {n:'4) Cessação tabágica', p:'Intervenção mais efetiva'}
-    ]},
-
-  // ===== CIRURGIA GERAL =====
-  { id:'cx1', cat:'Cirurgia Geral', tag:'ABD AG', tagClass:'tag-emerg', title:'Abdome agudo — Avaliação inicial',
-    rx:[
-      {n:'1) Jejum + acesso venoso + hidratação', p:'Cristaloide conforme estado volêmico'},
-      {n:'2) Exames: hemograma, PCR, amilase, lipase, ureia, Cr, Na, K, lactato, beta-hCG se mulher', p:'RX tórax e abdome. USG se colecistite/apendicite duvidosa'},
-      {n:'3) Analgesia: Dipirona 2g IV + Buscopan 20mg IV', p:'Opioide se dor intensa (Tramadol 100mg IV ou Morfina 2-4mg)'},
-      {n:'4) Antiemético: Ondansetrona 8 mg IV', p:'Metoclopramida 10 mg IV alternativa'},
-      {n:'5) TC abdome com contraste', p:'Padrão-ouro para maioria dos casos'},
-      {n:'6) NÃO usar analgesia potente até avaliação cirúrgica', p:'Pode mascarar sinais peritonite'}
-    ]},
-  { id:'cx2', cat:'Cirurgia Geral', tag:'APEND', tagClass:'tag-emerg', title:'Apendicite aguda',
-    rx:[
-      {n:'1) Jejum + acesso + hidratação (SF 1-2L)', p:'Ringer se cirurgia precoce'},
-      {n:'2) ATB pré-operatório: Cefazolina 2g IV + Metronidazol 500mg IV', p:'Dose única 30-60 min pré-incisão. Alternativa: Ceftriaxona 2g + Metronidazol'},
-      {n:'3) Analgesia: Dipirona 2g IV 6/6h + Tramadol 100mg IV 8/8h SOS', p:''},
-      {n:'4) Antiemético: Ondansetrona 8mg IV 8/8h SOS', p:''},
-      {n:'5) Apendicectomia (aberta ou VLP)', p:'Preferência por VLP em mulheres e obesos'},
-      {n:'6) Pós-op não complicada: alta D1-D2', p:'Sem ATB pós-op se apendicite simples'}
-    ]},
-  { id:'cx3', cat:'Cirurgia Geral', tag:'COLEC', tagClass:'tag-emerg', title:'Colecistite aguda',
-    rx:[
-      {n:'1) Jejum + hidratação + analgesia', p:'Dipirona 2g IV 6/6h + Hioscina (Buscopan) 20mg IV 6/6h'},
-      {n:'2) ATB: Ceftriaxona 2g IV + Metronidazol 500mg IV 8/8h', p:'Por 4-7 dias (ou Piperacilina-tazobactam em graves)'},
-      {n:'3) Colecistectomia VLP precoce', p:'Preferencialmente em 72h (Tokyo Guidelines)'},
-      {n:'4) Colecistostomia se alto risco cirúrgico', p:'Drenagem percutânea temporária'}
-    ]},
-  { id:'cx4', cat:'Cirurgia Geral', tag:'OIAg', tagClass:'tag-emerg', title:'Obstrução intestinal',
-    rx:[
-      {n:'1) Jejum + SNG em aspiração (descompressão)', p:'Alivia distensão e vômitos'},
-      {n:'2) Reposição volêmica agressiva', p:'SF ou Ringer 2-3L iniciais, guiada por diurese (>0.5 ml/kg/h)'},
-      {n:'3) Reposição eletrolítica', p:'Corrigir K, Na, Cl, alcalose metabólica'},
-      {n:'4) ATB se sinais de estrangulamento/perfuração', p:'Ceftriaxona + Metronidazol ou Piperacilina-tazobactam'},
-      {n:'5) TC abdome com contraste', p:'Define nível, causa e sinais de isquemia'},
-      {n:'6) Cirurgia se: estrangulamento, perfuração, isquemia, obstrução completa persistente', p:'Tratamento conservador em bridas sem complicação'}
-    ]},
-  { id:'cx5', cat:'Cirurgia Geral', tag:'PANCR', tagClass:'tag-emerg', title:'Pancreatite aguda',
-    rx:[
-      {n:'1) Hidratação agressiva primeiras 24h: Ringer lactato 5-10 ml/kg/h', p:'Meta: diurese >0.5 ml/kg/h, FC <120'},
-      {n:'2) Analgesia: Dipirona + Tramadol ou Morfina', p:'NÃO usar meperidina (não há superioridade comprovada)'},
-      {n:'3) Dieta precoce se leve', p:'VO quando tolerar. Não há benefício do jejum prolongado'},
-      {n:'4) ATB apenas se necrose infectada', p:'Imipenem 500mg IV 6/6h ou Meropenem'},
-      {n:'5) CPRE em 24-72h se colangite/obstrução biliar', p:'Colecistectomia na mesma internação se biliar leve'},
-      {n:'6) Gravidade: Ranson, BISAP, APACHE II', p:'UTI se ≥3 critérios de Ranson'}
-    ]},
-  { id:'cx6', cat:'Cirurgia Geral', tag:'HDA', tagClass:'tag-emerg', title:'HDA — Hemorragia digestiva alta',
-    rx:[
-      {n:'1) Acesso venoso calibroso (2) + cristaloide', p:'Transfusão hemácias se Hb <7 (ou <8 em cardiopata)'},
-      {n:'2) Omeprazol/Pantoprazol 80 mg IV bolus + 8 mg/h infusão', p:'Por 72h se úlcera péptica com sangramento ativo'},
-      {n:'3) Terlipressina 2mg IV 4/4h (se varizes)', p:'Ou Octreotida 50 mcg bolus + 50 mcg/h'},
-      {n:'4) Ceftriaxona 1g IV/dia 7 dias (se cirrótico)', p:'Profilaxia translocação bacteriana'},
-      {n:'5) EDA em 24h (urgente se instável)', p:'Terapêutica: adrenalina, clipe, ligadura, esclerose'},
-      {n:'6) SNG para descompressão (controverso)', p:'Apenas em casos selecionados'}
-    ]},
-  { id:'cx7', cat:'Cirurgia Geral', tag:'HÉRNIA', tagClass:'tag-emerg', title:'Hérnia encarcerada/estrangulada',
-    rx:[
-      {n:'1) Tentativa de redução manual (taxe) se <6h e sem sinais flogísticos', p:'Analgesia + sedação leve + Trendelemburg'},
-      {n:'2) Se reduzir: observação 24-48h + cirurgia eletiva precoce', p:''},
-      {n:'3) NÃO reduzir se: sinais flogísticos, sofrimento, >6h, peritonite', p:'Cirurgia de urgência'},
-      {n:'4) ATB profilático pré-op: Cefazolina 2g IV', p:'Se ressecção intestinal: Ceftriaxona + Metronidazol'},
-      {n:'5) Hidratação + analgesia + jejum', p:'Dipirona 2g IV + Tramadol 100mg IV'}
-    ]},
-  { id:'cx8', cat:'Cirurgia Geral', tag:'POP', tagClass:'tag-vo', title:'Pós-op imediato — Analgesia padrão',
-    rx:[
-      {n:'1) Dipirona 2g IV 6/6h', p:'Fixa (não SOS)'},
-      {n:'2) Tramadol 100mg IV 8/8h SOS', p:'Ou Morfina 2-4mg IV 4/4h SOS em cirurgias maiores'},
-      {n:'3) Cetoprofeno 100mg IV 12/12h por 48-72h', p:'Se função renal normal (sem AINE em >70a, DRC, IC descompensada)'},
-      {n:'4) Ondansetrona 8mg IV 8/8h SOS', p:'Profilaxia e tratamento náuseas'},
-      {n:'5) Omeprazol 40mg IV/dia', p:'Profilaxia úlcera de estresse'},
-      {n:'6) HBPM: Enoxaparina 40mg SC/dia', p:'Profilaxia TEV. Iniciar 12h pós-op'}
-    ]},
-  { id:'cx9', cat:'Cirurgia Geral', tag:'ATB PROF', tagClass:'tag-vo', title:'ATB profilaxia cirúrgica',
-    rx:[
-      {n:'Cirurgia limpa (herniorrafia, tireoide): Cefazolina 2g IV', p:'Dose única 30-60 min pré-incisão'},
-      {n:'Cirurgia limpa-contaminada (colecistectomia, gástrica): Cefazolina 2g IV', p:'Repetir após 4h se cirurgia prolongada'},
-      {n:'Cirurgia contaminada (colorretal): Cefazolina 2g + Metronidazol 500mg IV', p:'Ou Ceftriaxona 2g + Metronidazol'},
-      {n:'Alergia a beta-lactâmicos: Clindamicina 900mg IV + Gentamicina 5mg/kg IV', p:''},
-      {n:'Obeso (>120kg): Cefazolina 3g IV', p:'Dose pediátrica: 30 mg/kg'}
-    ]},
-  { id:'cx10', cat:'Cirurgia Geral', tag:'ILC', tagClass:'tag-vo', title:'Infecção de sítio cirúrgico',
-    rx:[
-      {n:'1) Abrir ferida, drenar coleções, coletar cultura', p:'Curativos diários'},
-      {n:'2) ATB empírico: Cefalexina 500mg VO 6/6h ou Cefazolina 2g IV 8/8h', p:'Se superficial'},
-      {n:'3) Profunda/órgão-cavidade: Ceftriaxona 2g IV + Metronidazol 500mg IV', p:'Ajustar por cultura'},
-      {n:'4) Debridamento cirúrgico se necrose', p:''},
-      {n:'5) Vácuo (VAC) se ferida complexa', p:''}
-    ]},
-
-  // ===== INTOXICAÇÕES =====
-  { id:'int1', cat:'Intoxicações', tag:'PARACET', tagClass:'tag-emerg', title:'Intoxicação por Paracetamol',
-    rx:[
-      {n:'1) Nomograma de Rumack-Matthew (4h pós-ingestão)', p:'N-acetilcisteína (NAC) se acima da linha de tratamento'},
-      {n:'2) NAC VO: 140 mg/kg ataque + 70 mg/kg 4/4h por 17 doses', p:'Total 72h'},
-      {n:'3) NAC IV (21h): 150 mg/kg em 200ml SG5% em 1h + 50 mg/kg em 500ml em 4h + 100 mg/kg em 1000ml em 16h', p:''},
-      {n:'4) Carvão ativado 1g/kg VO se <2h da ingestão', p:'Máx 50g adulto'},
-      {n:'5) Monitorar TGO/TGP, INR, Cr, glicemia', p:'Transferência para centro com transplante se IH fulminante'}
-    ]},
-  { id:'int2', cat:'Intoxicações', tag:'BZD', tagClass:'tag-emerg', title:'Intoxicação por Benzodiazepínico',
-    rx:[
-      {n:'1) Suporte de vias aéreas + O₂ + monitorização', p:'A maioria responde só a suporte'},
-      {n:'2) Flumazenil 0.2 mg IV em 15 seg, repetir 0.2mg/min até 1mg', p:'CUIDADO: risco de convulsão se uso crônico ou co-ingestão com TCA'},
-      {n:'3) NÃO usar flumazenil se:', p:'Uso crônico de BZD, epilepsia, co-ingestão com TCA, HIC'},
-      {n:'4) Carvão ativado só se <1h e via aérea protegida', p:''}
-    ]},
-  { id:'int3', cat:'Intoxicações', tag:'OPIOIDE', tagClass:'tag-emerg', title:'Intoxicação por Opioide',
-    rx:[
-      {n:'1) Suporte ventilatório + O₂', p:'Tríade: miose + depressão respiratória + coma'},
-      {n:'2) Naloxona 0.04-0.4 mg IV, repetir 2-3 min até FR >12', p:'Dose máxima 10mg. Diluir 1 ampola (0.4mg) em 9ml SF = 0.04mg/ml'},
-      {n:'3) Meta: reverter depressão respiratória, NÃO reversão total', p:'Pode precipitar abstinência grave'},
-      {n:'4) Naloxona tem ½ vida curta (30-60 min)', p:'Opioides de longa ação precisam infusão contínua'},
-      {n:'5) Infusão: 2/3 da dose efetiva por hora', p:''}
-    ]},
-  { id:'int4', cat:'Intoxicações', tag:'TCA', tagClass:'tag-emerg', title:'Intoxicação por Tricíclicos',
-    rx:[
-      {n:'1) Lavagem gástrica se <2h + Carvão ativado 1g/kg', p:'ECG: QRS >100ms = risco convulsão, >160ms = arritmia'},
-      {n:'2) Bicarbonato de sódio 8.4% 1-2 mEq/kg IV bolus se QRS >100ms', p:'Manter pH 7.45-7.55. Manutenção: 150 mEq em 1L SG5%'},
-      {n:'3) Convulsões: Diazepam ou Midazolam', p:'EVITAR Fenitoína (arritmogênica)'},
-      {n:'4) Arritmias ventriculares: Lidocaína', p:'EVITAR antiarrítmicos IA, IC'},
-      {n:'5) Hipotensão: cristaloide + Noradrenalina', p:'EVITAR adrenalina/dopamina'}
-    ]},
-  { id:'int5', cat:'Intoxicações', tag:'ORGAN', tagClass:'tag-emerg', title:'Intoxicação por Organofosforado/Carbamato',
-    rx:[
-      {n:'1) Descontaminação: remover roupa, lavar pele com água + sabão', p:'Proteger o profissional (EPI)'},
-      {n:'2) Atropina 2-5 mg IV, dobrar a cada 5 min até atropinização', p:'Meta: secreção traqueal seca, FC>80, ausculta limpa. Manter por 24-48h'},
-      {n:'3) Pralidoxima 30 mg/kg IV em 30 min + 8-10 mg/kg/h', p:'Apenas em organofosforado (não carbamato). Nas primeiras 48h'},
-      {n:'4) Síndrome colinérgica: DUMBELS', p:'Diarreia, urinação, miose, broncoespasmo/bradicardia, êmese, lacrimejamento, salivação/sudorese'},
-      {n:'5) Convulsões: Diazepam', p:''},
-      {n:'6) IOT + VM se insuficiência respiratória', p:''}
-    ]},
-  { id:'int6', cat:'Intoxicações', tag:'CO', tagClass:'tag-emerg', title:'Intoxicação por Monóxido de Carbono',
-    rx:[
-      {n:'1) O₂ 100% máscara não-reinalante IMEDIATO', p:'½ vida CO: 5h em ar ambiente → 1h em O₂ 100% → 20 min em O₂ hiperbárico'},
-      {n:'2) Manter O₂ 100% até COHb <5% e sintomas resolvidos', p:''},
-      {n:'3) O₂ hiperbárico se: COHb >25%, gestante com COHb >15%, perda de consciência, alteração neurológica, acidose grave, isquemia miocárdica', p:''},
-      {n:'4) SatO₂ do oximetro é FALSAMENTE NORMAL', p:'Pedir gasometria com co-oximetria'},
-      {n:'5) ECG + troponina', p:'Risco de isquemia miocárdica'}
-    ]},
-  { id:'int7', cat:'Intoxicações', tag:'ETILICA', tagClass:'tag-vo', title:'Intoxicação Alcoólica Aguda',
-    rx:[
-      {n:'1) Tiamina 100 mg IV ANTES da glicose', p:'Prevenção de Wernicke'},
-      {n:'2) Glicose 50% 40 ml IV se hipoglicemia', p:'Comum em etilistas crônicos'},
-      {n:'3) Hidratação: SF 0.9% 500-1000 ml', p:'Cuidado com sobrecarga'},
-      {n:'4) Reposição de Mg, K, P', p:'Hipomagnesemia frequente'},
-      {n:'5) Suporte ventilatório + posição lateral', p:'Risco broncoaspiração'}
-    ]},
-
-  // ===== QUEIMADURAS =====
-  { id:'q1', cat:'Queimaduras', tag:'MANEJO', tagClass:'tag-emerg', title:'Queimadura grave — Manejo inicial',
-    rx:[
-      {n:'1) ABCDE + Parar o processo (remover roupas, água corrente)', p:'Não usar gelo. Proteção térmica após resfriamento'},
-      {n:'2) Estimar SCQ: Regra dos 9 adulto / Lund-Browder criança', p:'Cabeça 9%, cada MS 9%, cada MI 18%, tronco ant 18%, tronco post 18%, genital 1%'},
-      {n:'3) Parkland: 4 ml × kg × %SCQ (Ringer lactato em 24h)', p:'Metade nas primeiras 8h (desde o trauma, não da chegada)'},
-      {n:'4) Meta diurese: 0.5-1 ml/kg/h adulto / 1 ml/kg/h criança', p:'Sonda vesical obrigatória se ≥20% SCQ'},
-      {n:'5) Analgesia: Morfina 0.05-0.1 mg/kg IV', p:'Repetir 5-10 min até controle'},
-      {n:'6) SNG se ≥20% SCQ (íleo paralítico)', p:'Nutrição enteral precoce'},
-      {n:'7) Profilaxia antitetânica', p:''},
-      {n:'8) Curativo com sulfadiazina de prata', p:'Colagenase se escaras'}
-    ]},
-  { id:'q2', cat:'Queimaduras', tag:'TRANSF', tagClass:'tag-emerg', title:'Queimadura — Critérios de transferência',
-    rx:[
-      {n:'Transferir para centro de queimados se:', p:''},
-      {n:'• 2º grau >10% SCQ', p:''},
-      {n:'• 3º grau em qualquer extensão', p:''},
-      {n:'• Face, mãos, pés, genitália, períneo, grandes articulações', p:''},
-      {n:'• Queimadura elétrica ou química', p:''},
-      {n:'• Queimadura inalatória', p:''},
-      {n:'• Criança em hospital sem pediatria', p:''},
-      {n:'• Doença prévia que pode complicar', p:''}
-    ]},
-  { id:'q3', cat:'Queimaduras', tag:'AMB', tagClass:'tag-vo', title:'Queimadura leve ambulatorial',
-    rx:[
-      {n:'1) Limpeza com SF 0.9% + clorexidina aquosa', p:'Remover tecido necrosado solto'},
-      {n:'2) Sulfadiazina de prata 1% creme ——— 1 bisnaga', p:'Aplicar 2x/dia, curativo oclusivo'},
-      {n:'3) Dipirona 1000 mg ——— 1 cx', p:'1 cp 6/6h se dor'},
-      {n:'4) Profilaxia antitetânica se necessário', p:''},
-      {n:'5) Retorno em 48-72h para reavaliação', p:''}
-    ]},
-
-  // ===== ACIDENTES POR ANIMAIS =====
-  { id:'an1', cat:'Acidentes Animais', tag:'OFID', tagClass:'tag-emerg', title:'Ofidismo — Bothrops (jararaca)',
-    rx:[
-      {n:'1) Identificação: edema, dor, sangramento no local, coagulopatia', p:'Mais comum no Brasil'},
-      {n:'2) Soro antibotrópico (SAB):', p:'Leve (2-4 ampolas), Moderado (4-8), Grave (12)'},
-      {n:'3) Diluir em 100 ml SF e infundir em 30-60 min', p:'Pré-medicação: Hidrocortisona 500mg IV + Difenidramina 50mg IV + Prometazina'},
-      {n:'4) Não fazer: torniquete, sucção, incisão, álcool', p:''},
-      {n:'5) Manter membro elevado, analgesia, hidratação', p:'Profilaxia tetânica'},
-      {n:'6) Reavaliar TP/TAP 6/6h', p:'Repetir SAB se coagulopatia persistente'}
-    ]},
-  { id:'an2', cat:'Acidentes Animais', tag:'OFID', tagClass:'tag-emerg', title:'Ofidismo — Crotalus (cascavel)',
-    rx:[
-      {n:'1) Quadro: fácies miastênica, mialgia, urina escura (rabdomiólise)', p:'Neurotoxicidade e miotoxicidade'},
-      {n:'2) Soro anticrotálico (SAC):', p:'Leve (5 ampolas), Moderado (10), Grave (20)'},
-      {n:'3) Hidratação abundante + alcalinização urinária', p:'Bicarbonato para urina pH >6.5'},
-      {n:'4) Monitorar CPK, função renal', p:'Risco de IRA por rabdomiólise'}
-    ]},
-  { id:'an3', cat:'Acidentes Animais', tag:'ESCORP', tagClass:'tag-emerg', title:'Escorpionismo',
-    rx:[
-      {n:'1) Leve (dor local apenas): analgesia + observação 6h', p:'Dipirona + lidocaína local'},
-      {n:'2) Moderado (dor + sintomas sistêmicos): SAEs 2-3 ampolas', p:'Sudorese, náusea, taquicardia'},
-      {n:'3) Grave (choque, EAP, arritmia): SAEs 4-6 ampolas', p:'UTI + suporte'},
-      {n:'4) Crianças <7 anos: risco maior', p:'Sempre considerar grave'},
-      {n:'5) Monitorar: FC, PA, ECG, troponina, glicemia, amilase', p:''}
-    ]},
-  { id:'an4', cat:'Acidentes Animais', tag:'ARANHA', tagClass:'tag-emerg', title:'Araneísmo — Loxoceles (aranha-marrom)',
-    rx:[
-      {n:'Cutâneo: dor tardia, lesão com halo equimótico → necrose', p:'Forma mais comum'},
-      {n:'Cutâneo-visceral: + hemólise, IRA', p:'Mais grave'},
-      {n:'1) Soro antiloxoscélico (SALox) ou antiaracnídico (SAA)', p:'Leve (5 amp), Moderado (10), Grave (10)'},
-      {n:'2) Prednisona 40-60 mg/dia por 5-7 dias', p:''},
-      {n:'3) Dapsona 100 mg/dia', p:'Se forma cutânea'},
-      {n:'4) Curativo local, não debridar precocemente', p:''}
-    ]},
-  { id:'an5', cat:'Acidentes Animais', tag:'RAIVA', tagClass:'tag-emerg', title:'Mordedura — Profilaxia antirrábica',
-    rx:[
-      {n:'Acidente leve (cão/gato sadio, observável): observar animal 10 dias', p:'Se mudar: iniciar vacina'},
-      {n:'Acidente leve (cão/gato desaparecido): 2 doses vacina D0, D3', p:''},
-      {n:'Acidente grave (morcego, silvestre, raivoso, múltiplas mordeduras profundas, cabeça/pescoço)', p:'Soro antirrábico 40 UI/kg INFILTRAR na ferida + 4-5 doses vacina D0, D3, D7, D14, D28'},
-      {n:'Limpeza: lavar 15 min com água + sabão + antisséptico', p:''},
-      {n:'Profilaxia antitetânica + ATB se ferida contaminada', p:'Amoxi-clav 875/125 12/12h 5-7 dias'}
-    ]},
 ];
+
+// Manter compatibilidade: DATA aponta para DATA_RX para o renderizador genérico
+const DATA = DATA_RX;
 
 // =================== MINHAS CONDUTAS (BLOCO ORIGINAL GUYTFG.txt) ===================
 // Reprodução fiel do bloco de notas — texto em maiúsculo, traços, prescrição idêntica
@@ -3654,14 +3751,361 @@ function installPWA() {
   deferredInstall.userChoice.then(() => { deferredInstall = null; document.getElementById('install-btn').style.display = 'none'; });
 }
 
+
+// =================== DADOS PEDIÁTRICOS ===================
+const DATA_PED = [
+  { id:'ped1', cat:'ATB Pediátrico', tag:'AMOXICILINA', tagClass:'tag-vo',
+    title:'Amoxicilina suspensão 250mg/5ml',
+    doses:[{med:'Amoxicilina', mgkg:25, conc:50, unit:'ml', freq:'8/8h', max:1000, obs:'50 mg/kg/dia ÷ 3 doses. Mín 7 dias'}] },
+  { id:'ped2', cat:'ATB Pediátrico', tag:'AMOXICLAV', tagClass:'tag-vo',
+    title:'Amoxicilina+Clavulanato 250+62,5/5ml',
+    doses:[{med:'Amoxicilina-clavulanato', mgkg:25, conc:50, unit:'ml', freq:'12/12h', max:875, obs:'50 mg/kg/dia ÷ 2 doses. 7-10 dias'}] },
+  { id:'ped3', cat:'ATB Pediátrico', tag:'CEFALEXINA', tagClass:'tag-vo',
+    title:'Cefalexina suspensão 250mg/5ml',
+    doses:[{med:'Cefalexina', mgkg:12.5, conc:50, unit:'ml', freq:'6/6h', max:500, obs:'50 mg/kg/dia ÷ 4 doses. 7-10 dias'}] },
+  { id:'ped4', cat:'ATB Pediátrico', tag:'AZITROMICINA', tagClass:'tag-vo',
+    title:'Azitromicina suspensão 200mg/5ml',
+    doses:[{med:'Azitromicina', mgkg:10, conc:40, unit:'ml', freq:'1x/dia', max:500, obs:'10 mg/kg/dia dose única por 5 dias'}] },
+  { id:'ped5', cat:'ATB Pediátrico', tag:'BACTRIM', tagClass:'tag-vo',
+    title:'SMX-TMP suspensão 200+40mg/5ml (Bactrim)',
+    doses:[{med:'TMP', mgkg:0.5, conc:8, unit:'ml', freq:'12/12h', max:320, obs:'8 mg/kg/dia de SMX (TMP=1.6) ÷ 2 doses. 7-10 dias'}] },
+  { id:'ped6', cat:'ATB Pediátrico', tag:'CEFTRIAXONA', tagClass:'tag-iv',
+    title:'Ceftriaxona 50-100mg/kg/dia IV',
+    doses:[{med:'Ceftriaxona', mgkg:50, conc:1000, unit:'mg', freq:'1x/dia', max:4000, obs:'50-100 mg/kg/dia IV. Meningite: 100mg/kg'}] },
+
+  { id:'ped7', cat:'Analgésico Pediátrico', tag:'DIPIRONA', tagClass:'tag-vo',
+    title:'Dipirona gotas 500mg/ml',
+    doses:[{med:'Dipirona', mgkg:25, conc:500, unit:'gt', freq:'6/6h', max:1000, obs:'1 gota/kg por dose. 20 gotas = 1ml'}] },
+  { id:'ped8', cat:'Analgésico Pediátrico', tag:'PARACETAMOL', tagClass:'tag-vo',
+    title:'Paracetamol gotas 200mg/ml',
+    doses:[{med:'Paracetamol', mgkg:10, conc:200, unit:'gt', freq:'6/6h', max:750, obs:'10-15 mg/kg por dose'}] },
+  { id:'ped9', cat:'Analgésico Pediátrico', tag:'IBUPROFENO', tagClass:'tag-vo',
+    title:'Ibuprofeno gotas 50mg/ml',
+    doses:[{med:'Ibuprofeno', mgkg:7, conc:50, unit:'gt', freq:'8/8h', max:400, obs:'5-10 mg/kg por dose. Não usar <6m'}] },
+
+  { id:'ped10', cat:'Resp. Pediátrico', tag:'PREDNISOLONA', tagClass:'tag-vo',
+    title:'Prednisolona suspensão 3mg/ml',
+    doses:[{med:'Prednisolona', mgkg:1, conc:3, unit:'ml', freq:'1x/dia', max:40, obs:'1-2 mg/kg/dia por 3-5 dias'}] },
+  { id:'ped11', cat:'Resp. Pediátrico', tag:'SALBUTAMOL', tagClass:'tag-inal',
+    title:'Salbutamol inalatório + espaçador',
+    doses:[{med:'Salbutamol', mgkg:0, conc:0, unit:'jatos', freq:'20/20min', max:0, obs:'<5 anos: 4 jatos. ≥5 anos: 8 jatos. Repetir até 3x. Usar com espaçador'}] },
+
+  { id:'ped12', cat:'GI Pediátrico', tag:'ONDANSETRONA', tagClass:'tag-vo',
+    title:'Ondansetrona 4mg/5ml',
+    doses:[{med:'Ondansetrona', mgkg:0.15, conc:0.8, unit:'ml', freq:'dose única', max:8, obs:'0,15 mg/kg dose única se vômitos. Máx 8mg'}] },
+  { id:'ped13', cat:'GI Pediátrico', tag:'FLORATIL', tagClass:'tag-vo',
+    title:'Floratil 200mg + Soro reidratação',
+    doses:[{med:'Floratil', mgkg:0, conc:0, unit:'sachê', freq:'12/12h', max:0, obs:'1 sachê 12/12h por 5 dias. SRO 50-100ml/kg em 4h (desidratação leve)'}] },
+  { id:'ped14', cat:'GI Pediátrico', tag:'ZINCO', tagClass:'tag-vo',
+    title:'Zinco 20mg/dia',
+    doses:[{med:'Zinco', mgkg:0, conc:0, unit:'cp', freq:'1x/dia', max:0, obs:'Crianças >6m: 20mg/dia por 10-14 dias. <6m: 10mg/dia. Reduz duração da diarreia'}] },
+
+  { id:'ped15', cat:'Emergência Pediátrica', tag:'DIAZEPAM', tagClass:'tag-emerg',
+    title:'Diazepam — Convulsão febril',
+    doses:[{med:'Diazepam', mgkg:0.3, conc:5, unit:'ml', freq:'dose única', max:10, obs:'0,3-0,5 mg/kg IV ou retal. Máx 10mg. Repetir após 5 min se persistir'}] },
+  { id:'ped16', cat:'Emergência Pediátrica', tag:'ADRENALINA', tagClass:'tag-emerg',
+    title:'Adrenalina PCR pediátrica',
+    doses:[{med:'Adrenalina', mgkg:0.01, conc:1, unit:'ml', freq:'3-5min', max:1, obs:'0,01 mg/kg IV/IO (1:10.000). Diluir 1ml em 9ml AD = 0,1mg/ml. Dose prática: Peso×0,1ml'}] },
+  { id:'ped17', cat:'Emergência Pediátrica', tag:'MIDAZOLAM', tagClass:'tag-emerg',
+    title:'Midazolam — Sedação/convulsão',
+    doses:[{med:'Midazolam', mgkg:0.2, conc:5, unit:'ml', freq:'dose única', max:5, obs:'0,2 mg/kg IM (amp 5mg/ml = 1ml). Alternativa: 0,5mg/kg intranasal'}] },
+];
+
+// =================== RENDER PRESCRIÇÕES ===================
+const CATS_RX = ['Todas', ...Array.from(new Set(DATA_RX.map(d => d.cat)))];
+let activeCatRx = 'Todas';
+let openRx = {};
+let favRx = {};
+
+function buildCatsRx() {
+  const el = document.getElementById('cats-rx');
+  if (!el) return;
+  el.innerHTML = '';
+  CATS_RX.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-btn' + (c === activeCatRx ? ' active' : '');
+    btn.textContent = c;
+    btn.onclick = () => { activeCatRx = c; buildCatsRx(); renderRx(); };
+    el.appendChild(btn);
+  });
+}
+
+function renderRx() {
+  const q = (document.getElementById('search-rx')?.value || '').toLowerCase().trim();
+  const peso = parseFloat(document.getElementById('peso-rx')?.value) || 0;
+  const el = document.getElementById('list-rx');
+  if (!el) return;
+  el.innerHTML = '';
+
+  let items = DATA_RX;
+  if (activeCatRx !== 'Todas') items = items.filter(d => d.cat === activeCatRx);
+  if (q) items = items.filter(d => {
+    const hay = [d.title, d.cat, d.cid, ...(d.ps||[]).map(r=>r.n+r.p), ...(d.casa||[]).map(r=>r.n+r.p)].join(' ').toLowerCase();
+    return hay.includes(q);
+  });
+
+  if (!items.length) { el.innerHTML = '<div class="empty">Nenhuma prescrição encontrada.</div>'; return; }
+
+  items.forEach(item => {
+    const isOpen = openRx[item.id];
+    const isFav = favRx[item.id];
+    const hasPS = item.ps && item.ps.length > 0;
+    const hasCasa = item.casa && item.casa.length > 0;
+
+    const card = document.createElement('div');
+    card.className = 'card' + (isFav ? ' fav' : '');
+    card.innerHTML = `
+      <div class="card-header" onclick="toggleRx('${item.id}')">
+        <div class="card-title-wrap">
+          <span class="card-title">${item.title}</span>
+          <span class="card-tag ${item.tagClass}">${item.tag}</span>
+          <span style="font-family:var(--font-mono);font-size:9px;color:var(--txt-4);letter-spacing:1px;">${item.cid||''}</span>
+        </div>
+        <div class="header-right">
+          <button class="fav-btn ${isFav?'on':''}" onclick="event.stopPropagation();favRx['${item.id}']=!favRx['${item.id}'];renderRx()" title="Favoritar">${isFav?'★':'☆'}</button>
+          <span class="chevron ${isOpen?'open':''}">▼</span>
+        </div>
+      </div>
+      <div class="card-body ${isOpen?'open':''}">
+        ${hasPS ? `
+          <div style="font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:2px;color:var(--pulse);margin:10px 0 6px;text-transform:uppercase;">▸ PRONTO-SOCORRO (IV/IM)</div>
+          ${item.ps.map(r => `<div class="rx-item"><div class="rx-name">${r.n}</div>${r.p?`<div class="rx-pos">${r.p}</div>`:''}</div>`).join('')}
+        ` : ''}
+        ${hasCasa ? `
+          <div style="font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:2px;color:var(--vital);margin:10px 0 6px;text-transform:uppercase;">▸ RECEITA PARA CASA</div>
+          ${item.casa.map(r => `<div class="rx-item"><div class="rx-name">${r.n}</div><div class="rx-pos">${r.p}</div></div>`).join('')}
+        ` : ''}
+        <div style="display:flex;gap:6px;margin-top:10px;">
+          ${hasPS ? `<button class="copy-btn" style="flex:1;" onclick="copyRxPS('${item.id}', this)">COPIAR PS</button>` : ''}
+          ${hasCasa ? `<button class="copy-btn" style="flex:1;background:var(--vital);border-color:var(--vital);" onclick="copyRxCasa('${item.id}', this)">COPIAR RECEITA</button>` : ''}
+          ${hasCasa ? `<button class="copy-btn" style="flex:0.6;background:var(--bg);color:var(--vital);font-size:10px;" onclick="printRxCasa('${item.id}')">🖨️</button>` : ''}
+        </div>
+      </div>
+    `;
+    el.appendChild(card);
+  });
+}
+
+function toggleRx(id) { openRx[id] = !openRx[id]; renderRx(); }
+
+function copyRxPS(id, btn) {
+  const item = DATA_RX.find(d => d.id === id);
+  if (!item || !item.ps) return;
+  const txt = item.ps.map((r,i) => `${i+1}) ${r.n}${r.p?' — '+r.p:''}`).join('\n');
+  navigator.clipboard.writeText(txt).then(() => {
+    btn.textContent='✓ COPIADO';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='COPIAR PS';btn.classList.remove('copied');},1800);
+    STATE.history.unshift({title:item.title+' (PS)',content:txt,time:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})});
+  });
+}
+
+function copyRxCasa(id, btn) {
+  const item = DATA_RX.find(d => d.id === id);
+  if (!item || !item.casa) return;
+  const txt = item.casa.map((r,i) => `${i+1}) ${r.n}\n${r.p}`).join('\n\n');
+  navigator.clipboard.writeText(txt).then(() => {
+    btn.textContent='✓ COPIADO';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='COPIAR RECEITA';btn.classList.remove('copied');},1800);
+    STATE.history.unshift({title:item.title+' (Casa)',content:txt,time:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})});
+  });
+}
+
+function printRxCasa(id) {
+  const item = DATA_RX.find(d => d.id === id);
+  if (!item || !item.casa) return;
+  const txt = item.casa.map((r,i) => `${i+1}) ${r.n}\n${r.p}`).join('\n\n');
+  printReceita(item.title, txt);
+}
+
+// =================== RENDER PEDIATRIA ===================
+const CATS_PED = ['Todas', ...Array.from(new Set(DATA_PED.map(d => d.cat)))];
+let activeCatPed = 'Todas';
+let openPed = {};
+
+function buildCatsPed() {
+  const el = document.getElementById('cats-ped');
+  if (!el) return;
+  el.innerHTML = '';
+  CATS_PED.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-btn' + (c === activeCatPed ? ' active' : '');
+    btn.textContent = c;
+    btn.onclick = () => { activeCatPed = c; buildCatsPed(); renderPed(); };
+    el.appendChild(btn);
+  });
+}
+
+function calcPedDose(d, peso) {
+  if (!peso || !d.mgkg) return null;
+  let dose = peso * d.mgkg;
+  if (d.max && dose > d.max) dose = d.max;
+  if (d.unit === 'gt') {
+    const gotas = Math.round(dose * 20 / d.conc);
+    return `<strong>${gotas} gotas</strong> por dose`;
+  } else if (d.unit === 'ml' && d.conc) {
+    const ml = (dose / d.conc).toFixed(1);
+    return `<strong>${ml} ml</strong> por dose`;
+  } else if (d.unit === 'mg') {
+    return `<strong>${dose.toFixed(0)} mg</strong> por dose`;
+  }
+  return null;
+}
+
+function renderPed() {
+  const q = (document.getElementById('search-ped')?.value || '').toLowerCase().trim();
+  const peso = parseFloat(document.getElementById('peso-ped')?.value) || 0;
+  const el = document.getElementById('list-ped');
+  if (!el) return;
+  el.innerHTML = '';
+
+  let items = DATA_PED;
+  if (activeCatPed !== 'Todas') items = items.filter(d => d.cat === activeCatPed);
+  if (q) items = items.filter(d => {
+    const hay = [d.title, d.cat, ...d.doses.map(r=>r.med+' '+r.obs)].join(' ').toLowerCase();
+    return hay.includes(q);
+  });
+
+  if (!items.length) { el.innerHTML = '<div class="empty">Nenhum medicamento encontrado.</div>'; return; }
+
+  items.forEach(item => {
+    const isOpen = openPed[item.id];
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="card-header" onclick="togglePed('${item.id}')">
+        <div class="card-title-wrap">
+          <span class="card-title">${item.title}</span>
+          <span class="card-tag ${item.tagClass}">${item.tag}</span>
+        </div>
+        <span class="chevron ${isOpen?'open':''}">▼</span>
+      </div>
+      <div class="card-body ${isOpen?'open':''}">
+        ${item.doses.map(d => {
+          const calcResult = calcPedDose(d, peso);
+          return `
+            <div class="rx-item">
+              <div class="rx-name">${d.med}</div>
+              <div class="rx-pos">${d.obs}</div>
+              ${calcResult ? `<div class="rx-ped">⚖️ ${peso}kg → ${calcResult} (${d.freq})</div>` : 
+                peso ? `<div class="rx-ped" style="color:var(--txt-4)">Digite o peso para calcular</div>` : ''}
+            </div>
+          `;
+        }).join('')}
+        <button class="copy-btn" onclick="copyPed('${item.id}', this, ${peso})">COPIAR DOSE</button>
+      </div>
+    `;
+    el.appendChild(card);
+  });
+}
+
+function togglePed(id) { openPed[id] = !openPed[id]; renderPed(); }
+
+function copyPed(id, btn, peso) {
+  const item = DATA_PED.find(d => d.id === id);
+  if (!item) return;
+  let txt = item.title + '\n';
+  item.doses.forEach(d => {
+    txt += d.obs;
+    const calc = calcPedDose(d, peso);
+    if (calc) txt += `\n→ ${peso}kg: ${calc.replace(/<[^>]+>/g,'')} (${d.freq})`;
+    txt += '\n';
+  });
+  navigator.clipboard.writeText(txt).then(() => {
+    btn.textContent='✓ COPIADO';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='COPIAR DOSE';btn.classList.remove('copied');},1800);
+  });
+}
+
+// =================== ATESTADO ===================
+function printAtestado() {
+  const perfil = getPerfil();
+  const nome = document.getElementById('at-nome').value.trim() || '___________________________________';
+  const cpf = document.getElementById('at-cpf').value.trim();
+  const dias = document.getElementById('at-dias').value.trim();
+  const cid = document.getElementById('at-cid').value.trim();
+  const obs = document.getElementById('at-obs').value.trim();
+  const dataIni = document.getElementById('at-data-ini').value;
+  
+  if (!dias) { alert('Preencha os dias de afastamento.'); return; }
+
+  const dataFormatada = dataIni ? new Date(dataIni + 'T00:00:00').toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR');
+  
+  const dataFim = dataIni ? (() => {
+    const d = new Date(dataIni + 'T00:00:00');
+    d.setDate(d.getDate() + parseInt(dias) - 1);
+    return d.toLocaleDateString('pt-BR');
+  })() : '';
+
+  const area = document.getElementById('print-area');
+  area.innerHTML = `
+    <div class="print-receita">
+      <div class="print-header">
+        <h2>${escapeHtml(perfil.header || 'PREFEITURA MUNICIPAL DE TAQUARITINGA/SP')}</h2>
+        <h3>ATESTADO MÉDICO</h3>
+      </div>
+      <div style="font-size:11pt;line-height:2;margin-bottom:20px;padding:10px 0;">
+        <p>Atesto para os devidos fins que o(a) paciente:</p>
+        <p><strong>Nome:</strong> ${escapeHtml(nome)}${cpf ? `&emsp;<strong>CPF:</strong> ${escapeHtml(cpf)}` : ''}</p>
+        <br>
+        <p>esteve sob meus cuidados médicos e necessita de <strong>${dias} dia(s)</strong> de afastamento${dataIni ? `, a partir de ${dataFormatada}${dataFim && dias > 1 ? ` a ${dataFim}` : ''}` : ''}.</p>
+        ${cid ? `<br><p><strong>CID-10:</strong> ${escapeHtml(cid)}</p>` : ''}
+        ${obs ? `<br><p><strong>Obs:</strong> ${escapeHtml(obs)}</p>` : ''}
+      </div>
+      <div class="print-footer">
+        <div>${escapeHtml(perfil.cidade || 'Taquaritinga')}, ${new Date().toLocaleDateString('pt-BR')}</div>
+        <div class="print-sig">
+          ${escapeHtml(perfil.nome || '')}${perfil.nome ? '<br>' : ''}${escapeHtml(perfil.crm || '')}
+        </div>
+      </div>
+    </div>
+  `;
+  area.style.display = 'block';
+  setTimeout(() => { window.print(); area.style.display = 'none'; }, 100);
+}
+
+function limparAtestado() {
+  ['at-nome','at-cpf','at-dias','at-cid','at-obs','at-data-ini'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+}
+
+
+// =================== JUMP DIAGNÓSTICO ===================
+function jumpDiag(tipo, cat) {
+  if (tipo === 'minhas') {
+    STATE.activeCatMinhas = cat;
+    buildCatsMinhas();
+    renderMinhas();
+    document.getElementById('search-minhas').value = '';
+    document.getElementById('list-minhas').scrollIntoView({behavior:'smooth', block:'start'});
+  } else if (tipo === 'rx') {
+    activeCatRx = cat;
+    buildCatsRx();
+    renderRx();
+    document.getElementById('search-rx').value = '';
+    document.getElementById('list-rx').scrollIntoView({behavior:'smooth', block:'start'});
+  }
+}
+
 // =================== INIT ===================
 loadPerfil();
 loadCustom();
+// Seção Minhas
 buildCats();
 renderList();
 buildCatsMinhas();
 renderMinhas();
 renderCustom();
+// Seção Prescrições
+buildCatsRx();
+renderRx();
+// Seção Pediatria
+buildCatsPed();
+renderPed();
+// Definir data inicial do atestado
+try { document.getElementById('at-data-ini').valueAsDate = new Date(); } catch(e){}
+
 </script>
 </div><!-- /.container -->
 </body>
