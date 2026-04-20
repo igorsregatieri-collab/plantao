@@ -5642,11 +5642,25 @@ function copyMinhasRx(id, btn) {
 }
 
 function printMinhaRx(id) {
+  // Se painel de edição estiver aberto, imprime o editado
+  var editDiv = document.getElementById('edit-tmp-' + id);
+  var ta = document.getElementById('edit-tmp-txt-' + id);
+  if (editDiv && editDiv.style.display !== 'none' && ta && ta.value.trim()) {
+    var item2 = MINHAS.find(function(d){ return d.id === id; });
+    var extras2 = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]');
+    var extra2 = extras2.find(function(d){ return d.id === id; });
+    var title2 = (item2 ? item2.title : '') || (extra2 ? extra2.title : '') || id;
+    printReceita(title2, ta.value);
+    return;
+  }
+  // Caso contrário imprime original
   var item = MINHAS.find(function(d) { return d.id === id; });
-  if (!item) return;
+  var extras = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]');
+  var extra = extras.find(function(d){ return d.id === id; });
   var rxEl = document.getElementById('rx-min-' + id);
-  var txt = rxEl ? rxEl.textContent : item.rx;
-  printReceita(item.title, txt);
+  var txt = (rxEl ? rxEl.textContent : '') || (extra ? extra.rx : '') || (item ? item.rx : '');
+  var title = (item ? item.title : '') || (extra ? extra.title : '') || id;
+  printReceita(title, txt);
 }
 
 
