@@ -5616,7 +5616,7 @@ function calcDoseMinhas(itemId) {
           novaLinha = linha.replace(/\d+\s*GOTAS/gi, g + ' GOTAS');
           break;
         case 'cetoprofeno':
-          var g2 = Math.round(peso * 0.5);
+          var g2 = Math.round(peso * 1);
           novaLinha = linha.replace(/\d+\s*GOTAS/gi, g2 + ' GOTAS');
           break;
         case 'seki':
@@ -5624,7 +5624,7 @@ function calcDoseMinhas(itemId) {
           novaLinha = linha.replace(/\d+(?:[,\.]\d+)?\s*ML/gi, ml + ' ML');
           break;
         case 'bromoprida':
-          var g3 = Math.round(peso * 0.5);
+          var g3 = Math.round(peso * 1);
           novaLinha = linha.replace(/\d+\s*GOTAS/gi, g3 + ' GOTAS');
           break;
         case 'prednisolona':
@@ -5636,7 +5636,8 @@ function calcDoseMinhas(itemId) {
           novaLinha = linha.replace(/\d+\s*GOTAS/gi, g4 + ' GOTAS');
           break;
         case 'ondansetrona':
-          var ml3 = Math.max(1, Math.round((peso * 0.15 / 0.8) * 2) / 2);
+          var doseOnd = Math.min(peso * 0.15, 4);
+          var ml3 = Math.round((doseOnd / 0.8) * 10) / 10;
           novaLinha = linha.replace(/\d+(?:[,\.]\d+)?\s*ML/gi, ml3 + ' ML');
           break;
         case 'amoxicilina':
