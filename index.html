@@ -7,7 +7,7 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
-  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Noto+Color+Emoji&display=swap');
 
   
   :root {
@@ -48,8 +48,8 @@
     --violet-glow: rgba(176, 126, 250, 0.18);
 
     /* Tipografia */
-    --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
-    --font-sans: 'Space Grotesk', -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace, 'Noto Color Emoji';
+    --font-sans: 'Space Grotesk', -apple-system, sans-serif, 'Noto Color Emoji';
 
     /* Glass */
     --glass: rgba(12, 17, 32, 0.7);
@@ -1721,20 +1721,20 @@
 
 <div class="combo-bar no-print" id="combo-bar">
   <span class="combo-count" id="combo-count">0 selecionados</span>
-  <button onclick="combinePrint()">🖨️ Imprimir</button>
-  <button onclick="combineCopy()">📋 Copiar tudo</button>
+  <button onclick="combinePrint()">Imprimir</button>
+  <button onclick="combineCopy()">Copiar tudo</button>
   <button onclick="combineClear()" style="background:rgba(255,255,255,0.2);color:white;">Limpar</button>
 </div>
 
 <div class="tabs no-print">
-  <button class="tab active" data-section="minhas" onclick="setSection('minhas')">📘 Minhas</button>
-  <button class="tab" data-section="prescricoes" onclick="setSection('prescricoes')">📋 Prescrições</button>
-  <button class="tab" data-section="ped" onclick="setSection('ped')">👶 Pediatria</button>
-  <button class="tab" data-section="editor" onclick="setSection('editor')">✏️ Editor</button>
-  <button class="tab" data-section="atestado" onclick="setSection('atestado')">📄 Atestado</button>
-  <button class="tab" data-section="calc" onclick="setSection('calc')">🧮 Calc</button>
-  <button class="tab" data-section="scores" onclick="setSection('scores')">📊 Scores</button>
-  <button class="tab" data-section="hist" onclick="setSection('hist')">🕘 Hist</button>
+  <button class="tab active" data-section="minhas" onclick="setSection('minhas')">Minhas</button>
+  <button class="tab" data-section="prescricoes" onclick="setSection('prescricoes')">Prescrições</button>
+  <button class="tab" data-section="ped" onclick="setSection('ped')">Pediatria</button>
+  <button class="tab" data-section="editor" onclick="setSection('editor')">Editor</button>
+  <button class="tab" data-section="atestado" onclick="setSection('atestado')">Atestado</button>
+  <button class="tab" data-section="calc" onclick="setSection('calc')">Calc</button>
+  <button class="tab" data-section="scores" onclick="setSection('scores')">Scores</button>
+  <button class="tab" data-section="hist" onclick="setSection('hist')">Hist</button>
 </div>
 
 <!-- =================== SEÇÃO MINHAS CONDUTAS (BLOCO ORIGINAL) =================== -->
@@ -2165,7 +2165,7 @@ RETORNO SE NECESSARIO
 
   <div class="editor-actions">
     <button class="btn-primary" onclick="novaConduta()">➕ Nova conduta</button>
-    <button class="btn-secondary" onclick="syncFromCloud()">🔄 Sincronizar</button>
+    <button class="btn-secondary" onclick="syncFromCloud()">Sincronizar</button>
     <button class="btn-secondary" onclick="exportData()">📤 Exportar JSON</button>
     <button class="btn-secondary" onclick="document.getElementById('import-file').click()">📥 Importar JSON</button>
     <button class="btn-danger" onclick="resetCustom()">🗑️ Apagar todas</button>
@@ -2175,7 +2175,7 @@ RETORNO SE NECESSARIO
   <div id="editor-form-area"></div>
 
   <div class="panel" style="background:var(--warn-bg);border-color:var(--warn);padding:12px 16px;margin-bottom:14px;">
-    <div style="font-size:12px;color:var(--text);"><strong>✏️ Editor de condutas customizadas</strong> — salvas no seu navegador (localStorage). Use "Exportar JSON" pra fazer backup e "Importar JSON" pra carregar em outro dispositivo.</div>
+    <div style="font-size:12px;color:var(--text);"><strong>Editor de condutas customizadas</strong> — salvas no seu navegador (localStorage). Use "Exportar JSON" pra fazer backup e "Importar JSON" pra carregar em outro dispositivo.</div>
   </div>
 
   <div id="custom-list"></div>
@@ -2217,13 +2217,13 @@ RETORNO SE NECESSARIO
       <div class="field"><label>Observação (opcional)</label><input type="text" id="at-obs" placeholder="Recomendações adicionais"></div>
     </div>
     <div style="display:flex;gap:8px;margin-top:14px;">
-      <button class="btn-primary" onclick="printAtestado()">🖨️ Imprimir Atestado</button>
+      <button class="btn-primary" onclick="printAtestado()">Imprimir Atestado</button>
       <button class="btn-secondary" onclick="limparAtestado()">Limpar</button>
     </div>
   </div>
 
   <div class="info-banner cyan" style="margin-top:12px;">
-    <strong>LEMBRETE</strong> — O atestado será gerado com seu cabeçalho e dados cadastrados na aba ✏️ Editor → Perfil do médico.
+    <strong>LEMBRETE</strong> — O atestado será gerado com seu cabeçalho e dados cadastrados na aba Editor → Perfil do médico.
   </div>
 </div>
 
@@ -2232,8 +2232,45 @@ RETORNO SE NECESSARIO
   <div class="calc-grid">
 
 
+    <div class="panel" style="grid-column:span 2;">
+      <h2>Anafilaxia Pediátrica</h2>
+      <div class="desc">Baseado em SGAI/WAO 2020. Adrenalina 1:1000 IM coxa lateral — PRIMEIRA LINHA.</div>
+      <div class="field-row">
+        <div class="field">
+          <label>Peso (kg)</label>
+          <input type="number" id="anafi-peso" oninput="calcAnafi()" placeholder="20" step="0.5" min="1" max="100">
+        </div>
+        <div class="field">
+          <label>Via de adrenalina</label>
+          <select id="anafi-via" onchange="calcAnafi()">
+            <option value="im">IM (1ª linha)</option>
+            <option value="iv">EV (choque refratário)</option>
+          </select>
+        </div>
+      </div>
+      <div id="anafi-result" class="result" style="margin-top:10px;">Preencha o peso</div>
+    </div>
+
+    <div class="panel" style="grid-column:span 2;">
+      <h2>Anafilaxia Pediátrica</h2>
+      <div class="desc">WAO/SGAI 2020 — Adrenalina IM coxa lateral PRIMEIRA LINHA</div>
+      <div class="field-row">
+        <div class="field"><label>Peso (kg)</label><input type="number" id="anafi-peso" oninput="calcAnafi()" placeholder="20" step="0.5" min="1" max="100"></div>
+      </div>
+      <div id="anafi-result" class="result" style="margin-top:10px;">Preencha o peso</div>
+    </div>
+
+    <div class="panel" style="grid-column:span 2;">
+      <h2>Crise de Asma Pediátrica</h2>
+      <div class="desc">GINA 2023 — Broncodilatação + corticoide + O2</div>
+      <div class="field-row">
+        <div class="field"><label>Peso (kg)</label><input type="number" id="asma-peso" oninput="calcAsma()" placeholder="20" step="0.5" min="1" max="100"></div>
+      </div>
+      <div id="asma-result" class="result" style="margin-top:10px;">Preencha o peso</div>
+    </div>
+
     <div class="panel">
-      <h2>🩺 Gasometria Arterial</h2>
+      <h2>Gasometria Arterial</h2>
       <div class="desc">Interpretação sistemática: pH → PaCO2 → HCO3 → compensação</div>
       <div class="field-row">
         <div class="field"><label>pH</label><input type="number" id="g-ph" oninput="calcGaso()" placeholder="7.40" step="0.01"></div>
@@ -2252,7 +2289,7 @@ RETORNO SE NECESSARIO
 
 
     <div class="panel">
-      <h2>⏰ Divisão de Plantão</h2>
+      <h2>Divisão de Plantão</h2>
       <div class="desc">Divide o plantão entre 2 pessoas. Fim padrão: 07:00 do dia seguinte</div>
       <div class="field-row">
         <div class="field"><label>Início do plantão</label><input type="time" id="pt-inicio" oninput="calcPlantao()" value="19:00"></div>
@@ -2267,7 +2304,7 @@ RETORNO SE NECESSARIO
 
 
     <div class="panel" style="grid-column:span 2;">
-      <h2>💉 Sequência Rápida de Intubação (IOT)</h2>
+      <h2>Sequência Rápida de Intubação (IOT)</h2>
       <div class="desc">Pré-anestésico → Indução (opióide + hipnótico + bloqueador NM)</div>
       <div class="field-row">
         <div class="field"><label>Peso (kg)</label><input type="number" id="iot-peso" oninput="calcIOT()" placeholder="70" step="1" style="font-size:18px;font-weight:700;"></div>
@@ -2297,7 +2334,7 @@ RETORNO SE NECESSARIO
     </div>
 
     <div class="panel">
-      <h2>💧 Gotejamento de soro</h2>
+      <h2>Gotejamento de soro</h2>
       <div class="desc">Calcula gotas/min e microgotas/min</div>
       <div class="field-row">
         <div class="field"><label>Volume (ml)</label><input type="number" id="gt-vol" oninput="calcGotej()" placeholder="500"></div>
@@ -2307,7 +2344,7 @@ RETORNO SE NECESSARIO
     </div>
 
     <div class="panel">
-      <h2>💉 Noradrenalina</h2>
+      <h2>Noradrenalina</h2>
       <div class="desc">Diluição padrão: 4 amp (16mg) em 234ml SG5% = 250ml a 64 mcg/ml</div>
       <div class="field-row">
         <div class="field"><label>Peso (kg)</label><input type="number" id="nor-peso" oninput="calcNor()" placeholder="70"></div>
@@ -2317,7 +2354,7 @@ RETORNO SE NECESSARIO
     </div>
 
     <div class="panel">
-      <h2>💉 Dobutamina</h2>
+      <h2>Dobutamina</h2>
       <div class="desc">Diluição padrão: 1 amp (250mg) em 230ml SG5% = 250ml a 1000 mcg/ml</div>
       <div class="field-row">
         <div class="field"><label>Peso (kg)</label><input type="number" id="dob-peso" oninput="calcDob()" placeholder="70"></div>
@@ -2327,7 +2364,7 @@ RETORNO SE NECESSARIO
     </div>
 
     <div class="panel">
-      <h2>💉 Fentanil contínuo</h2>
+      <h2>Fentanil contínuo</h2>
       <div class="desc">Diluição: 10 amp (500mcg) puro = 10ml a 50 mcg/ml. Diluído: 10 amp em 90ml SF = 100ml a 5 mcg/ml</div>
       <div class="field-row">
         <div class="field"><label>Peso (kg)</label><input type="number" id="fen-peso" oninput="calcFen()" placeholder="70"></div>
@@ -2337,7 +2374,7 @@ RETORNO SE NECESSARIO
     </div>
 
     <div class="panel">
-      <h2>💉 Midazolam contínuo</h2>
+      <h2>Midazolam contínuo</h2>
       <div class="desc">Diluição: 5 amp (75mg) em 35ml SF = 50ml a 1500 mcg/ml (1.5 mg/ml)</div>
       <div class="field-row">
         <div class="field"><label>Peso (kg)</label><input type="number" id="mid-peso" oninput="calcMid()" placeholder="70"></div>
@@ -2347,7 +2384,7 @@ RETORNO SE NECESSARIO
     </div>
 
     <div class="panel">
-      <h2>📐 Superfície corporal</h2>
+      <h2>Superfície corporal</h2>
       <div class="desc">Fórmula de Mosteller</div>
       <div class="field-row">
         <div class="field"><label>Peso (kg)</label><input type="number" id="sc-peso" oninput="calcSC()" placeholder="70"></div>
@@ -2357,7 +2394,7 @@ RETORNO SE NECESSARIO
     </div>
 
     <div class="panel">
-      <h2>🩺 Clearance creatinina</h2>
+      <h2>Clearance creatinina</h2>
       <div class="desc">Cockcroft-Gault</div>
       <div class="field-row">
         <div class="field"><label>Idade</label><input type="number" id="cl-idade" oninput="calcCl()" placeholder="60"></div>
@@ -2371,7 +2408,7 @@ RETORNO SE NECESSARIO
     </div>
 
     <div class="panel">
-      <h2>⚖️ IMC</h2>
+      <h2>IMC</h2>
       <div class="desc">Índice de massa corporal</div>
       <div class="field-row">
         <div class="field"><label>Peso (kg)</label><input type="number" id="imc-peso" oninput="calcIMC()" placeholder="70"></div>
@@ -2381,7 +2418,7 @@ RETORNO SE NECESSARIO
     </div>
 
     <div class="panel">
-      <h2>🔥 Parkland (queimadura)</h2>
+      <h2>Parkland (queimadura)</h2>
       <div class="desc">Reposição volêmica em 24h: 4 × peso × %SCQ</div>
       <div class="field-row">
         <div class="field"><label>Peso (kg)</label><input type="number" id="pk-peso" oninput="calcParkland()" placeholder="70"></div>
@@ -2391,7 +2428,7 @@ RETORNO SE NECESSARIO
     </div>
 
     <div class="panel">
-      <h2>💧 Déficit de água livre</h2>
+      <h2>Déficit de água livre</h2>
       <div class="desc">Hipernatremia. DAL = 0,6 × peso × (Na/140 − 1)</div>
       <div class="field-row">
         <div class="field"><label>Peso (kg)</label><input type="number" id="dal-peso" oninput="calcDAL()" placeholder="70"></div>
@@ -2401,7 +2438,7 @@ RETORNO SE NECESSARIO
     </div>
 
     <div class="panel">
-      <h2>🧂 Correção de Sódio</h2>
+      <h2>Correção de Sódio</h2>
       <div class="desc">Hiponatremia. Variação máx: 8-10 mEq/L em 24h</div>
       <div class="field-row">
         <div class="field"><label>Peso (kg)</label><input type="number" id="na-peso" oninput="calcNa()" placeholder="70"></div>
@@ -2415,7 +2452,7 @@ RETORNO SE NECESSARIO
     </div>
 
     <div class="panel">
-      <h2>🧪 Anion Gap</h2>
+      <h2>Anion Gap</h2>
       <div class="desc">AG = Na − (Cl + HCO3). Normal: 8-12 mEq/L</div>
       <div class="field-row">
         <div class="field"><label>Na</label><input type="number" id="ag-na" oninput="calcAG()" placeholder="140"></div>
@@ -2426,7 +2463,7 @@ RETORNO SE NECESSARIO
     </div>
 
     <div class="panel">
-      <h2>🩸 Transfusão (Hb)</h2>
+      <h2>Transfusão (Hb)</h2>
       <div class="desc">1 CH eleva Hb ~1 g/dL. Meta geral Hb ≥7 (≥8 em cardiopata)</div>
       <div class="field-row">
         <div class="field"><label>Hb atual (g/dL)</label><input type="number" id="tr-hb" oninput="calcTransf()" placeholder="6.5" step="0.1"></div>
@@ -2436,7 +2473,7 @@ RETORNO SE NECESSARIO
     </div>
 
     <div class="panel">
-      <h2>💊 Correção de Cálcio (albumina)</h2>
+      <h2>Correção de Cálcio (albumina)</h2>
       <div class="desc">Ca corrigido = Ca + 0,8 × (4 − Alb)</div>
       <div class="field-row">
         <div class="field"><label>Ca sérico</label><input type="number" id="ca-ca" oninput="calcCa()" placeholder="8.0" step="0.1"></div>
@@ -2951,7 +2988,7 @@ const MINHAS = [
   { id:'m_geca1', cat:'GECA', title:'GECA — ADULTO',
     rx:'VIA ORAL-\n\n1) DIPIRONA 500 MG----------------------------------1 CX\nTOMAR 1 CP DE 6/6 HORAS SE DOR OU FEBRE\n\n2)BROMOPRIDA 10 MG-----------------------------------1 CX\nTOMAR 1 CP DE 8/8 HORAS SE NAUSEA OU VÔMITOS\n\n3)SORO DE REIDRATAÇÃO ORAL  ---------------------------------------1 FRASCO\nTOMAR 1,5 L POR DIA E TODA A QUANTIDADE DE LIQUIDOS QUE CONSEGUIR\n\n4)FLORATIL 200 MG   ---------------------------------------1 CX\nDILUIR UM SACHE EM AGUA E TOMAR DE 12/12 HORAS POR 5 DIAS' },
   { id:'m_geca2', cat:'GECA', title:'GECA — PEDIÁTRICO',
-    rx:'VIA ORAL-\n\n1) DIPIRONA 500 MG/ML----------------------------------1 FRASCO\nTOMAR 36 GOTAS DE 6/6 HORAS SE DOR OU FEBRE\n\n2)ONDASETRONA 4 MG/5ML-----------------------------------1 FRASCO\nTOMAR 10 ML DE 8/8 HORAS SE NAUSEA OU VÔMITOS\n\n3)SORO DE REIDRATAÇÃO ORAL  ---------------------------------------1 FRASCO\nTOMAR 1,5 L POR DIA E TODA A QUANTIDADE DE LIQUIDOS QUE CONSEGUIR\n\n4)FLORATIL 200 MG   ---------------------------------------1 CX\nDILUIR UM SACHE EM AGUA E TOMAR DE 12/12 HORAS POR 5 DIAS\n\n5)ZINCO 20 MG   ---------------------------------------1 CX\nTOMAR 1 CP POR DIA POR 7 DIAS\n\n2)BROMOPRIDA 4 MG/ML-----------------------------------1 FRASCO\nTOMAR 36 GOTAS DE 8/8 HORAS SE NAUSEA OU VÔMITOS' },
+    rx:'VIA ORAL-\n\n1) DIPIRONA 500 MG/ML----------------------------------1 FRASCO\nTOMAR 1 GOTAS DE 6/6 HORAS SE DOR OU FEBRE\n\n2)ONDASETRONA 4 MG/5ML-----------------------------------1 FRASCO\nTOMAR 1 ML DE 8/8 HORAS SE NAUSEA OU VOMITOS\n\n3)SEKI XAROPE---------------------------------------1 FRASCO\nTOMAR 1 ML DE 8/8 HORAS SE TOSSE\n\n4)SORO DE REIDRATACAO ORAL  ---------------------------------------1 FRASCO\nTOMAR 1,5 L POR DIA E TODA A QUANTIDADE DE LIQUIDOS QUE CONSEGUIR\n\n5)FLORATIL 200 MG   ---------------------------------------1 CX\nDILUIR UM SACHE EM AGUA E TOMAR DE 12/12 HORAS POR 5 DIAS\n\n6)ZINCO 20 MG   ---------------------------------------1 CX\nTOMAR 1 CP POR DIA POR 7 DIAS\n\n7)BROMOPRIDA 4 MG/ML-----------------------------------1 FRASCO\nTOMAR 1 GOTAS DE 8/8 HORAS SE NAUSEA OU VOMITOS' },
 
   // --- SINUSITE ---
   { id:'m_sin1', cat:'SINUSITE', title:'SINUSITE',
@@ -3321,7 +3358,7 @@ var CATS_MINHAS = CATS_MINHAS_BASE;
 function toggleTheme() {
   STATE.theme = STATE.theme === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', STATE.theme === 'light' ? 'light' : 'dark');
-  document.getElementById('theme-btn').textContent = STATE.theme === 'dark' ? '🌙' : '☀️';
+  document.getElementById('theme-btn').textContent = STATE.theme === 'dark' ? 'Dark' : 'Light';
 }
 
 // =================== SEÇÕES ===================
@@ -3422,7 +3459,7 @@ function renderList() {
             ${calcPed(r, peso) ? `<div class="rx-ped">⚖️ ${calcPed(r, peso)}</div>` : ''}
           </div>
         `).join('')}
-        <button class="copy-btn" onclick="copyRx('${item.id}', this)">📋 Copiar receita</button>
+        <button class="copy-btn" onclick="copyRx('${item.id}', this)">Copiar receita</button>
       </div>
     `;
     el.appendChild(card);
@@ -3512,21 +3549,21 @@ function renderMinhas() {
       </div>
       <div class="card-body ${isOpen ? 'open' : ''}">
         <div style="display:flex;gap:6px;margin-bottom:10px;">
-          <button class="copy-btn" style="flex:2;" onclick="copyMinhasRx('${item.id}', this)">📋 Copiar</button>
-          <button class="copy-btn" style="flex:1;" onclick="printMinhaRx('${item.id}')">🖨️ Imprimir</button>
-          <button class="copy-btn" style="flex:1;background:var(--warn-dim);border-color:var(--warn);" onclick="editarParaImprimir('${item.id}')">✏️ Editar</button>
+          <button class="copy-btn" style="flex:2;" onclick="copyMinhasRx('${item.id}', this)">Copiar</button>
+          <button class="copy-btn" style="flex:1;" onclick="printMinhaRx('${item.id}')">Imprimir</button>
+          <button class="copy-btn" style="flex:1;background:var(--warn-dim);border-color:var(--warn);" onclick="editarParaImprimir('${item.id}')">Editar</button>
         </div>
         <div id="edit-tmp-${item.id}" style="display:none;margin-bottom:10px;">
           <textarea id="edit-tmp-txt-${item.id}" style="width:100%;min-height:120px;padding:10px;font-family:ui-monospace,Consolas,Monaco,monospace;font-size:12px;line-height:1.6;background:var(--bg-2);color:var(--txt);border:1px solid var(--warn);border-radius:8px;resize:vertical;"></textarea>
           <div style="display:flex;gap:6px;margin-top:6px;">
-            <button class="copy-btn" style="flex:1;background:var(--vital-dim);border-color:var(--vital);" onclick="copiarEditado('${item.id}', this)">📋 Copiar</button>
-            <button class="copy-btn" style="flex:1;" onclick="imprimirEditado('${item.id}', '${item.title}')">🖨️ Imprimir</button>
-            <button class="copy-btn" style="flex:1;background:var(--bg-3);border-color:var(--line);" onclick="fecharEdicaoTemp('${item.id}')">✕ Fechar</button>
+            <button class="copy-btn" style="flex:1;background:var(--vital-dim);border-color:var(--vital);" onclick="copiarEditado('${item.id}', this)">Copiar</button>
+            <button class="copy-btn" style="flex:1;" onclick="imprimirEditado('${item.id}', '${item.title}')">Imprimir</button>
+            <button class="copy-btn" style="flex:1;background:var(--bg-3);border-color:var(--line);" onclick="fecharEdicaoTemp('${item.id}')">x Fechar</button>
           </div>
         </div>
         ${showPeso ? `
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:8px 10px;background:var(--warn-glow);border:1px solid var(--warn);border-radius:8px;">
-          <span style="font-family:var(--font-mono);font-size:10px;color:var(--warn);font-weight:700;">⚖️ PESO (kg)</span>
+          <span style="font-family:var(--font-mono);font-size:10px;color:var(--warn);font-weight:700;">PESO (kg)</span>
           <input type="number" id="${pesoId}" placeholder="kg" min="1" max="100" step="0.5"
             style="width:70px;padding:5px 8px;font-family:var(--font-mono);font-size:13px;font-weight:700;border:1px solid var(--warn);border-radius:6px;background:var(--bg);color:var(--warn);text-align:center;"
             oninput="calcDoseMinhas('${item.id}')">
@@ -3565,7 +3602,7 @@ function copyRx(id, btn) {
   navigator.clipboard.writeText(txt).then(() => {
     btn.textContent = '✓ Copiado!';
     btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = '📋 Copiar receita'; btn.classList.remove('copied'); }, 1800);
+    setTimeout(() => { btn.textContent = 'Copiar receita'; btn.classList.remove('copied'); }, 1800);
 
     // Adiciona ao histórico
     STATE.history.unshift({
@@ -4109,7 +4146,7 @@ function renderScores() {
         `).join('')}
       </div>
       <div class="result" id="result-${sc.id}"><strong>0</strong> pontos</div>
-      <button onclick="limparScore('${sc.id}')" style="margin-top:8px;width:100%;padding:6px;font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:1px;background:transparent;border:1px solid var(--line-2);border-radius:6px;color:var(--txt-3);cursor:pointer;" onmouseover="this.style.borderColor='var(--cyan)';this.style.color='var(--cyan)'" onmouseout="this.style.borderColor='var(--line-2)';this.style.color='var(--txt-3)'">↺ LIMPAR</button>
+      <button onclick="limparScore('${sc.id}')" style="margin-top:8px;width:100%;padding:6px;font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:1px;background:transparent;border:1px solid var(--line-2);border-radius:6px;color:var(--txt-3);cursor:pointer;" onmouseover="this.style.borderColor='var(--cyan)';this.style.color='var(--cyan)'" onmouseout="this.style.borderColor='var(--line-2)';this.style.color='var(--txt-3)'">[ Limpar ]</button>
     </div>
   `).join('');
   // Drag scores
@@ -4377,7 +4414,7 @@ function renderCustom() {
           <span class="card-tag tag-vo">${item.cat || 'CUSTOM'}</span>
         </div>
         <div class="header-right" onclick="event.stopPropagation();">
-          <button class="mini-btn" onclick="editCustom('${item.id}')">✏️ Editar</button>
+          <button class="mini-btn" onclick="editCustom('${item.id}')">Editar</button>
           <button class="mini-btn" onclick="printCustom('${item.id}')">🖨️</button>
           <button class="mini-btn danger" onclick="deleteCustom('${item.id}')">🗑️</button>
         </div>
@@ -4669,10 +4706,10 @@ function installPWA() {
 const DATA_PED = [
   { id:'ped1', cat:'ATB Pediátrico', tag:'AMOXICILINA', tagClass:'tag-vo',
     title:'Amoxicilina suspensão 250mg/5ml',
-    doses:[{med:'Amoxicilina', mgkg:25, conc:50, unit:'ml', freq:'8/8h', max:1000, obs:'50 mg/kg/dia ÷ 3 doses. Mín 7 dias'}] },
+    doses:[{med:'Amoxicilina', mgkg:16.7, conc:50, unit:'ml', freq:'8/8h', max:500, obs:'50mg/kg/dia ÷ 3 doses (Nelson 21ª/UpToDate). Mín 7 dias'}] },
   { id:'ped2', cat:'ATB Pediátrico', tag:'AMOXICLAV', tagClass:'tag-vo',
     title:'Amoxicilina+Clavulanato 250+62,5/5ml',
-    doses:[{med:'Amoxicilina-clavulanato', mgkg:25, conc:50, unit:'ml', freq:'12/12h', max:875, obs:'50 mg/kg/dia ÷ 2 doses. 7-10 dias'}] },
+    doses:[{med:'Amoxicilina-clavulanato', mgkg:22.5, conc:50, unit:'ml', freq:'12/12h', max:500, obs:'45mg/kg/dia ÷ 2 doses (Nelson 21ª). 7-10 dias'}] },
   { id:'ped3', cat:'ATB Pediátrico', tag:'CEFALEXINA', tagClass:'tag-vo',
     title:'Cefalexina suspensão 250mg/5ml',
     doses:[{med:'Cefalexina', mgkg:12.5, conc:50, unit:'ml', freq:'6/6h', max:500, obs:'50 mg/kg/dia ÷ 4 doses. 7-10 dias'}] },
@@ -4681,7 +4718,7 @@ const DATA_PED = [
     doses:[{med:'Azitromicina', mgkg:10, conc:40, unit:'ml', freq:'1x/dia', max:500, obs:'10 mg/kg/dia dose única por 5 dias'}] },
   { id:'ped5', cat:'ATB Pediátrico', tag:'BACTRIM', tagClass:'tag-vo',
     title:'SMX-TMP suspensão 200+40mg/5ml (Bactrim)',
-    doses:[{med:'TMP', mgkg:0.5, conc:8, unit:'ml', freq:'12/12h', max:320, obs:'8 mg/kg/dia de SMX (TMP=1.6) ÷ 2 doses. 7-10 dias'}] },
+    doses:[{med:'TMP', mgkg:4, conc:8, unit:'ml', freq:'12/12h', max:160, obs:'TMP 8mg/kg/dia ÷ 2 doses = 4mg/kg/dose (Nelson 21ª/UpToDate). 7-10 dias'}] },
   { id:'ped6', cat:'ATB Pediátrico', tag:'CEFTRIAXONA', tagClass:'tag-iv',
     title:'Ceftriaxona 50-100mg/kg/dia IV',
     doses:[{med:'Ceftriaxona', mgkg:50, conc:1000, unit:'mg', freq:'1x/dia', max:4000, obs:'50-100 mg/kg/dia IV. Meningite: 100mg/kg'}] },
@@ -5474,11 +5511,11 @@ try { calcPlantao(); } catch(e) {}
 // Regras de dose por peso:
 // SEKI xarope: <15kg → 5ml | ≥15kg → 10ml
 // DIPIRONA 500mg/ml: 1 gota/kg (máx 40 gotas)
-// CETOPROFENO 20mg/ml: 0,5mg/kg → gotas = (peso*0,5/20)*20 = peso*0,5 gotas
+// CETOPROFENO 20mg/ml: 1 gota/kg (1mg/kg)
 // ONDANSETRONA 4mg/5ml: 0,15mg/kg → ml = (peso*0,15/0,8)
 // PREDNISOLONA 3mg/ml: 1mg/kg → ml = peso/3
 // NIMESULIDA 50mg/ml: 5mg/kg → gotas = (peso*5/50)*20
-// BROMOPRIDA 4mg/ml: 0,1mg/kg → gotas = (peso*0,1/4)*20
+// BROMOPRIDA 4mg/ml: 1 gota/kg
 
 function calcDosePedItem(linha, peso) {
   var l = linha.toUpperCase();
@@ -5494,14 +5531,15 @@ function calcDosePedItem(linha, peso) {
     var gotas = Math.min(Math.round(peso), 40);
     result = linha.replace(/\d+\s*GOTAS/gi, gotas + ' GOTAS');
   }
-  // CETOPROFENO gotas (20mg/ml, 0,5mg/kg)
+  // CETOPROFENO gotas (20mg/ml, 1 gota/kg)
   else if (l.includes('CETOPROFENO') && l.includes('GOTAS')) {
-    var gotas2 = Math.round(peso * 0.5);
+    var gotas2 = Math.round(peso * 1);
     result = linha.replace(/\d+\s*GOTAS/gi, gotas2 + ' GOTAS');
   }
-  // ONDANSETRONA ml (4mg/5ml → 0,15mg/kg)
+  // ONDANSETRONA ml (4mg/5ml=0,8mg/ml → 0,15mg/kg, máx 4mg=5ml)
   else if ((l.includes('ONDASETRONA') || l.includes('ONDANSETRONA')) && l.includes('ML')) {
-    var ml = Math.round((peso * 0.15 / 0.8) * 10) / 10;
+    var doseOnd = Math.min(peso * 0.15, 4);
+    var ml = Math.round((doseOnd / 0.8) * 10) / 10;
     result = linha.replace(/\d+(?:[,\.]\d+)?\s*ML/gi, ml + ' ML');
   }
   // PREDNISOLONA ml (3mg/ml → 1mg/kg)
@@ -5514,19 +5552,19 @@ function calcDosePedItem(linha, peso) {
     var gotas3 = Math.round(peso * 2);
     result = linha.replace(/\d+\s*GOTAS/gi, gotas3 + ' GOTAS');
   }
-  // BROMOPRIDA gotas (4mg/ml → 0,1mg/kg)
+  // BROMOPRIDA gotas (4mg/ml, 1 gota/kg)
   else if (l.includes('BROMOPRIDA') && l.includes('GOTAS')) {
-    var gotas4 = Math.round(peso * 0.5);
+    var gotas4 = Math.round(peso * 1);
     result = linha.replace(/\d+\s*GOTAS/gi, gotas4 + ' GOTAS');
   }
-  // AMOXICILINA xarope ml (250mg/5ml → 50mg/kg/dia ÷ 2)
+  // AMOXICILINA xarope ml (250mg/5ml → 16,7mg/kg/dose)
   else if (l.includes('AMOXICILINA') && l.includes('ML')) {
-    var ml3 = Math.round((peso * 50 / 2) / 50 * 10) / 10;
+    var ml3 = Math.round((peso * 16.7 / 50) * 10) / 10;
     result = linha.replace(/\d+(?:[,\.]\d+)?\s*ML/gi, ml3 + ' ML');
   }
-  // CEFALEXINA xarope ml (250mg/5ml → 25mg/kg/dose)
+  // CEFALEXINA xarope ml (250mg/5ml → 50mg/kg/dia ÷ 4 doses = 12,5mg/kg/dose)
   else if (l.includes('CEFALEXINA') && l.includes('ML')) {
-    var ml4 = Math.round((peso * 25 / 50) * 10) / 10;
+    var ml4 = Math.round((peso * 12.5 / 50) * 10) / 10;
     result = linha.replace(/\d+(?:[,\.]\d+)?\s*ML/gi, ml4 + ' ML');
   }
 
@@ -5636,7 +5674,7 @@ function copyMinhasRx(id, btn) {
   var txt = rxEl ? rxEl.textContent : item.rx;
   navigator.clipboard.writeText(txt).then(function() {
     btn.textContent = '✓ COPIADO'; btn.classList.add('copied');
-    setTimeout(function() { btn.textContent = '📋 Copiar'; btn.classList.remove('copied'); }, 1800);
+    setTimeout(function() { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 1800);
     STATE.history.unshift({ title: item.title, content: txt, time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) });
   });
 }
@@ -5779,7 +5817,7 @@ function calcIOT() {
 
   el.className = 'result';
   el.innerHTML =
-    '<div style="font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:2px;color:var(--cyan);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--line);">⚖️ PESO: ' + peso + ' kg — SEQUÊNCIA RÁPIDA IOT</div>' +
+    '<div style="font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:2px;color:var(--cyan);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--line);">PESO: ' + peso + ' kg — SEQUÊNCIA RÁPIDA IOT</div>' +
     pre +
     '<div style="font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:2px;color:var(--pulse);margin-bottom:8px;">● INDUÇÃO</div>' +
     opioTxt + hipnoTxt + bnmTxt +
@@ -5899,6 +5937,131 @@ function deleteAnamModel(id) {
   renderCustomAnamBtns();
 }
 
+// =================== ANAFILAXIA PEDIÁTRICA ===================
+// Refs: WAO 2020, SGAI 2020, UpToDate, Nelson 21ª ed
+// Adrenalina 1:1000 (1mg/ml) IM: 0,01mg/kg, máx 0,3mg (<30kg) ou 0,5mg (≥30kg)
+// Prometazina: CONTRAINDICADA <2 anos (apneia); 0,25mg/kg IM/EV ≥2 anos, máx 25mg
+// Hidrocortisona: 10mg/kg EV, máx 200mg
+// Difenidramina: 1mg/kg EV/IM, máx 50mg
+// Salbutamol nebul: 0,15mg/kg, mín 2,5mg, máx 5mg (se broncoespasmo)
+// SF 20ml/kg bolus (hipotensão)
+
+function calcAnafi() {
+  var peso = parseFloat(document.getElementById('anafi-peso').value);
+  var el = document.getElementById('anafi-result');
+  if (!peso || peso <= 0) { el.innerHTML = 'Preencha o peso'; return; }
+
+  function row(n, label, dose, ml, info, warn) {
+    var cor = warn ? 'var(--pulse)' : 'var(--cyan)';
+    var bg  = warn ? 'rgba(255,45,85,0.06)' : 'rgba(0,212,255,0.04)';
+    return '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;padding:8px 10px;background:'+bg+';border-radius:8px;border-left:3px solid '+cor+';">'+
+      '<span style="font-family:var(--font-mono);font-size:13px;font-weight:800;color:'+cor+';min-width:22px;">'+n+'</span>'+
+      '<div style="flex:1;">'+
+        '<div style="font-weight:700;font-size:13px;">'+label+' <span style="color:'+cor+';font-size:15px;">→ '+ml+'</span></div>'+
+        '<div style="font-size:11px;color:var(--txt-3);">'+dose+' | '+info+'</div>'+
+        (warn ? '<div style="font-size:10px;color:var(--pulse);margin-top:2px;">⚠ '+warn+'</div>' : '')+
+      '</div></div>';
+  }
+
+  // Adrenalina 1:1000 IM
+  var adrenDose = peso * 0.01;
+  var adrenMax  = peso < 30 ? 0.3 : 0.5;
+  adrenDose = Math.min(adrenDose, adrenMax);
+  var adrenMl   = adrenDose.toFixed(2);
+
+  // Prometazina IM/EV (só ≥2 anos — alertar)
+  var promDose  = Math.min(peso * 0.25, 25);
+  var promMl    = (promDose / 25).toFixed(2); // 25mg/ml
+
+  // Hidrocortisona EV
+  var hidroDose = Math.min(peso * 10, 200);
+  var hidroMl   = (hidroDose / 500 * 10).toFixed(1); // reconstituir 500mg/10ml = 50mg/ml
+
+  // Difenidramina EV/IM
+  var difeDose  = Math.min(peso * 1, 50);
+  var difeMl    = (difeDose / 50).toFixed(1); // 50mg/ml
+
+  // Salbutamol nebulização (se broncoespasmo)
+  var salbDose  = Math.max(2.5, Math.min(peso * 0.15, 5));
+  var salbMl    = (salbDose / 5).toFixed(2); // 5mg/ml → completar SF até 3ml
+
+  // SF bolus
+  var sfVol = Math.round(peso * 20);
+
+  el.className = 'result';
+  el.innerHTML =
+    '<div style="font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:2px;color:var(--pulse);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--line);">ANAFILAXIA — PESO: '+peso+' kg</div>'+
+    '<div style="font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:1px;color:var(--vital);margin-bottom:6px;">1ª LINHA</div>'+
+    row('A','Adrenalina 1:1000 IM (coxa lateral)',adrenDose.toFixed(2)+'mg',adrenMl+' mL','Amp 1mg/mL — repetir em 5-15min se necessário','')+''+
+    '<div style="font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:1px;color:var(--warn);margin:10px 0 6px;">2ª LINHA — ADJUVANTES</div>'+
+    row('B','Hidrocortisona EV',hidroDose.toFixed(0)+'mg',hidroMl+' mL','Amp 100mg/2mL (50mg/mL) — EV lento','')+''+
+    row('C','Difenidramina EV/IM (anti-H1)',difeDose.toFixed(0)+'mg',difeMl+' mL','Amp 50mg/mL — EV lento ou IM','')+''+
+    row('D','Prometazina IM/EV (anti-H1)',promDose.toFixed(1)+'mg',promMl+' mL','Amp 25mg/mL','CONTRAINDICADA < 2 anos (risco apneia)')+''+
+    '<div style="font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:1px;color:var(--cyan);margin:10px 0 6px;">SE BRONCOESPASMO</div>'+
+    row('E','Salbutamol nebulização',salbDose.toFixed(1)+'mg',salbMl+' mL','Amp 5mg/mL — completar com SF até 3mL','')+''+
+    '<div style="font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:1px;color:var(--cyan);margin:10px 0 6px;">SE HIPOTENSÃO</div>'+
+    '<div style="padding:8px 10px;background:rgba(0,212,255,0.04);border-radius:8px;border-left:3px solid var(--cyan-dim);font-size:12px;">SF 0,9% — <strong>'+sfVol+' mL</strong> EV rápido (20 mL/kg) — repetir se necessário</div>'+
+    '<div style="font-size:10px;color:var(--txt-4);margin-top:8px;">O2 alto fluxo. Decúbito dorsal pernas elevadas. Monitorizar. Observar min 4-6h após resolução.</div>';
+}
+
+// =================== ASMA PEDIÁTRICA ===================
+// Refs: GINA 2023, PAHO, SBP, UpToDate
+// Salbutamol MDI/nebul: 0,15mg/kg (mín 2,5, máx 5mg) — repetir 20/20min x3
+// Ipratrópio nebul: <20kg=250mcg / ≥20kg=500mcg — associar nas primeiras 3 doses
+// Prednisolona VO: 1-2mg/kg/dia, máx 40mg/dia
+// Hidrocortisona EV (grave): 5mg/kg, máx 100mg
+// MgSO4 EV (grave refratário): 25-75mg/kg, máx 2g em 20min
+// O2 para SatO2 ≥94%
+
+function calcAsma() {
+  var peso = parseFloat(document.getElementById('asma-peso').value);
+  var el = document.getElementById('asma-result');
+  if (!peso || peso <= 0) { el.innerHTML = 'Preencha o peso'; return; }
+
+  function row(n, label, dose, ml, info) {
+    return '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;padding:8px 10px;background:rgba(0,212,255,0.04);border-radius:8px;border-left:3px solid var(--cyan-dim);">'+
+      '<span style="font-family:var(--font-mono);font-size:13px;font-weight:800;color:var(--cyan);min-width:22px;">'+n+'</span>'+
+      '<div style="flex:1;">'+
+        '<div style="font-weight:700;font-size:13px;">'+label+' <span style="color:var(--cyan);font-size:15px;">→ '+ml+'</span></div>'+
+        '<div style="font-size:11px;color:var(--txt-3);">'+dose+' | '+info+'</div>'+
+      '</div></div>';
+  }
+
+  // Salbutamol nebulização
+  var salbDose = Math.max(2.5, Math.min(peso * 0.15, 5));
+  var salbMl   = (salbDose / 5).toFixed(2); // 5mg/ml
+
+  // Ipratrópio
+  var ipraMsg  = peso < 20 ? '250 mcg' : '500 mcg';
+  var ipraMl   = peso < 20 ? '1 mL' : '2 mL'; // 250mcg/mL
+
+  // Prednisolona VO
+  var predDose = Math.min(peso * 1, 40);
+  var predMl   = (predDose / 3).toFixed(1); // 3mg/mL
+
+  // Hidrocortisona EV (crise grave)
+  var hidroDose = Math.min(peso * 5, 100);
+  var hidroMl   = (hidroDose / 50).toFixed(1); // 50mg/mL
+
+  // MgSO4 EV (grave refratário) — 50mg/kg máx 2000mg
+  var mgDose = Math.min(peso * 50, 2000);
+  var mgMl   = (mgDose / 500).toFixed(1); // MgSO4 50% = 500mg/mL → diluir em SF 20mL correr em 20min
+  var mgMlDil = (mgDose / 100).toFixed(1); // diluído em SF para 10mg/mL
+
+  el.className = 'result';
+  el.innerHTML =
+    '<div style="font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:2px;color:var(--cyan);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--line);">ASMA — PESO: '+peso+' kg</div>'+
+    '<div style="font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:1px;color:var(--vital);margin-bottom:6px;">BRONCODILATAÇÃO (repetir 20/20min x3)</div>'+
+    row('1','Salbutamol nebulização',salbDose.toFixed(1)+'mg',salbMl+' mL + SF até 3 mL','Amp 5mg/mL — associar O2 6-8 L/min no nebulizador')+''+
+    row('2','Ipratrópio nebulização',ipraMsg,ipraMl+' + junto ao salbutamol','Amp 250mcg/mL — associar nas primeiras 3 doses')+''+
+    '<div style="font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:1px;color:var(--warn);margin:10px 0 6px;">CORTICOIDE</div>'+
+    row('3','Prednisolona VO (leve-moderada)',predDose.toFixed(0)+'mg',predMl+' mL','Susp 3mg/mL — 1-2mg/kg/dia, máx 40mg — manter 3-5 dias')+''+
+    row('4','Hidrocortisona EV (grave)',hidroDose.toFixed(0)+'mg',hidroMl+' mL','Reconstituir 100mg/2mL=50mg/mL — EV lento — se não tolerar VO')+''+
+    '<div style="font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:1px;color:var(--violet);margin:10px 0 6px;">GRAVE REFRATÁRIO</div>'+
+    row('5','MgSO4 EV',mgDose.toFixed(0)+'mg',mgMlDil+' mL (dil. 10mg/mL)','MgSO4 50% — diluir em SF → 10mg/mL — infundir em 20 min')+
+    '<div style="font-size:10px;color:var(--txt-4);margin-top:8px;">O2 para SatO2 ≥94%. SatO2 &lt;92% = crise grave. Monitorizar FC/FR/SpO2. Se não responder em 1h = UTI.</div>';
+}
+
 // =================== EDIÇÃO TEMPORÁRIA ============
 function editarParaImprimir(id) {
   var editDiv = document.getElementById('edit-tmp-' + id);
@@ -5922,7 +6085,7 @@ function copiarEditado(id, btn) {
   if (!ta) return;
   navigator.clipboard.writeText(ta.value).then(function() {
     btn.textContent = '✅ Copiado';
-    setTimeout(function(){ btn.textContent = '📋 Copiar'; }, 1800);
+    setTimeout(function(){ btn.textContent = 'Copiar'; }, 1800);
   });
 }
 function imprimirEditado(id, title) {
@@ -5947,7 +6110,7 @@ function initCalcLimparBtns() {
     if (panel.querySelector('.btn-limpar-calc')) return;
     var btn = document.createElement('button');
     btn.className = 'btn-limpar-calc';
-    btn.textContent = '↺ Limpar';
+    btn.textContent = '[ Limpar ]';
     btn.style.cssText = 'margin-top:8px;width:100%;padding:6px;font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:1px;background:transparent;border:1px solid var(--line-2);border-radius:6px;color:var(--txt-3);cursor:pointer;';
     btn.onmouseover = function(){ btn.style.borderColor='var(--cyan)'; btn.style.color='var(--cyan)'; };
     btn.onmouseout = function(){ btn.style.borderColor='var(--line-2)'; btn.style.color='var(--txt-3)'; };
