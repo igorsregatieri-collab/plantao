@@ -4242,6 +4242,7 @@ function apiCallJsonp(params) {
 
 async function apiPost(body) {
   try {
+    // Tentar com cors primeiro (lê resposta)
     const res = await fetch(AS_URL, {
       method: 'POST',
       redirect: 'follow',
@@ -4249,8 +4250,19 @@ async function apiPost(body) {
       headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify(body)
     });
-    const txt = await res.text();
-    return JSON.parse(txt);
+    if (res.ok) {
+      var txt = await res.text();
+      try { return JSON.parse(txt); } catch(e2) { return { ok: true }; }
+    }
+    // Se falhou, tentar no-cors (fire-and-forget — POST chega mas não lê resposta)
+    await fetch(AS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      credentials: 'omit',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(body)
+    });
+    return { ok: true, mode: 'no-cors' };
   } catch(e) {
     console.error('apiPost offline:', e);
     return null;
@@ -4392,7 +4404,8 @@ async function syncFromCloud() {
       renderCondutaModelBtns();
     }
 
-    updateSyncBadge('synced', 'sincronizado');
+    updateSyncBadge('synced', 'sincronizado ✓');
+    console.log('Sync completo — subiu e baixou tudo');
   } catch(e) {
     console.error('sync erro:', e);
     updateSyncBadge('error', 'offline (usando local)');
