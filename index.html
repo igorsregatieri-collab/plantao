@@ -4382,10 +4382,20 @@ async function syncFromCloud() {
         id: c.id,
         cat: c.cat || c.categoria || 'GERAL',
         title: c.title || c.titulo || '',
-        rx: c.rx || c.prescricao || ''
+        rx: c.rx || c.prescricao || '',
+        _minhas: c._minhas || false
       }));
       saveCustomLocal();
       renderCustom();
+      // Restaurar minhas_extra dos itens com flag _minhas
+      var minhasExtra = CUSTOM.filter(function(c){ return c._minhas; }).map(function(c){
+        return { id: c.id, cat: c.cat, title: c.title, rx: c.rx };
+      });
+      if (minhasExtra.length > 0) {
+        localStorage.setItem('plantao_minhas_extra', JSON.stringify(minhasExtra));
+        buildCatsMinhas();
+        renderMinhas();
+      }
     }
 
     // 5. Baixar anam models
@@ -4423,7 +4433,8 @@ async function saveCustomCloud(item) {
     id: item.id,
     cat: item.cat,
     title: item.title,
-    rx: item.rx
+    rx: item.rx,
+    _minhas: item._minhas || false
   });
   if (r && r.ok) {
     updateSyncBadge('synced', 'salvo na nuvem');
@@ -5763,11 +5774,14 @@ function saveEditFormToMinhas(id) {
   // Salvar em MINHAS_EXTRA (localStorage) para aparecer na lista Minhas
   var extras = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]');
   var idx3 = extras.findIndex(function(e) { return e.id === id; });
-  var extraObj = { id: id, cat: cat, title: title, rx: rx };
+  var extraObj = { id: id, cat: cat, title: title, rx: rx, _minhas: true };
   if (idx3 >= 0) extras[idx3] = extraObj;
   else extras.push(extraObj);
   localStorage.setItem('plantao_minhas_extra', JSON.stringify(extras));
-  
+
+  // Subir para nuvem com flag _minhas
+  saveCustomCloud({ id: id, title: title, cat: cat, rx: rx, _minhas: true });
+
   // Re-renderizar Minhas
   buildCatsMinhas();
   renderMinhas();
