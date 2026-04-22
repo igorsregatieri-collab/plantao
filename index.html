@@ -4353,19 +4353,48 @@ function loadCustom() {
 
 async function syncFromCloud() {
   updateSyncBadge('syncing', 'sincronizando...');
-  const r = await apiCall({ action: 'list' });
-  console.log('syncFromCloud response:', JSON.stringify(r));
-  if (r && r.items) {
-    CUSTOM = r.items.map(c => ({
-      id: c.id,
-      cat: c.cat || c.categoria || 'GERAL',
-      title: c.title || c.titulo || '',
-      rx: c.rx || c.prescricao || ''
-    }));
-    saveCustomLocal();
-    renderCustom();
+  try {
+    // 1. Subir condutas custom
+    for (const c of CUSTOM) { await saveCustomCloud(c); }
+
+    // 2. Subir anam models
+    await apiPost({ action: 'saveAnamModels', data: ANAM_MODELS });
+
+    // 3. Subir conduta models
+    await apiPost({ action: 'saveCondutaModels', data: CONDUTA_MODELS });
+
+    // 4. Baixar condutas custom da nuvem
+    const r = await apiCall({ action: 'list' });
+    if (r && r.items) {
+      CUSTOM = r.items.map(c => ({
+        id: c.id,
+        cat: c.cat || c.categoria || 'GERAL',
+        title: c.title || c.titulo || '',
+        rx: c.rx || c.prescricao || ''
+      }));
+      saveCustomLocal();
+      renderCustom();
+    }
+
+    // 5. Baixar anam models
+    const ra = await apiCall({ action: 'getAnamModels' });
+    if (ra && ra.data && ra.data.length) {
+      ANAM_MODELS = ra.data;
+      localStorage.setItem('plantao_anam_models', JSON.stringify(ANAM_MODELS));
+      renderCustomAnamBtns();
+    }
+
+    // 6. Baixar conduta models
+    const rc = await apiCall({ action: 'getCondutaModels' });
+    if (rc && rc.data && rc.data.length) {
+      CONDUTA_MODELS = rc.data;
+      localStorage.setItem('plantao_conduta_models', JSON.stringify(CONDUTA_MODELS));
+      renderCondutaModelBtns();
+    }
+
     updateSyncBadge('synced', 'sincronizado');
-  } else {
+  } catch(e) {
+    console.error('sync erro:', e);
     updateSyncBadge('error', 'offline (usando local)');
   }
 }
