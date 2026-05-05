@@ -2492,19 +2492,20 @@ RETORNO SE NECESSARIO
   </div>
 </div>
 
+
 <!-- =================== SEÇÃO INTERNAÇÃO =================== -->
 <div class="section" id="section-internacao">
   <div class="panel">
     <h2>🏥 GERADOR DE PRESCRIÇÃO HOSPITALAR</h2>
-    <div class="desc">Preencha os campos e clique em Imprimir Prescrição</div>
+    <div class="desc">Tudo editável. Edite valores antes de imprimir.</div>
 
-    <!-- CABEÇALHO DO PACIENTE -->
+    <!-- CABEÇALHO PACIENTE -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0 10px;">
       <div class="field"><label>Nome do Paciente</label><input type="text" id="int-nome" placeholder="Nome completo"></div>
-      <div class="field"><label>Data de Nascimento / Idade</label><input type="text" id="int-nasc" placeholder="DD/MM/AAAA — XX anos"></div>
+      <div class="field"><label>DN / Idade</label><input type="text" id="int-nasc" placeholder="DD/MM/AAAA — XX anos"></div>
       <div class="field"><label>Peso (kg)</label><input type="number" id="int-peso" placeholder="70" step="0.5" min="1" oninput="calcIntGotejo()"></div>
-      <div class="field"><label>Diagnóstico / CID</label><input type="text" id="int-diag" placeholder="Ex: Apendicite aguda — K35"></div>
-      <div class="field" style="grid-column:span 2;"><label>Alergias / Comorbidades</label><input type="text" id="int-alerg" placeholder="Sem alergias conhecidas / HAS, DM..."></div>
+      <div class="field"><label>Diagnóstico / CID</label><input type="text" id="int-diag" placeholder="Ex: Apendicite — K35"></div>
+      <div class="field" style="grid-column:span 2;"><label>Alergias / Comorbidades</label><input type="text" id="int-alerg" placeholder="Sem alergias / HAS, DM..."></div>
     </div>
 
     <div style="border-top:1px solid var(--line);margin:14px 0;"></div>
@@ -2512,408 +2513,149 @@ RETORNO SE NECESSARIO
     <!-- 1. DIETA -->
     <div class="ef-group">
       <div class="ef-label">1 — Dieta</div>
-      <div class="field-row">
-        <div class="field">
-          <select id="int-dieta" style="width:100%;padding:9px 12px;font-family:var(--font-mono);font-size:13px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);">
-            <option value="Dieta geral">Dieta geral</option>
-            <option value="Dieta para idade">Dieta para idade</option>
-            <option value="Dieta zero (jejum)">Dieta zero (jejum)</option>
-            <option value="Dieta hipossódica">Dieta hipossódica</option>
-            <option value="Dieta para diabético">Dieta para diabético</option>
-            <option value="Dieta para diabético hipossódica">Dieta para diabético hipossódica</option>
-            <option value="Dieta pastosa">Dieta pastosa</option>
-            <option value="Dieta líquida">Dieta líquida</option>
-            <option value="Dieta por SNE">Dieta por SNE</option>
-          </select>
-        </div>
-      </div>
+      <select id="int-dieta" style="width:100%;padding:9px 12px;font-family:var(--font-mono);font-size:13px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);">
+        <option value="Dieta geral">Dieta geral</option>
+        <option value="Dieta para idade">Dieta para idade</option>
+        <option value="Dieta zero (jejum)">Dieta zero (jejum)</option>
+        <option value="Dieta hipossódica">Dieta hipossódica</option>
+        <option value="Dieta para diabético">Dieta para diabético</option>
+        <option value="Dieta para diabético hipossódica">Dieta para diabético hipossódica</option>
+        <option value="Dieta pastosa">Dieta pastosa</option>
+        <option value="Dieta líquida">Dieta líquida</option>
+        <option value="Dieta por SNE">Dieta por SNE</option>
+      </select>
     </div>
 
-    <!-- 2. HIDRATAÇÃO EV -->
+    <!-- 2. HIDRATAÇÃO -->
     <div class="ef-group">
       <div class="ef-label">2 — Hidratação EV</div>
-      <div class="field-row" style="flex-wrap:wrap;gap:8px;">
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;">
         <div class="field" style="min-width:140px;">
           <label>Solução</label>
-          <select id="int-hid-sol" oninput="calcIntGotejo()" style="padding:9px 12px;font-family:var(--font-mono);font-size:13px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);">
+          <select id="int-hid-sol" style="padding:9px 12px;font-family:var(--font-mono);font-size:13px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);">
             <option value="SF 0,9%">SF 0,9%</option>
             <option value="Glicofisiológico">Glicofisiológico</option>
             <option value="SG 5%">SG 5%</option>
             <option value="Ringer Lactato">Ringer Lactato</option>
           </select>
         </div>
-        <div class="field" style="min-width:100px;">
+        <div class="field" style="min-width:90px;">
           <label>Volume (ml)</label>
           <input type="number" id="int-hid-vol" placeholder="500" min="100" step="50" oninput="calcIntGotejo()" style="padding:9px 12px;font-family:var(--font-mono);font-size:14px;font-weight:700;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--cyan);">
         </div>
-        <div class="field" style="min-width:100px;">
-          <label>Em (horas)</label>
+        <div class="field" style="min-width:90px;">
+          <label>Em (h)</label>
           <input type="number" id="int-hid-horas" placeholder="6" min="1" max="24" step="1" oninput="calcIntGotejo()" style="padding:9px 12px;font-family:var(--font-mono);font-size:14px;font-weight:700;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--cyan);">
         </div>
-        <div class="field" style="min-width:140px;align-self:flex-end;">
+        <div class="field" style="min-width:140px;flex:1;">
           <div id="int-gotejo-result" style="padding:9px 12px;font-family:var(--font-mono);font-size:13px;color:var(--vital);font-weight:700;background:rgba(0,232,150,0.06);border:1px solid var(--vital-dim);border-radius:8px;">— gotas/min</div>
         </div>
       </div>
-      <div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
+      <div style="margin-top:8px;display:flex;align-items:center;gap:10px;padding:8px;background:var(--bg-2);border:1px solid var(--line);border-radius:6px;">
         <input type="checkbox" id="int-kcl" style="width:16px;height:16px;accent-color:var(--warn);">
-        <label for="int-kcl" style="font-family:var(--font-mono);font-size:11px;color:var(--txt-2);">Acrescentar KCl 19,1% 10ml no soro (reposição de potássio)</label>
+        <label for="int-kcl" style="font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;">Acrescentar KCl 19,1% 10ml no soro</label>
       </div>
     </div>
 
-    <!-- 3. DIPIRONA -->
-    <div class="ef-group" style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg-2);border-radius:8px;border:1px solid var(--line);">
-      <input type="checkbox" id="int-dipirona" checked style="width:18px;height:18px;accent-color:var(--cyan);">
-      <label for="int-dipirona" style="font-family:var(--font-mono);font-size:12px;color:var(--txt);flex:1;">3 — Dipirona 1 amp (2g) + SF 100ml EV — 6/6h — SN</label>
-    </div>
-
-    <!-- 4. BROMOPRIDA -->
-    <div class="ef-group" style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg-2);border-radius:8px;border:1px solid var(--line);">
-      <input type="checkbox" id="int-bromoprida" checked style="width:18px;height:18px;accent-color:var(--cyan);">
-      <label for="int-bromoprida" style="font-family:var(--font-mono);font-size:12px;color:var(--txt);flex:1;">4 — Bromoprida 1 amp + SF 100ml EV — 8/8h — SN (náuseas/vômitos)</label>
-    </div>
-
-    <!-- 5. TRAMADOL -->
-    <div class="ef-group" style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg-2);border-radius:8px;border:1px solid var(--line);">
-      <input type="checkbox" id="int-tramadol" style="width:18px;height:18px;accent-color:var(--violet);">
-      <label for="int-tramadol" style="font-family:var(--font-mono);font-size:12px;color:var(--txt);flex:1;">5 — Tramadol 1 amp (100mg) + SF 100ml EV — 8/8h — SN (dor intensa)</label>
-    </div>
-
-    <!-- 6. ATB -->
+    <!-- 3-5. MEDS PRINCIPAIS — checkbox + texto editável -->
     <div class="ef-group">
-      <div class="ef-label">6 — Antibiótico (texto livre)</div>
-      <textarea id="int-atb" placeholder="Ex: Ceftriaxona 2g + SF 250ml EV 1x/dia por 7 dias&#10;(deixe em branco se não usar ATB)" style="width:100%;min-height:60px;padding:10px 12px;font-family:var(--font-mono);font-size:12px;line-height:1.6;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);resize:vertical;"></textarea>
-      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;">
-        <button class="ef-pill" onclick="preencherATB('Ceftriaxona 2g + SF 250ml EV 1x/dia')">Ceftriaxona 2g</button>
-        <button class="ef-pill" onclick="preencherATB('Metronidazol 500mg + SF 100ml EV 8/8h')">Metronidazol</button>
-        <button class="ef-pill" onclick="preencherATB('Ampicilina+Sulbactam 3g + SF 100ml EV 6/6h')">Amp+Sulbact</button>
-        <button class="ef-pill" onclick="preencherATB('Ciprofloxacino 400mg EV 12/12h')">Cipro EV</button>
-        <button class="ef-pill" onclick="preencherATB('Piperacilina+Tazobactam 4,5g + SF 100ml EV 6/6h')">Pip+Tazo</button>
-        <button class="ef-pill" onclick="preencherATB('Meropenem 1g + SF 100ml EV 8/8h')">Meropenem</button>
-        <button class="ef-pill" onclick="preencherATB('Clindamicina 600mg + SF 100ml EV 8/8h')">Clinda EV</button>
+      <div class="ef-label">3 — Medicações principais</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-2);border:1px solid var(--line);border-radius:8px;">
+          <input type="checkbox" id="int-dipirona" checked style="width:18px;height:18px;accent-color:var(--cyan);">
+          <input type="text" id="int-dipirona-txt" value="Dipirona 1 amp (2g) + SF 100ml EV — 6/6h SN (dor/febre)" style="flex:1;padding:7px 10px;font-family:var(--font-mono);font-size:11.5px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--txt);">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-2);border:1px solid var(--line);border-radius:8px;">
+          <input type="checkbox" id="int-bromoprida" checked style="width:18px;height:18px;accent-color:var(--cyan);">
+          <input type="text" id="int-bromoprida-txt" value="Bromoprida 1 amp + SF 100ml EV — 8/8h SN (náuseas)" style="flex:1;padding:7px 10px;font-family:var(--font-mono);font-size:11.5px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--txt);">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-2);border:1px solid var(--line);border-radius:8px;">
+          <input type="checkbox" id="int-tramadol" style="width:18px;height:18px;accent-color:var(--violet);">
+          <input type="text" id="int-tramadol-txt" value="Tramadol 100mg (1 amp) + SF 100ml EV — 8/8h SN (dor intensa)" style="flex:1;padding:7px 10px;font-family:var(--font-mono);font-size:11.5px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--txt);">
+        </div>
       </div>
     </div>
 
-    <!-- 7. DEXTRO + INSULINA -->
+    <!-- 4. ATB editável (cada um com input editável + remove) -->
+    <div class="ef-group">
+      <div class="ef-label">4 — Antibióticos</div>
+      <div id="int-atb-list" style="display:flex;flex-direction:column;gap:5px;margin-bottom:8px;"></div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;">
+        <button type="button" class="ef-pill" onclick="addATB('Ceftriaxona 2g + SF 250ml EV 1x/dia')">+ Ceftriaxona 2g</button>
+        <button type="button" class="ef-pill" onclick="addATB('Metronidazol 500mg + SF 100ml EV 8/8h')">+ Metronidazol</button>
+        <button type="button" class="ef-pill" onclick="addATB('Ampicilina+Sulbactam 3g + SF 100ml EV 6/6h')">+ Amp+Sulbact</button>
+        <button type="button" class="ef-pill" onclick="addATB('Ciprofloxacino 400mg EV 12/12h')">+ Cipro EV</button>
+        <button type="button" class="ef-pill" onclick="addATB('Piperacilina+Tazobactam 4,5g + SF 100ml EV 6/6h')">+ Pip+Tazo</button>
+        <button type="button" class="ef-pill" onclick="addATB('Meropenem 1g + SF 100ml EV 8/8h')">+ Meropenem</button>
+        <button type="button" class="ef-pill" onclick="addATB('Clindamicina 600mg + SF 100ml EV 8/8h')">+ Clinda EV</button>
+        <button type="button" class="ef-pill" onclick="addATB('')">+ ATB livre</button>
+      </div>
+    </div>
+
+    <!-- 5. DEXTRO EDITÁVEL -->
     <div class="ef-group">
       <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg-2);border-radius:8px;border:1px solid var(--line);">
         <input type="checkbox" id="int-dextro" onchange="toggleDextroPanel()" style="width:18px;height:18px;accent-color:var(--warn);">
-        <label for="int-dextro" style="font-family:var(--font-mono);font-size:12px;color:var(--txt);flex:1;">7 — Esquema Dextro + Insulina Regular</label>
+        <label for="int-dextro" style="font-family:var(--font-mono);font-size:12px;color:var(--txt);flex:1;cursor:pointer;">5 — Dextro 6/6h + Insulina Regular SC (esquema)</label>
         <select id="int-dextro-protocolo" onchange="renderEsquemaInsulina()" style="padding:7px 10px;font-family:var(--font-mono);font-size:11px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);">
           <option value="conservador">Conservador</option>
           <option value="intensivo">Intensivo</option>
           <option value="hospitalar">Hospitalar Padrão</option>
         </select>
       </div>
-      <div id="int-dextro-panel" style="display:none;margin-top:8px;padding:10px 14px;background:rgba(255,184,0,0.05);border:1px solid var(--warn-dim);border-radius:8px;font-family:var(--font-mono);font-size:11px;line-height:1.9;color:var(--txt-2);">
-        <div style="font-weight:700;color:var(--warn);margin-bottom:6px;">ESQUEMA INSULINA REGULAR SC</div>
-        <div id="int-insulina-texto"></div>
+      <div id="int-dextro-panel" style="display:none;margin-top:8px;padding:10px;background:rgba(255,184,0,0.05);border:1px solid var(--warn-dim);border-radius:8px;">
+        <div style="font-family:var(--font-mono);font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--warn);margin-bottom:8px;">ESQUEMA INSULINA REGULAR — EDITÁVEL</div>
+        <div id="int-insulina-rows" style="display:flex;flex-direction:column;gap:4px;"></div>
+        <div style="display:flex;gap:6px;margin-top:6px;">
+          <button type="button" class="ef-pill" onclick="addInsulinaRow('','')">+ Adicionar faixa</button>
+          <button type="button" class="ef-pill" onclick="resetInsulinaRows()">↺ Restaurar protocolo</button>
+        </div>
       </div>
     </div>
 
-    <!-- 8. CUIDADOS GERAIS -->
+    <!-- 6. CUIDADOS DE ENFERMAGEM -->
     <div class="ef-group">
-      <div class="ef-label">8 — Cuidados de Enfermagem</div>
+      <div class="ef-label">6 — Cuidados de Enfermagem</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:10px;background:var(--bg-2);border-radius:8px;border:1px solid var(--line);">
         <label style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-cuidado" value="SSVV 6/6h" checked style="accent-color:var(--cyan);"> SSVV 6/6h</label>
         <label style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-cuidado" value="Controle de débito hídrico" checked style="accent-color:var(--cyan);"> Débito hídrico</label>
         <label style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-cuidado" value="Decúbito elevado 30°" checked style="accent-color:var(--cyan);"> Decúbito 30°</label>
         <label style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-cuidado" value="Acesso venoso pérvio" checked style="accent-color:var(--cyan);"> AV pérvio</label>
-        <label style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-cuidado" value="SNE — manutenção e controle de posição" style="accent-color:var(--cyan);"> SNE</label>
+        <label style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-cuidado" value="SNE — manutenção" style="accent-color:var(--cyan);"> SNE</label>
         <label style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-cuidado" value="O2 cateter nasal 2-4 L/min" style="accent-color:var(--cyan);"> O₂ cateter</label>
         <label style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-cuidado" value="SVD — controle de diurese" style="accent-color:var(--cyan);"> SVD</label>
         <label style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-cuidado" value="Avisar médico se: FC>100, FR>20, SpO2<94%, PA<90x60 ou febre" checked style="accent-color:var(--cyan);"> Avisar médico</label>
       </div>
     </div>
 
-    <!-- 9. ITENS ADICIONAIS -->
+    <!-- 7. ITENS ADICIONAIS EDITÁVEIS -->
     <div class="ef-group">
-      <div class="ef-label">9 — Itens Adicionais</div>
-      <div style="display:flex;gap:6px;margin-bottom:8px;">
-        <input type="text" id="int-extra-input" placeholder="Descreva o item..." style="flex:1;padding:9px 12px;font-family:var(--font-mono);font-size:12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);">
-        <button class="btn-primary" onclick="addIntExtra()" style="padding:9px 16px;">+ Add</button>
+      <div class="ef-label">7 — Itens adicionais</div>
+      <div id="int-extras-list" style="display:flex;flex-direction:column;gap:5px;margin-bottom:8px;"></div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;">
+        <button type="button" class="ef-pill" onclick="addExtra('Omeprazol 40mg + AD 10ml EV 1x/dia (jejum)')">+ Omeprazol</button>
+        <button type="button" class="ef-pill" onclick="addExtra('Heparina 5.000 UI SC 8/8h (profilaxia TVP)')">+ Heparina</button>
+        <button type="button" class="ef-pill" onclick="addExtra('Enoxaparina 40mg SC 1x/dia (profilaxia TVP)')">+ Enoxaparina</button>
+        <button type="button" class="ef-pill" onclick="addExtra('Ondansetrona 4mg + AD 8ml EV 8/8h SN')">+ Ondansetrona EV</button>
+        <button type="button" class="ef-pill" onclick="addExtra('Dexametasona 4mg + AD 3ml EV 8/8h')">+ Dexa</button>
+        <button type="button" class="ef-pill" onclick="addExtra('Hidrocortisona 100mg + SF 100ml EV 8/8h')">+ Hidrocortisona</button>
+        <button type="button" class="ef-pill" onclick="addExtra('AAS 100mg VO 1x/dia')">+ AAS</button>
+        <button type="button" class="ef-pill" onclick="addExtra('Insulina Glargina ___ UI SC às 22h')">+ Glargina</button>
+        <button type="button" class="ef-pill" onclick="addExtra('Morfina 2mg + AD 8ml EV bolus lento SN')">+ Morfina</button>
+        <button type="button" class="ef-pill" onclick="addExtra('Ranitidina 50mg + SF 100ml EV 8/8h')">+ Ranitidina</button>
+        <button type="button" class="ef-pill" onclick="addExtra('Furosemida 20mg + AD 18ml EV 12/12h')">+ Furosemida</button>
+        <button type="button" class="ef-pill" onclick="addExtra('')">+ Item livre</button>
       </div>
-      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;">
-        <button class="ef-pill" onclick="addIntExtraText('Omeprazol 40mg + AD 10ml EV 1x/dia (jejum)')">Omeprazol EV</button>
-        <button class="ef-pill" onclick="addIntExtraText('Heparina 5.000 UI SC 8/8h (profilaxia TVP)')">Heparina</button>
-        <button class="ef-pill" onclick="addIntExtraText('Enoxaparina 40mg SC 1x/dia (profilaxia TVP)')">Enoxaparina</button>
-        <button class="ef-pill" onclick="addIntExtraText('Ondansetrona 4mg + AD 8ml EV 8/8h SN')">Ondansetrona EV</button>
-        <button class="ef-pill" onclick="addIntExtraText('Dexametasona 4mg + AD 3ml EV 8/8h')">Dexa</button>
-        <button class="ef-pill" onclick="addIntExtraText('Hidrocortisona 100mg + SF 100ml EV 8/8h')">Hidrocortisona</button>
-        <button class="ef-pill" onclick="addIntExtraText('AAS 100mg VO 1x/dia')">AAS</button>
-        <button class="ef-pill" onclick="addIntExtraText('Insulina Glargina ___ UI SC às 22h')">Glargina</button>
-        <button class="ef-pill" onclick="addIntExtraText('Morfina 2mg + AD 8ml EV bolus lento SN')">Morfina</button>
-        <button class="ef-pill" onclick="addIntExtraText('Ranitidina 50mg + SF 100ml EV 8/8h')">Ranitidina</button>
-        <button class="ef-pill" onclick="addIntExtraText('Furosemida 20mg + AD 18ml EV 12/12h')">Furosemida</button>
-      </div>
-      <div id="int-extras-list" style="display:flex;flex-direction:column;gap:4px;"></div>
     </div>
 
     <div style="display:flex;gap:8px;margin-top:16px;">
-      <button class="btn-primary" style="flex:2;" onclick="printInternacao()">🖨️ Imprimir Prescrição</button>
-      <button class="btn-secondary" onclick="limparInternacao()">Limpar</button>
+      <button type="button" class="btn-primary" style="flex:2;" onclick="printInternacao()">🖨️ Imprimir Prescrição</button>
+      <button type="button" class="btn-secondary" onclick="limparInternacao()">Limpar</button>
     </div>
   </div>
 </div>
 
-// =================== INTERNAÇÃO ===================
-var _intExtras = [];
 
-function calcIntGotejo() {
-  var vol = parseFloat(document.getElementById('int-hid-vol').value) || 0;
-  var horas = parseFloat(document.getElementById('int-hid-horas').value) || 0;
-  var el = document.getElementById('int-gotejo-result');
-  if (!vol || !horas) { el.textContent = '— gotas/min'; return; }
-  var gtMin = Math.round(vol / (horas * 3));
-  var mlH = Math.round(vol / horas);
-  el.textContent = gtMin + ' gts/min  |  ' + mlH + ' ml/h';
-}
-
-function preencherATB(texto) {
-  var ta = document.getElementById('int-atb');
-  if (ta.value.trim()) ta.value += '\n' + texto;
-  else ta.value = texto;
-}
-
-function addIntExtra() {
-  var inp = document.getElementById('int-extra-input');
-  var txt = inp.value.trim();
-  if (!txt) return;
-  _intExtras.push(txt);
-  inp.value = '';
-  renderIntExtras();
-}
-
-function addIntExtraText(txt) {
-  _intExtras.push(txt);
-  renderIntExtras();
-}
-
-function removeIntExtra(idx) {
-  _intExtras.splice(idx, 1);
-  renderIntExtras();
-}
-
-function renderIntExtras() {
-  var el = document.getElementById('int-extras-list');
-  el.innerHTML = _intExtras.map(function(t, i) {
-    return '<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg-2);border:1px solid var(--line);border-radius:8px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);">' +
-      '<span style="flex:1;">' + t + '</span>' +
-      '<button onclick="removeIntExtra(' + i + ')" style="background:none;border:none;color:var(--pulse);cursor:pointer;font-size:14px;padding:0;">✕</button>' +
-      '</div>';
-  }).join('');
-}
-
-function toggleDextroPanel() {
-  var cb = document.getElementById('int-dextro');
-  var panel = document.getElementById('int-dextro-panel');
-  panel.style.display = cb.checked ? 'block' : 'none';
-  if (cb.checked) renderEsquemaInsulina();
-}
-
-function renderEsquemaInsulina() {
-  var proto = document.getElementById('int-dextro-protocolo').value;
-  var esquemas = {
-    conservador: [
-      'Glicemia ≤140 mg/dL → Sem insulina',
-      'Glicemia 141-180 mg/dL → Insulina Regular 2 UI SC',
-      'Glicemia 181-220 mg/dL → Insulina Regular 4 UI SC',
-      'Glicemia 221-280 mg/dL → Insulina Regular 6 UI SC',
-      'Glicemia 281-350 mg/dL → Insulina Regular 8 UI SC',
-      'Glicemia >350 mg/dL → Insulina Regular 10 UI SC + Avisar médico'
-    ],
-    intensivo: [
-      'Glicemia <70 mg/dL → HIPOGLICEMIA — Glicose 50% 40ml EV + Avisar médico',
-      'Glicemia 70-110 mg/dL → Sem insulina',
-      'Glicemia 111-140 mg/dL → Insulina Regular 2 UI SC',
-      'Glicemia 141-180 mg/dL → Insulina Regular 4 UI SC',
-      'Glicemia 181-240 mg/dL → Insulina Regular 6 UI SC',
-      'Glicemia 241-300 mg/dL → Insulina Regular 8 UI SC',
-      'Glicemia >300 mg/dL → Insulina Regular 10 UI SC + Avisar médico'
-    ],
-    hospitalar: [
-      'Glicemia <70 mg/dL → HIPOGLICEMIA — Glicose 50% 40ml EV + Avisar médico',
-      'Glicemia 70-140 mg/dL → Sem insulina',
-      'Glicemia 141-180 mg/dL → Insulina Regular 2 UI SC',
-      'Glicemia 181-220 mg/dL → Insulina Regular 4 UI SC',
-      'Glicemia 221-280 mg/dL → Insulina Regular 6 UI SC',
-      'Glicemia 281-350 mg/dL → Insulina Regular 8 UI SC',
-      'Glicemia >350 mg/dL → Insulina Regular 12 UI SC + Avisar médico'
-    ]
-  };
-  var linhas = esquemas[proto] || esquemas.conservador;
-  document.getElementById('int-insulina-texto').innerHTML =
-    'Dextro 6/6h. Aplicar Insulina Regular SC conforme resultado:<br>' +
-    linhas.join('<br>');
-}
-
-function gerarLinhasInternacao() {
-  var linhas = [];
-  var num = 1;
-
-  // 1. Dieta
-  linhas.push(num++ + ') ' + document.getElementById('int-dieta').value);
-
-  // 2. Hidratação
-  var sol = document.getElementById('int-hid-sol').value;
-  var vol = document.getElementById('int-hid-vol').value;
-  var horas = document.getElementById('int-hid-horas').value;
-  var kcl = document.getElementById('int-kcl').checked;
-  var gtMin = (vol && horas) ? Math.round(vol / (horas * 3)) : null;
-  if (vol && horas) {
-    var hidTxt = num++ + ') ' + sol + ' ' + vol + 'ml EV em ' + horas + 'h';
-    if (gtMin) hidTxt += ' (' + gtMin + ' gts/min)';
-    if (kcl) hidTxt += ' + KCl 19,1% 10ml';
-    linhas.push(hidTxt);
-  }
-
-  // 3. Dipirona
-  if (document.getElementById('int-dipirona').checked)
-    linhas.push(num++ + ') Dipirona 2g (1 amp) + SF 100ml EV — 6/6h — SN (dor/febre)');
-
-  // 4. Bromoprida
-  if (document.getElementById('int-bromoprida').checked)
-    linhas.push(num++ + ') Bromoprida 1 amp + SF 100ml EV — 8/8h — SN (náuseas/vômitos)');
-
-  // 5. Tramadol
-  if (document.getElementById('int-tramadol').checked)
-    linhas.push(num++ + ') Tramadol 100mg (1 amp) + SF 100ml EV — 8/8h — SN (dor intensa)');
-
-  // 6. ATB
-  var atb = document.getElementById('int-atb').value.trim();
-  if (atb) {
-    atb.split('\n').forEach(function(linha) {
-      if (linha.trim()) linhas.push(num++ + ') ' + linha.trim());
-    });
-  }
-
-  // 7. Dextro + Insulina
-  if (document.getElementById('int-dextro').checked) {
-    var proto = document.getElementById('int-dextro-protocolo').value;
-    var nomes = { conservador: 'Conservador', intensivo: 'Intensivo', hospitalar: 'Hospitalar Padrão' };
-    linhas.push(num++ + ') Dextro capilar 6/6h + Insulina Regular SC conforme esquema (' + nomes[proto] + '):');
-    var esquemas = {
-      conservador: [
-        '   ≤140 → Sem insulina',
-        '   141-180 → 2 UI SC',
-        '   181-220 → 4 UI SC',
-        '   221-280 → 6 UI SC',
-        '   281-350 → 8 UI SC',
-        '   >350 → 10 UI SC + Avisar médico'
-      ],
-      intensivo: [
-        '   <70 → HIPOGLICEMIA: Glicose 50% 40ml EV + Avisar médico',
-        '   70-110 → Sem insulina',
-        '   111-140 → 2 UI SC',
-        '   141-180 → 4 UI SC',
-        '   181-240 → 6 UI SC',
-        '   241-300 → 8 UI SC',
-        '   >300 → 10 UI SC + Avisar médico'
-      ],
-      hospitalar: [
-        '   <70 → HIPOGLICEMIA: Glicose 50% 40ml EV + Avisar médico',
-        '   70-140 → Sem insulina',
-        '   141-180 → 2 UI SC',
-        '   181-220 → 4 UI SC',
-        '   221-280 → 6 UI SC',
-        '   281-350 → 8 UI SC',
-        '   >350 → 12 UI SC + Avisar médico'
-      ]
-    };
-    (esquemas[proto] || esquemas.conservador).forEach(function(l) { linhas.push(l); });
-  }
-
-  // 8. Cuidados de enfermagem
-  var cuidados = [];
-  document.querySelectorAll('.int-cuidado:checked').forEach(function(cb) {
-    cuidados.push(cb.value);
-  });
-  if (cuidados.length) linhas.push(num++ + ') Cuidados de enfermagem: ' + cuidados.join('; '));
-
-  // 9. Extras
-  _intExtras.forEach(function(t) {
-    linhas.push(num++ + ') ' + t);
-  });
-
-  return linhas;
-}
-
-function printInternacao() {
-  var perfil = getPerfil();
-  var nome = document.getElementById('int-nome').value.trim() || '___________________________________';
-  var nasc = document.getElementById('int-nasc').value.trim() || '';
-  var peso = document.getElementById('int-peso').value.trim() || '';
-  var diag = document.getElementById('int-diag').value.trim() || '';
-  var alerg = document.getElementById('int-alerg').value.trim() || 'Sem alergias conhecidas';
-  var dataHoje = new Date().toLocaleDateString('pt-BR');
-  var horaAgora = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-  var linhas = gerarLinhasInternacao();
-
-  var css = 'body{font-family:Arial,sans-serif;background:white;color:black;margin:0;padding:20px 30px;font-size:11pt}' +
-    'table{width:100%;border-collapse:collapse}' +
-    'td,th{border:1px solid #000;padding:5px 8px;vertical-align:top}' +
-    '.header-inst{text-align:center;font-size:12pt;font-weight:bold;border-bottom:2px solid #000;padding-bottom:8px;margin-bottom:8px}' +
-    '.header-title{text-align:center;font-size:14pt;font-weight:bold;letter-spacing:1px;margin-bottom:10px}' +
-    '.col-num{width:32px;text-align:center;font-weight:bold}' +
-    '.col-rx{width:65%}' +
-    '.col-hora{width:80px;text-align:center}' +
-    '.footer{margin-top:30px;display:flex;justify-content:space-between;align-items:flex-end}' +
-    '.sig{border-top:1px solid #000;width:50%;padding-top:4px;text-align:center;font-size:9.5pt}' +
-    '@page{size:A4;margin:1.5cm 2cm}';
-
-  var rows = linhas.map(function(l, i) {
-    return '<tr><td class="col-num">' + (i+1) + '</td><td class="col-rx">' + l.replace(/^[\d]+\)\s*/, '') + '</td><td class="col-hora"></td></tr>';
-  }).join('');
-
-  var corpo =
-    '<div class="header-inst">' + escapeHtml(perfil.header || 'PREFEITURA MUNICIPAL DE TAQUARITINGA/SP') + '</div>' +
-    '<div class="header-title">PRESCRIÇÃO MÉDICA</div>' +
-    '<table style="margin-bottom:8px;font-size:10pt;">' +
-    '<tr><td><b>Paciente:</b> ' + escapeHtml(nome) + '</td>' +
-    '<td><b>DN/Idade:</b> ' + escapeHtml(nasc) + '</td>' +
-    '<td><b>Peso:</b> ' + escapeHtml(peso) + ' kg</td></tr>' +
-    '<tr><td colspan="2"><b>Diagnóstico:</b> ' + escapeHtml(diag) + '</td>' +
-    '<td><b>Data:</b> ' + dataHoje + '  <b>Hora:</b> ' + horaAgora + '</td></tr>' +
-    '<tr><td colspan="3"><b>Alergias / Comorbidades:</b> ' + escapeHtml(alerg) + '</td></tr>' +
-    '</table>' +
-    '<table>' +
-    '<thead><tr><th class="col-num">Nº</th><th class="col-rx">PRESCRIÇÃO MÉDICA</th><th class="col-hora">HORA</th></tr></thead>' +
-    '<tbody>' + rows + '</tbody>' +
-    '</table>' +
-    '<div class="footer">' +
-    '<div>' + escapeHtml(perfil.cidade || 'Taquaritinga') + ', ' + dataHoje + '</div>' +
-    '<div class="sig">' + escapeHtml(perfil.nome || '') + (perfil.nome ? '<br>' : '') + escapeHtml(perfil.crm || '') + '</div>' +
-    '</div>';
-
-  var win = window.open('', '_blank', 'width=820,height=960,toolbar=0,menubar=0,location=0,status=0,scrollbars=1');
-  win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title> </title><style>' + css + '</style></head><body>' + corpo + '</body></html>');
-  win.document.close();
-  win.focus();
-  setTimeout(function() { win.print(); win.close(); }, 400);
-}
-
-function limparInternacao() {
-  ['int-nome','int-nasc','int-peso','int-diag','int-alerg','int-hid-vol','int-hid-horas','int-atb','int-extra-input'].forEach(function(id) {
-    var el = document.getElementById(id); if (el) el.value = '';
-  });
-  document.getElementById('int-hid-sol').selectedIndex = 0;
-  document.getElementById('int-dieta').selectedIndex = 0;
-  document.getElementById('int-dextro-protocolo').selectedIndex = 0;
-  document.getElementById('int-dipirona').checked = true;
-  document.getElementById('int-bromoprida').checked = true;
-  document.getElementById('int-tramadol').checked = false;
-  document.getElementById('int-kcl').checked = false;
-  document.getElementById('int-dextro').checked = false;
-  document.getElementById('int-dextro-panel').style.display = 'none';
-  document.getElementById('int-gotejo-result').textContent = '— gotas/min';
-  document.querySelectorAll('.int-cuidado').forEach(function(cb) {
-    cb.checked = ['SSVV 6/6h','Controle de débito hídrico','Decúbito elevado 30°','Acesso venoso pérvio','Avisar médico se: FC>100, FR>20, SpO2<94%, PA<90x60 ou febre'].indexOf(cb.value) >= 0;
-  });
-  _intExtras = [];
-  renderIntExtras();
-}
-
-// setSection patch: adicionar 'internacao' no handler
-// (já funciona pelo data-section genérico — nenhuma mudança necessária)
 <!-- ÁREA DE IMPRESSÃO -->
 <div id="print-area"></div>
 
@@ -6617,6 +6359,271 @@ function limparScore(id) {
   document.querySelectorAll('#score-items-' + id + ' input[type="checkbox"]').forEach(function(cb){ cb.checked = false; });
   var el = document.getElementById('result-' + id);
   if (el) { el.className = 'result'; el.innerHTML = '<strong>0</strong> pontos'; }
+}
+
+
+// =================== INTERNAÇÃO ===================
+var _intATBs = [];
+var _intExtras = [];
+var _intInsulina = [];
+
+var INSULINA_PROTOCOLOS = {
+  conservador: [
+    ['≤140 mg/dL', 'Sem insulina'],
+    ['141-180 mg/dL', '2 UI SC'],
+    ['181-220 mg/dL', '4 UI SC'],
+    ['221-280 mg/dL', '6 UI SC'],
+    ['281-350 mg/dL', '8 UI SC'],
+    ['>350 mg/dL', '10 UI SC + Avisar médico']
+  ],
+  intensivo: [
+    ['<70 mg/dL', 'HIPOGLICEMIA: Glicose 50% 40ml EV + Avisar médico'],
+    ['70-110 mg/dL', 'Sem insulina'],
+    ['111-140 mg/dL', '2 UI SC'],
+    ['141-180 mg/dL', '4 UI SC'],
+    ['181-240 mg/dL', '6 UI SC'],
+    ['241-300 mg/dL', '8 UI SC'],
+    ['>300 mg/dL', '10 UI SC + Avisar médico']
+  ],
+  hospitalar: [
+    ['<70 mg/dL', 'HIPOGLICEMIA: Glicose 50% 40ml EV + Avisar médico'],
+    ['70-140 mg/dL', 'Sem insulina'],
+    ['141-180 mg/dL', '2 UI SC'],
+    ['181-220 mg/dL', '4 UI SC'],
+    ['221-280 mg/dL', '6 UI SC'],
+    ['281-350 mg/dL', '8 UI SC'],
+    ['>350 mg/dL', '12 UI SC + Avisar médico']
+  ]
+};
+
+function calcIntGotejo() {
+  var vol = parseFloat(document.getElementById('int-hid-vol').value) || 0;
+  var horas = parseFloat(document.getElementById('int-hid-horas').value) || 0;
+  var el = document.getElementById('int-gotejo-result');
+  if (!vol || !horas) { el.textContent = '— gotas/min'; return; }
+  var gtMin = Math.round(vol / (horas * 3));
+  var mlH = Math.round(vol / horas);
+  el.textContent = gtMin + ' gts/min  |  ' + mlH + ' ml/h';
+}
+
+// ===== ATB =====
+function addATB(text) {
+  _intATBs.push(text || '');
+  renderATBs();
+  // Foca no novo input
+  setTimeout(function() {
+    var inputs = document.querySelectorAll('#int-atb-list input[type="text"]');
+    if (inputs.length) inputs[inputs.length - 1].focus();
+  }, 50);
+}
+function removeATB(idx) {
+  _intATBs.splice(idx, 1);
+  renderATBs();
+}
+function renderATBs() {
+  var el = document.getElementById('int-atb-list');
+  if (!el) return;
+  el.innerHTML = _intATBs.map(function(t, i) {
+    return '<div style="display:flex;gap:6px;align-items:center;">' +
+      '<input type="text" value="' + escapeHtml(t) + '" oninput="_intATBs[' + i + '] = this.value" placeholder="Ex: Ceftriaxona 2g + SF 250ml EV 1x/dia" style="flex:1;padding:8px 10px;font-family:var(--font-mono);font-size:11.5px;border:1px solid var(--warn-dim);border-radius:6px;background:var(--bg);color:var(--txt);">' +
+      '<button type="button" onclick="removeATB(' + i + ')" style="background:none;border:1px solid var(--line);border-radius:6px;color:var(--pulse);cursor:pointer;font-size:13px;padding:4px 8px;">✕</button>' +
+      '</div>';
+  }).join('');
+}
+
+// ===== EXTRAS =====
+function addExtra(text) {
+  _intExtras.push(text || '');
+  renderExtras();
+  setTimeout(function() {
+    var inputs = document.querySelectorAll('#int-extras-list input[type="text"]');
+    if (inputs.length) inputs[inputs.length - 1].focus();
+  }, 50);
+}
+function removeExtra(idx) {
+  _intExtras.splice(idx, 1);
+  renderExtras();
+}
+function renderExtras() {
+  var el = document.getElementById('int-extras-list');
+  if (!el) return;
+  el.innerHTML = _intExtras.map(function(t, i) {
+    return '<div style="display:flex;gap:6px;align-items:center;">' +
+      '<input type="text" value="' + escapeHtml(t) + '" oninput="_intExtras[' + i + '] = this.value" placeholder="Descreva o item..." style="flex:1;padding:8px 10px;font-family:var(--font-mono);font-size:11.5px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--txt);">' +
+      '<button type="button" onclick="removeExtra(' + i + ')" style="background:none;border:1px solid var(--line);border-radius:6px;color:var(--pulse);cursor:pointer;font-size:13px;padding:4px 8px;">✕</button>' +
+      '</div>';
+  }).join('');
+}
+
+// ===== DEXTRO + INSULINA =====
+function toggleDextroPanel() {
+  var cb = document.getElementById('int-dextro');
+  var panel = document.getElementById('int-dextro-panel');
+  panel.style.display = cb.checked ? 'block' : 'none';
+  if (cb.checked && !_intInsulina.length) {
+    resetInsulinaRows();
+  }
+}
+function renderEsquemaInsulina() {
+  resetInsulinaRows();
+}
+function resetInsulinaRows() {
+  var proto = document.getElementById('int-dextro-protocolo').value;
+  _intInsulina = (INSULINA_PROTOCOLOS[proto] || INSULINA_PROTOCOLOS.conservador).map(function(r) {
+    return [r[0], r[1]];
+  });
+  renderInsulinaRows();
+}
+function addInsulinaRow(faixa, dose) {
+  _intInsulina.push([faixa || '', dose || '']);
+  renderInsulinaRows();
+}
+function removeInsulinaRow(idx) {
+  _intInsulina.splice(idx, 1);
+  renderInsulinaRows();
+}
+function renderInsulinaRows() {
+  var el = document.getElementById('int-insulina-rows');
+  if (!el) return;
+  el.innerHTML = _intInsulina.map(function(r, i) {
+    return '<div style="display:flex;gap:6px;align-items:center;">' +
+      '<input type="text" value="' + escapeHtml(r[0]) + '" oninput="_intInsulina[' + i + '][0] = this.value" placeholder="Faixa (ex: 141-180)" style="flex:0.7;padding:6px 8px;font-family:var(--font-mono);font-size:11px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--txt);">' +
+      '<span style="color:var(--txt-3);font-family:var(--font-mono);">→</span>' +
+      '<input type="text" value="' + escapeHtml(r[1]) + '" oninput="_intInsulina[' + i + '][1] = this.value" placeholder="Conduta (ex: 4 UI SC)" style="flex:1;padding:6px 8px;font-family:var(--font-mono);font-size:11px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--txt);">' +
+      '<button type="button" onclick="removeInsulinaRow(' + i + ')" style="background:none;border:1px solid var(--line);border-radius:6px;color:var(--pulse);cursor:pointer;font-size:12px;padding:3px 7px;">✕</button>' +
+      '</div>';
+  }).join('');
+}
+
+// ===== GERAÇÃO E IMPRESSÃO =====
+function gerarLinhasInternacao() {
+  var linhas = [];
+
+  // 1. Dieta
+  linhas.push(document.getElementById('int-dieta').value);
+
+  // 2. Hidratação
+  var sol = document.getElementById('int-hid-sol').value;
+  var vol = document.getElementById('int-hid-vol').value;
+  var horas = document.getElementById('int-hid-horas').value;
+  var kcl = document.getElementById('int-kcl').checked;
+  if (vol && horas) {
+    var gtMin = Math.round(vol / (horas * 3));
+    var hidTxt = sol + ' ' + vol + 'ml EV em ' + horas + 'h (' + gtMin + ' gts/min)';
+    if (kcl) hidTxt += ' + KCl 19,1% 10ml';
+    linhas.push(hidTxt);
+  }
+
+  // 3. Meds principais
+  if (document.getElementById('int-dipirona').checked)
+    linhas.push(document.getElementById('int-dipirona-txt').value);
+  if (document.getElementById('int-bromoprida').checked)
+    linhas.push(document.getElementById('int-bromoprida-txt').value);
+  if (document.getElementById('int-tramadol').checked)
+    linhas.push(document.getElementById('int-tramadol-txt').value);
+
+  // 4. ATBs
+  _intATBs.forEach(function(t) { if (t.trim()) linhas.push(t.trim()); });
+
+  // 5. Dextro + Insulina
+  if (document.getElementById('int-dextro').checked) {
+    var proto = document.getElementById('int-dextro-protocolo').value;
+    var nomes = { conservador: 'Conservador', intensivo: 'Intensivo', hospitalar: 'Hospitalar Padrão' };
+    linhas.push('Dextro capilar 6/6h + Insulina Regular SC conforme esquema (' + nomes[proto] + '):');
+    _intInsulina.forEach(function(r) {
+      if (r[0] || r[1]) linhas.push('   ' + r[0] + ' → ' + r[1]);
+    });
+  }
+
+  // 6. Cuidados
+  var cuidados = [];
+  document.querySelectorAll('.int-cuidado:checked').forEach(function(cb) { cuidados.push(cb.value); });
+  if (cuidados.length) linhas.push('Cuidados de enfermagem: ' + cuidados.join('; '));
+
+  // 7. Extras
+  _intExtras.forEach(function(t) { if (t.trim()) linhas.push(t.trim()); });
+
+  return linhas;
+}
+
+function printInternacao() {
+  var perfil = getPerfil();
+  var nome = document.getElementById('int-nome').value.trim() || '___________________________________';
+  var nasc = document.getElementById('int-nasc').value.trim() || '';
+  var peso = document.getElementById('int-peso').value.trim() || '';
+  var diag = document.getElementById('int-diag').value.trim() || '';
+  var alerg = document.getElementById('int-alerg').value.trim() || 'Sem alergias conhecidas';
+  var dataHoje = new Date().toLocaleDateString('pt-BR');
+  var horaAgora = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  var linhas = gerarLinhasInternacao();
+
+  if (!linhas.length) { alert('Nenhuma prescrição preenchida.'); return; }
+
+  var css = 'body{font-family:Arial,sans-serif;background:white;color:black;margin:0;padding:18px 26px;font-size:11pt}' +
+    'table{width:100%;border-collapse:collapse}' +
+    'td,th{border:1px solid #000;padding:5px 8px;vertical-align:top;font-size:10.5pt}' +
+    '.h-inst{text-align:center;font-size:12pt;font-weight:bold;border-bottom:2px solid #000;padding-bottom:6px;margin-bottom:6px}' +
+    '.h-title{text-align:center;font-size:14pt;font-weight:bold;letter-spacing:1px;margin-bottom:8px}' +
+    '.col-num{width:32px;text-align:center;font-weight:bold}' +
+    '.col-rx{width:auto}' +
+    '.col-hora{width:80px;text-align:center}' +
+    '.foot{margin-top:24px;display:flex;justify-content:space-between;align-items:flex-end}' +
+    '.sig{border-top:1px solid #000;width:50%;padding-top:4px;text-align:center;font-size:9.5pt}' +
+    '@page{size:A4;margin:1.2cm 1.6cm}';
+
+  var rows = linhas.map(function(l, i) {
+    return '<tr><td class="col-num">' + (i+1) + '</td><td class="col-rx">' + escapeHtml(l) + '</td><td class="col-hora"></td></tr>';
+  }).join('');
+
+  var corpo =
+    '<div class="h-inst">' + escapeHtml(perfil.header || 'PREFEITURA MUNICIPAL DE TAQUARITINGA/SP') + '</div>' +
+    '<div class="h-title">PRESCRIÇÃO MÉDICA</div>' +
+    '<table style="margin-bottom:6px;font-size:10pt;">' +
+    '<tr><td><b>Paciente:</b> ' + escapeHtml(nome) + '</td>' +
+    '<td><b>DN/Idade:</b> ' + escapeHtml(nasc) + '</td>' +
+    '<td><b>Peso:</b> ' + escapeHtml(peso) + ' kg</td></tr>' +
+    '<tr><td colspan="2"><b>Diagnóstico:</b> ' + escapeHtml(diag) + '</td>' +
+    '<td><b>Data:</b> ' + dataHoje + '  <b>Hora:</b> ' + horaAgora + '</td></tr>' +
+    '<tr><td colspan="3"><b>Alergias / Comorbidades:</b> ' + escapeHtml(alerg) + '</td></tr>' +
+    '</table>' +
+    '<table>' +
+    '<thead><tr><th class="col-num">Nº</th><th class="col-rx">PRESCRIÇÃO MÉDICA</th><th class="col-hora">HORA</th></tr></thead>' +
+    '<tbody>' + rows + '</tbody>' +
+    '</table>' +
+    '<div class="foot">' +
+    '<div>' + escapeHtml(perfil.cidade || 'Taquaritinga') + ', ' + dataHoje + '</div>' +
+    '<div class="sig">' + escapeHtml(perfil.nome || '') + (perfil.nome ? '<br>' : '') + escapeHtml(perfil.crm || '') + '</div>' +
+    '</div>';
+
+  var win = window.open('', '_blank', 'width=820,height=960,toolbar=0,menubar=0,location=0,status=0,scrollbars=1');
+  win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title> </title><style>' + css + '</style></head><body>' + corpo + '</body></html>');
+  win.document.close();
+  win.focus();
+  setTimeout(function() { win.print(); win.close(); }, 400);
+}
+
+function limparInternacao() {
+  ['int-nome','int-nasc','int-peso','int-diag','int-alerg','int-hid-vol','int-hid-horas'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('int-hid-sol').selectedIndex = 0;
+  document.getElementById('int-dieta').selectedIndex = 0;
+  document.getElementById('int-dextro-protocolo').selectedIndex = 0;
+  document.getElementById('int-dipirona').checked = true;
+  document.getElementById('int-bromoprida').checked = true;
+  document.getElementById('int-tramadol').checked = false;
+  document.getElementById('int-kcl').checked = false;
+  document.getElementById('int-dextro').checked = false;
+  document.getElementById('int-dextro-panel').style.display = 'none';
+  document.getElementById('int-gotejo-result').textContent = '— gotas/min';
+  document.querySelectorAll('.int-cuidado').forEach(function(cb) {
+    cb.checked = ['SSVV 6/6h','Controle de débito hídrico','Decúbito elevado 30°','Acesso venoso pérvio','Avisar médico se: FC>100, FR>20, SpO2<94%, PA<90x60 ou febre'].indexOf(cb.value) >= 0;
+  });
+  _intATBs = [];
+  _intExtras = [];
+  _intInsulina = [];
+  renderATBs();
+  renderExtras();
 }
 
 // =================== INIT ===================
