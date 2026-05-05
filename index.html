@@ -1735,6 +1735,7 @@
   <button class="tab" data-section="calc" onclick="setSection('calc')">Calc</button>
   <button class="tab" data-section="scores" onclick="setSection('scores')">Scores</button>
   <button class="tab" data-section="hist" onclick="setSection('hist')">Hist</button>
+  <button class="tab" data-section="internacao" onclick="setSection('internacao')">Internação</button>
 </div>
 
 <!-- =================== SEÇÃO MINHAS CONDUTAS (BLOCO ORIGINAL) =================== -->
@@ -2182,7 +2183,7 @@ RETORNO SE NECESSARIO
 </div>
 
 <!-- =================== ÁREA DE IMPRESSÃO (OCULTA) =================== -->
-<div id="print-area"></div>
+
 
 <!-- =================== SEÇÃO ATESTADO =================== -->
 <div class="section" id="section-atestado">
@@ -2247,15 +2248,6 @@ RETORNO SE NECESSARIO
             <option value="iv">EV (choque refratário)</option>
           </select>
         </div>
-      </div>
-      <div id="anafi-result" class="result" style="margin-top:10px;">Preencha o peso</div>
-    </div>
-
-    <div class="panel" style="grid-column:span 2;">
-      <h2>Anafilaxia Pediátrica</h2>
-      <div class="desc">WAO/SGAI 2020 — Adrenalina IM coxa lateral PRIMEIRA LINHA</div>
-      <div class="field-row">
-        <div class="field"><label>Peso (kg)</label><input type="number" id="anafi-peso" oninput="calcAnafi()" placeholder="20" step="0.5" min="1" max="100"></div>
       </div>
       <div id="anafi-result" class="result" style="margin-top:10px;">Preencha o peso</div>
     </div>
@@ -2988,7 +2980,7 @@ const MINHAS = [
   { id:'m_geca1', cat:'GECA', title:'GECA — ADULTO',
     rx:'VIA ORAL-\n\n1) DIPIRONA 500 MG----------------------------------1 CX\nTOMAR 1 CP DE 6/6 HORAS SE DOR OU FEBRE\n\n2)BROMOPRIDA 10 MG-----------------------------------1 CX\nTOMAR 1 CP DE 8/8 HORAS SE NAUSEA OU VÔMITOS\n\n3)SORO DE REIDRATAÇÃO ORAL  ---------------------------------------1 FRASCO\nTOMAR 1,5 L POR DIA E TODA A QUANTIDADE DE LIQUIDOS QUE CONSEGUIR\n\n4)FLORATIL 200 MG   ---------------------------------------1 CX\nDILUIR UM SACHE EM AGUA E TOMAR DE 12/12 HORAS POR 5 DIAS' },
   { id:'m_geca2', cat:'GECA', title:'GECA — PEDIÁTRICO',
-    rx:'VIA ORAL-\n\n1) DIPIRONA 500 MG/ML----------------------------------1 FRASCO\nTOMAR 1 GOTAS DE 6/6 HORAS SE DOR OU FEBRE\n\n2)ONDASETRONA 4 MG/5ML-----------------------------------1 FRASCO\nTOMAR 1 ML DE 8/8 HORAS SE NAUSEA OU VOMITOS\n\n3)SEKI XAROPE---------------------------------------1 FRASCO\nTOMAR 1 ML DE 8/8 HORAS SE TOSSE\n\n4)SORO DE REIDRATACAO ORAL  ---------------------------------------1 FRASCO\nTOMAR 1,5 L POR DIA E TODA A QUANTIDADE DE LIQUIDOS QUE CONSEGUIR\n\n5)FLORATIL 200 MG   ---------------------------------------1 CX\nDILUIR UM SACHE EM AGUA E TOMAR DE 12/12 HORAS POR 5 DIAS\n\n6)ZINCO 20 MG   ---------------------------------------1 CX\nTOMAR 1 CP POR DIA POR 7 DIAS\n\n7)BROMOPRIDA 4 MG/ML-----------------------------------1 FRASCO\nTOMAR 1 GOTAS DE 8/8 HORAS SE NAUSEA OU VOMITOS' },
+    rx:'VIA ORAL-\n\n1) DIPIRONA 500 MG/ML----------------------------------1 FRASCO\nTOMAR 1 GOTAS POR KG DE 6/6 HORAS SE DOR OU FEBRE\n\n2) ONDANSETRONA 4 MG/5ML-----------------------------------1 FRASCO\n\u226415KG: TOMAR 5 ML DE 8/8 HORAS SE NAUSEA OU VOMITO\n>15KG: TOMAR 10 ML DE 8/8 HORAS SE NAUSEA OU VOMITO\n\n3) SORO DE REIDRATACAO ORAL---------------------------------------1 FRASCO\nTOMAR 1,5 L POR DIA E TODA QUANTIDADE DE LIQUIDOS QUE CONSEGUIR\n\n4) FLORATIL 200 MG---------------------------------------1 CX\nDILUIR 1 SACHE EM AGUA E TOMAR DE 12/12 HORAS POR 5 DIAS\n\n-----------OPCIONAIS-----------\n\n5) ZINCO 20 MG---------------------------------------1 CX\nTOMAR 1 CP POR DIA POR 10 DIAS\n\n6) BROMOPRIDA 4 MG/ML-----------------------------------1 FRASCO\nTOMAR 1 GOTAS POR KG DE 8/8 HORAS SE NAUSEA OU VOMITO PERSISTENTE' },
 
   // --- SINUSITE ---
   { id:'m_sin1', cat:'SINUSITE', title:'SINUSITE',
@@ -4174,7 +4166,7 @@ document.addEventListener('keydown', (e) => {
     if (STATE.section === 'minhas') {
       document.getElementById('search-minhas').focus();
     } else {
-      setSection('condutas');
+      setSection('prescricoes');
       document.getElementById('search').focus();
     }
   }
@@ -4191,7 +4183,7 @@ document.addEventListener('keydown', (e) => {
   // 1-5 → trocar seção (com Alt)
   if (e.altKey && ['1','2','3','4','5'].includes(e.key)) {
     e.preventDefault();
-    const sects = ['minhas','condutas','calc','scores','hist'];
+    const sects = ['minhas','prescricoes','calc','scores','hist'];
     setSection(sects[parseInt(e.key)-1]);
   }
   // T → toggle tema
@@ -4497,13 +4489,22 @@ function copyCustom(id, btn) {
   });
 }
 
+// =================== SENHA PROTEÇÃO ===================
+function pedirSenha(callback) {
+  var s = prompt('🔒 Senha para edição:');
+  if (s === 'igor123') { callback(); }
+  else if (s !== null) { alert('❌ Senha incorreta.'); }
+}
+
 function novaConduta() {
-  showEditForm({ id: 'c_' + Date.now(), title: '', cat: '', rx: '' });
+  pedirSenha(function() {
+    showEditForm({ id: 'c_' + Date.now(), title: '', cat: '', rx: '' });
+  });
 }
 
 function editCustom(id) {
   const item = CUSTOM.find(c => c.id === id);
-  if (item) showEditForm({ ...item });
+  if (item) pedirSenha(function() { showEditForm({ ...item }); });
 }
 
 function showEditForm(item) {
@@ -4550,19 +4551,23 @@ async function saveEditForm(id) {
 async function deleteCustom(id) {
   const item = CUSTOM.find(c => c.id === id);
   if (!item) return;
-  if (!confirm(`Apagar "${item.title}"?`)) return;
-  CUSTOM = CUSTOM.filter(c => c.id !== id);
-  saveCustomLocal();
-  renderCustom();
-  await deleteCustomCloud(id);
+  pedirSenha(async function() {
+    if (!confirm('Apagar "' + item.title + '"?')) return;
+    CUSTOM = CUSTOM.filter(c => c.id !== id);
+    saveCustomLocal();
+    renderCustom();
+    await deleteCustomCloud(id);
+  });
 }
 
 async function resetCustom() {
-  if (!confirm('APAGAR TODAS as condutas customizadas? (nuvem e local)')) return;
-  for (const c of CUSTOM) { await deleteCustomCloud(c.id); }
-  CUSTOM = [];
-  saveCustomLocal();
-  renderCustom();
+  pedirSenha(async function() {
+    if (!confirm('APAGAR TODAS as condutas customizadas? (nuvem e local)')) return;
+    for (const c of CUSTOM) { await deleteCustomCloud(c.id); }
+    CUSTOM = [];
+    saveCustomLocal();
+    renderCustom();
+  });
 }
 
 // =================== EXPORT / IMPORT ===================
@@ -5373,20 +5378,21 @@ function saveCondutaModel() {
   var nome = document.getElementById('conduta-editor-nome').value.trim().toUpperCase();
   var texto = document.getElementById('conduta-editor-texto').value.trim().toUpperCase();
   if (!nome || !texto) { alert('Preencha nome e texto.'); return; }
-  var id = 'cm_' + Date.now();
-  var model = { id: id, name: nome, text: texto };
-  CONDUTA_MODELS.push(model);
-  localStorage.setItem('plantao_conduta_models', JSON.stringify(CONDUTA_MODELS));
-  syncCondutaToCloud();
-  // Também adiciona em CUSTOM (aparece na lista Minhas)
-  var customItem = { id: id, title: nome, cat: 'CONDUTA', rx: texto };
-  CUSTOM.push(customItem);
-  saveCustomLocal();
-  renderCustom();
-  document.getElementById('conduta-editor-nome').value = '';
-  document.getElementById('conduta-editor-texto').value = '';
-  document.getElementById('conduta-editor-box').style.display = 'none';
-  renderCondutaModelBtns();
+  pedirSenha(function() {
+    var id = 'cm_' + Date.now();
+    var model = { id: id, name: nome, text: texto };
+    CONDUTA_MODELS.push(model);
+    localStorage.setItem('plantao_conduta_models', JSON.stringify(CONDUTA_MODELS));
+    syncCondutaToCloud();
+    var customItem = { id: id, title: nome, cat: 'CONDUTA', rx: texto };
+    CUSTOM.push(customItem);
+    saveCustomLocal();
+    renderCustom();
+    document.getElementById('conduta-editor-nome').value = '';
+    document.getElementById('conduta-editor-texto').value = '';
+    document.getElementById('conduta-editor-box').style.display = 'none';
+    renderCondutaModelBtns();
+  });
 }
 
 function toggleCondutaModel(id) {
@@ -5405,10 +5411,12 @@ function copyCondutaModel(id, btn) {
 }
 
 function deleteCondutaModel(id) {
-  if (!confirm('Excluir este modelo?')) return;
-  CONDUTA_MODELS = CONDUTA_MODELS.filter(function(m) { return m.id !== id; });
-  localStorage.setItem('plantao_conduta_models', JSON.stringify(CONDUTA_MODELS));
-  renderCondutaModelBtns();
+  pedirSenha(function() {
+    if (!confirm('Excluir este modelo?')) return;
+    CONDUTA_MODELS = CONDUTA_MODELS.filter(function(m) { return m.id !== id; });
+    localStorage.setItem('plantao_conduta_models', JSON.stringify(CONDUTA_MODELS));
+    renderCondutaModelBtns();
+  });
 }
 
 
@@ -5689,9 +5697,9 @@ function calcDoseMinhas(itemId) {
           novaLinha = linha.replace(/\d+\s*GOTAS/gi, g4 + ' GOTAS');
           break;
         case 'ondansetrona':
-          var doseOnd = Math.min(peso * 0.15, 4);
-          var ml3 = Math.round((doseOnd / 0.8) * 10) / 10;
-          novaLinha = linha.replace(/\d+(?:[,\.]\d+)?\s*ML/gi, ml3 + ' ML');
+          // ≤15kg → 5ml | >15kg → 10ml (sem cálculo por peso, regra fixa)
+          var mlOnd = peso <= 15 ? 5 : 10;
+          novaLinha = linha.replace(/\d+(?:[,.]\d+)?\s*ML/gi, mlOnd + ' ML');
           break;
         case 'amoxicilina':
           var ml4 = Math.max(1, Math.round((peso * 25 / 50) * 2) / 2);
@@ -5758,6 +5766,7 @@ function printMinhaRx(id) {
 
 
 function saveEditFormToMinhas(id) {
+  pedirSenha(function() {
   var title = document.getElementById('ef-title').value.trim();
   var cat = document.getElementById('ef-cat').value.trim().toUpperCase() || 'CUSTOM';
   var rx = document.getElementById('ef-rx').value.trim();
@@ -5788,6 +5797,7 @@ function saveEditFormToMinhas(id) {
   
   document.getElementById('editor-form-area').innerHTML = '';
   alert('✅ Salvo em Minhas na categoria "' + cat + '"!');
+  });
 }
 
 
@@ -5977,21 +5987,25 @@ function saveAnamModel() {
   const nome = document.getElementById('anam-editor-nome').value.trim().toUpperCase();
   const texto = document.getElementById('anam-editor-texto').value.trim();
   if (!nome || !texto) { alert('Preencha nome e texto.'); return; }
-  const model = { id: 'am_' + Date.now(), name: nome, text: texto };
-  ANAM_MODELS.push(model);
-  localStorage.setItem('plantao_anam_models', JSON.stringify(ANAM_MODELS));
-  syncAnamToCloud();
-  document.getElementById('anam-editor-nome').value = '';
-  document.getElementById('anam-editor-texto').value = '';
-  document.getElementById('anam-editor-box').style.display = 'none';
-  renderCustomAnamBtns();
+  pedirSenha(function() {
+    const model = { id: 'am_' + Date.now(), name: nome, text: texto };
+    ANAM_MODELS.push(model);
+    localStorage.setItem('plantao_anam_models', JSON.stringify(ANAM_MODELS));
+    syncAnamToCloud();
+    document.getElementById('anam-editor-nome').value = '';
+    document.getElementById('anam-editor-texto').value = '';
+    document.getElementById('anam-editor-box').style.display = 'none';
+    renderCustomAnamBtns();
+  });
 }
 
 function deleteAnamModel(id) {
-  if (!confirm('Excluir este modelo?')) return;
-  ANAM_MODELS = ANAM_MODELS.filter(m => m.id !== id);
-  localStorage.setItem('plantao_anam_models', JSON.stringify(ANAM_MODELS));
-  renderCustomAnamBtns();
+  pedirSenha(function() {
+    if (!confirm('Excluir este modelo?')) return;
+    ANAM_MODELS = ANAM_MODELS.filter(m => m.id !== id);
+    localStorage.setItem('plantao_anam_models', JSON.stringify(ANAM_MODELS));
+    renderCustomAnamBtns();
+  });
 }
 
 // =================== ANAFILAXIA PEDIÁTRICA ===================
@@ -6236,11 +6250,15 @@ renderPed();
   if (!tabBar) return;
   var tabs = Array.from(tabBar.querySelectorAll('.tab'));
   var order = JSON.parse(localStorage.getItem('plantao_tabs_order') || 'null');
-  if (order && order.length) {
+  var currentSecs = tabs.map(function(t){ return t.dataset.section; });
+  // Invalidate stale order (missing tabs from app updates)
+  if (order && order.length && currentSecs.every(function(s){ return order.indexOf(s) >= 0; })) {
     order.forEach(function(sec) {
       var found = tabs.find(function(t){ return t.dataset.section === sec; });
       if (found) tabBar.insertBefore(found, tabBar.querySelector('.tab-actions'));
     });
+  } else if (order) {
+    localStorage.removeItem('plantao_tabs_order');
   }
   tabs.forEach(function(t, i) {
     t.setAttribute('draggable','true');
@@ -6298,6 +6316,429 @@ function initAtestadoData() {
 }
 try { initAtestadoData(); } catch(e){}
 
+
+<!-- =================== SEÇÃO INTERNAÇÃO =================== -->
+<div class="section" id="section-internacao">
+  <div class="panel">
+    <h2>🏥 GERADOR DE PRESCRIÇÃO HOSPITALAR</h2>
+    <div class="desc">Preencha os campos e clique em Imprimir Prescrição</div>
+
+    <!-- CABEÇALHO DO PACIENTE -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0 10px;">
+      <div class="field"><label>Nome do Paciente</label><input type="text" id="int-nome" placeholder="Nome completo"></div>
+      <div class="field"><label>Data de Nascimento / Idade</label><input type="text" id="int-nasc" placeholder="DD/MM/AAAA — XX anos"></div>
+      <div class="field"><label>Peso (kg)</label><input type="number" id="int-peso" placeholder="70" step="0.5" min="1" oninput="calcIntGotejo()"></div>
+      <div class="field"><label>Diagnóstico / CID</label><input type="text" id="int-diag" placeholder="Ex: Apendicite aguda — K35"></div>
+      <div class="field" style="grid-column:span 2;"><label>Alergias / Comorbidades</label><input type="text" id="int-alerg" placeholder="Sem alergias conhecidas / HAS, DM..."></div>
+    </div>
+
+    <div style="border-top:1px solid var(--line);margin:14px 0;"></div>
+
+    <!-- 1. DIETA -->
+    <div class="ef-group">
+      <div class="ef-label">1 — Dieta</div>
+      <div class="field-row">
+        <div class="field">
+          <select id="int-dieta" style="width:100%;padding:9px 12px;font-family:var(--font-mono);font-size:13px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);">
+            <option value="Dieta geral">Dieta geral</option>
+            <option value="Dieta para idade">Dieta para idade</option>
+            <option value="Dieta zero (jejum)">Dieta zero (jejum)</option>
+            <option value="Dieta hipossódica">Dieta hipossódica</option>
+            <option value="Dieta para diabético">Dieta para diabético</option>
+            <option value="Dieta para diabético hipossódica">Dieta para diabético hipossódica</option>
+            <option value="Dieta pastosa">Dieta pastosa</option>
+            <option value="Dieta líquida">Dieta líquida</option>
+            <option value="Dieta por SNE">Dieta por SNE</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. HIDRATAÇÃO EV -->
+    <div class="ef-group">
+      <div class="ef-label">2 — Hidratação EV</div>
+      <div class="field-row" style="flex-wrap:wrap;gap:8px;">
+        <div class="field" style="min-width:140px;">
+          <label>Solução</label>
+          <select id="int-hid-sol" oninput="calcIntGotejo()" style="padding:9px 12px;font-family:var(--font-mono);font-size:13px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);">
+            <option value="SF 0,9%">SF 0,9%</option>
+            <option value="Glicofisiológico">Glicofisiológico</option>
+            <option value="SG 5%">SG 5%</option>
+            <option value="Ringer Lactato">Ringer Lactato</option>
+          </select>
+        </div>
+        <div class="field" style="min-width:100px;">
+          <label>Volume (ml)</label>
+          <input type="number" id="int-hid-vol" placeholder="500" min="100" step="50" oninput="calcIntGotejo()" style="padding:9px 12px;font-family:var(--font-mono);font-size:14px;font-weight:700;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--cyan);">
+        </div>
+        <div class="field" style="min-width:100px;">
+          <label>Em (horas)</label>
+          <input type="number" id="int-hid-horas" placeholder="6" min="1" max="24" step="1" oninput="calcIntGotejo()" style="padding:9px 12px;font-family:var(--font-mono);font-size:14px;font-weight:700;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--cyan);">
+        </div>
+        <div class="field" style="min-width:140px;align-self:flex-end;">
+          <div id="int-gotejo-result" style="padding:9px 12px;font-family:var(--font-mono);font-size:13px;color:var(--vital);font-weight:700;background:rgba(0,232,150,0.06);border:1px solid var(--vital-dim);border-radius:8px;">— gotas/min</div>
+        </div>
+      </div>
+      <div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
+        <input type="checkbox" id="int-kcl" style="width:16px;height:16px;accent-color:var(--warn);">
+        <label for="int-kcl" style="font-family:var(--font-mono);font-size:11px;color:var(--txt-2);">Acrescentar KCl 19,1% 10ml no soro (reposição de potássio)</label>
+      </div>
+    </div>
+
+    <!-- 3. DIPIRONA -->
+    <div class="ef-group" style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg-2);border-radius:8px;border:1px solid var(--line);">
+      <input type="checkbox" id="int-dipirona" checked style="width:18px;height:18px;accent-color:var(--cyan);">
+      <label for="int-dipirona" style="font-family:var(--font-mono);font-size:12px;color:var(--txt);flex:1;">3 — Dipirona 1 amp (2g) + SF 100ml EV — 6/6h — SN</label>
+    </div>
+
+    <!-- 4. BROMOPRIDA -->
+    <div class="ef-group" style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg-2);border-radius:8px;border:1px solid var(--line);">
+      <input type="checkbox" id="int-bromoprida" checked style="width:18px;height:18px;accent-color:var(--cyan);">
+      <label for="int-bromoprida" style="font-family:var(--font-mono);font-size:12px;color:var(--txt);flex:1;">4 — Bromoprida 1 amp + SF 100ml EV — 8/8h — SN (náuseas/vômitos)</label>
+    </div>
+
+    <!-- 5. TRAMADOL -->
+    <div class="ef-group" style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg-2);border-radius:8px;border:1px solid var(--line);">
+      <input type="checkbox" id="int-tramadol" style="width:18px;height:18px;accent-color:var(--violet);">
+      <label for="int-tramadol" style="font-family:var(--font-mono);font-size:12px;color:var(--txt);flex:1;">5 — Tramadol 1 amp (100mg) + SF 100ml EV — 8/8h — SN (dor intensa)</label>
+    </div>
+
+    <!-- 6. ATB -->
+    <div class="ef-group">
+      <div class="ef-label">6 — Antibiótico (texto livre)</div>
+      <textarea id="int-atb" placeholder="Ex: Ceftriaxona 2g + SF 250ml EV 1x/dia por 7 dias&#10;(deixe em branco se não usar ATB)" style="width:100%;min-height:60px;padding:10px 12px;font-family:var(--font-mono);font-size:12px;line-height:1.6;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);resize:vertical;"></textarea>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;">
+        <button class="ef-pill" onclick="preencherATB('Ceftriaxona 2g + SF 250ml EV 1x/dia')">Ceftriaxona 2g</button>
+        <button class="ef-pill" onclick="preencherATB('Metronidazol 500mg + SF 100ml EV 8/8h')">Metronidazol</button>
+        <button class="ef-pill" onclick="preencherATB('Ampicilina+Sulbactam 3g + SF 100ml EV 6/6h')">Amp+Sulbact</button>
+        <button class="ef-pill" onclick="preencherATB('Ciprofloxacino 400mg EV 12/12h')">Cipro EV</button>
+        <button class="ef-pill" onclick="preencherATB('Piperacilina+Tazobactam 4,5g + SF 100ml EV 6/6h')">Pip+Tazo</button>
+        <button class="ef-pill" onclick="preencherATB('Meropenem 1g + SF 100ml EV 8/8h')">Meropenem</button>
+        <button class="ef-pill" onclick="preencherATB('Clindamicina 600mg + SF 100ml EV 8/8h')">Clinda EV</button>
+      </div>
+    </div>
+
+    <!-- 7. DEXTRO + INSULINA -->
+    <div class="ef-group">
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg-2);border-radius:8px;border:1px solid var(--line);">
+        <input type="checkbox" id="int-dextro" onchange="toggleDextroPanel()" style="width:18px;height:18px;accent-color:var(--warn);">
+        <label for="int-dextro" style="font-family:var(--font-mono);font-size:12px;color:var(--txt);flex:1;">7 — Esquema Dextro + Insulina Regular</label>
+        <select id="int-dextro-protocolo" onchange="renderEsquemaInsulina()" style="padding:7px 10px;font-family:var(--font-mono);font-size:11px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);">
+          <option value="conservador">Conservador</option>
+          <option value="intensivo">Intensivo</option>
+          <option value="hospitalar">Hospitalar Padrão</option>
+        </select>
+      </div>
+      <div id="int-dextro-panel" style="display:none;margin-top:8px;padding:10px 14px;background:rgba(255,184,0,0.05);border:1px solid var(--warn-dim);border-radius:8px;font-family:var(--font-mono);font-size:11px;line-height:1.9;color:var(--txt-2);">
+        <div style="font-weight:700;color:var(--warn);margin-bottom:6px;">ESQUEMA INSULINA REGULAR SC</div>
+        <div id="int-insulina-texto"></div>
+      </div>
+    </div>
+
+    <!-- 8. CUIDADOS GERAIS -->
+    <div class="ef-group">
+      <div class="ef-label">8 — Cuidados de Enfermagem</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:10px;background:var(--bg-2);border-radius:8px;border:1px solid var(--line);">
+        <label style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-cuidado" value="SSVV 6/6h" checked style="accent-color:var(--cyan);"> SSVV 6/6h</label>
+        <label style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-cuidado" value="Controle de débito hídrico" checked style="accent-color:var(--cyan);"> Débito hídrico</label>
+        <label style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-cuidado" value="Decúbito elevado 30°" checked style="accent-color:var(--cyan);"> Decúbito 30°</label>
+        <label style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-cuidado" value="Acesso venoso pérvio" checked style="accent-color:var(--cyan);"> AV pérvio</label>
+        <label style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-cuidado" value="SNE — manutenção e controle de posição" style="accent-color:var(--cyan);"> SNE</label>
+        <label style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-cuidado" value="O2 cateter nasal 2-4 L/min" style="accent-color:var(--cyan);"> O₂ cateter</label>
+        <label style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-cuidado" value="SVD — controle de diurese" style="accent-color:var(--cyan);"> SVD</label>
+        <label style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-cuidado" value="Avisar médico se: FC>100, FR>20, SpO2<94%, PA<90x60 ou febre" checked style="accent-color:var(--cyan);"> Avisar médico</label>
+      </div>
+    </div>
+
+    <!-- 9. ITENS ADICIONAIS -->
+    <div class="ef-group">
+      <div class="ef-label">9 — Itens Adicionais</div>
+      <div style="display:flex;gap:6px;margin-bottom:8px;">
+        <input type="text" id="int-extra-input" placeholder="Descreva o item..." style="flex:1;padding:9px 12px;font-family:var(--font-mono);font-size:12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);">
+        <button class="btn-primary" onclick="addIntExtra()" style="padding:9px 16px;">+ Add</button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;">
+        <button class="ef-pill" onclick="addIntExtraText('Omeprazol 40mg + AD 10ml EV 1x/dia (jejum)')">Omeprazol EV</button>
+        <button class="ef-pill" onclick="addIntExtraText('Heparina 5.000 UI SC 8/8h (profilaxia TVP)')">Heparina</button>
+        <button class="ef-pill" onclick="addIntExtraText('Enoxaparina 40mg SC 1x/dia (profilaxia TVP)')">Enoxaparina</button>
+        <button class="ef-pill" onclick="addIntExtraText('Ondansetrona 4mg + AD 8ml EV 8/8h SN')">Ondansetrona EV</button>
+        <button class="ef-pill" onclick="addIntExtraText('Dexametasona 4mg + AD 3ml EV 8/8h')">Dexa</button>
+        <button class="ef-pill" onclick="addIntExtraText('Hidrocortisona 100mg + SF 100ml EV 8/8h')">Hidrocortisona</button>
+        <button class="ef-pill" onclick="addIntExtraText('AAS 100mg VO 1x/dia')">AAS</button>
+        <button class="ef-pill" onclick="addIntExtraText('Insulina Glargina ___ UI SC às 22h')">Glargina</button>
+        <button class="ef-pill" onclick="addIntExtraText('Morfina 2mg + AD 8ml EV bolus lento SN')">Morfina</button>
+        <button class="ef-pill" onclick="addIntExtraText('Ranitidina 50mg + SF 100ml EV 8/8h')">Ranitidina</button>
+        <button class="ef-pill" onclick="addIntExtraText('Furosemida 20mg + AD 18ml EV 12/12h')">Furosemida</button>
+      </div>
+      <div id="int-extras-list" style="display:flex;flex-direction:column;gap:4px;"></div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button class="btn-primary" style="flex:2;" onclick="printInternacao()">🖨️ Imprimir Prescrição</button>
+      <button class="btn-secondary" onclick="limparInternacao()">Limpar</button>
+    </div>
+  </div>
+</div>
+
+// =================== INTERNAÇÃO ===================
+var _intExtras = [];
+
+function calcIntGotejo() {
+  var vol = parseFloat(document.getElementById('int-hid-vol').value) || 0;
+  var horas = parseFloat(document.getElementById('int-hid-horas').value) || 0;
+  var el = document.getElementById('int-gotejo-result');
+  if (!vol || !horas) { el.textContent = '— gotas/min'; return; }
+  var gtMin = Math.round(vol / (horas * 3));
+  var mlH = Math.round(vol / horas);
+  el.textContent = gtMin + ' gts/min  |  ' + mlH + ' ml/h';
+}
+
+function preencherATB(texto) {
+  var ta = document.getElementById('int-atb');
+  if (ta.value.trim()) ta.value += '\n' + texto;
+  else ta.value = texto;
+}
+
+function addIntExtra() {
+  var inp = document.getElementById('int-extra-input');
+  var txt = inp.value.trim();
+  if (!txt) return;
+  _intExtras.push(txt);
+  inp.value = '';
+  renderIntExtras();
+}
+
+function addIntExtraText(txt) {
+  _intExtras.push(txt);
+  renderIntExtras();
+}
+
+function removeIntExtra(idx) {
+  _intExtras.splice(idx, 1);
+  renderIntExtras();
+}
+
+function renderIntExtras() {
+  var el = document.getElementById('int-extras-list');
+  el.innerHTML = _intExtras.map(function(t, i) {
+    return '<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg-2);border:1px solid var(--line);border-radius:8px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);">' +
+      '<span style="flex:1;">' + t + '</span>' +
+      '<button onclick="removeIntExtra(' + i + ')" style="background:none;border:none;color:var(--pulse);cursor:pointer;font-size:14px;padding:0;">✕</button>' +
+      '</div>';
+  }).join('');
+}
+
+function toggleDextroPanel() {
+  var cb = document.getElementById('int-dextro');
+  var panel = document.getElementById('int-dextro-panel');
+  panel.style.display = cb.checked ? 'block' : 'none';
+  if (cb.checked) renderEsquemaInsulina();
+}
+
+function renderEsquemaInsulina() {
+  var proto = document.getElementById('int-dextro-protocolo').value;
+  var esquemas = {
+    conservador: [
+      'Glicemia ≤140 mg/dL → Sem insulina',
+      'Glicemia 141-180 mg/dL → Insulina Regular 2 UI SC',
+      'Glicemia 181-220 mg/dL → Insulina Regular 4 UI SC',
+      'Glicemia 221-280 mg/dL → Insulina Regular 6 UI SC',
+      'Glicemia 281-350 mg/dL → Insulina Regular 8 UI SC',
+      'Glicemia >350 mg/dL → Insulina Regular 10 UI SC + Avisar médico'
+    ],
+    intensivo: [
+      'Glicemia <70 mg/dL → HIPOGLICEMIA — Glicose 50% 40ml EV + Avisar médico',
+      'Glicemia 70-110 mg/dL → Sem insulina',
+      'Glicemia 111-140 mg/dL → Insulina Regular 2 UI SC',
+      'Glicemia 141-180 mg/dL → Insulina Regular 4 UI SC',
+      'Glicemia 181-240 mg/dL → Insulina Regular 6 UI SC',
+      'Glicemia 241-300 mg/dL → Insulina Regular 8 UI SC',
+      'Glicemia >300 mg/dL → Insulina Regular 10 UI SC + Avisar médico'
+    ],
+    hospitalar: [
+      'Glicemia <70 mg/dL → HIPOGLICEMIA — Glicose 50% 40ml EV + Avisar médico',
+      'Glicemia 70-140 mg/dL → Sem insulina',
+      'Glicemia 141-180 mg/dL → Insulina Regular 2 UI SC',
+      'Glicemia 181-220 mg/dL → Insulina Regular 4 UI SC',
+      'Glicemia 221-280 mg/dL → Insulina Regular 6 UI SC',
+      'Glicemia 281-350 mg/dL → Insulina Regular 8 UI SC',
+      'Glicemia >350 mg/dL → Insulina Regular 12 UI SC + Avisar médico'
+    ]
+  };
+  var linhas = esquemas[proto] || esquemas.conservador;
+  document.getElementById('int-insulina-texto').innerHTML =
+    'Dextro 6/6h. Aplicar Insulina Regular SC conforme resultado:<br>' +
+    linhas.join('<br>');
+}
+
+function gerarLinhasInternacao() {
+  var linhas = [];
+  var num = 1;
+
+  // 1. Dieta
+  linhas.push(num++ + ') ' + document.getElementById('int-dieta').value);
+
+  // 2. Hidratação
+  var sol = document.getElementById('int-hid-sol').value;
+  var vol = document.getElementById('int-hid-vol').value;
+  var horas = document.getElementById('int-hid-horas').value;
+  var kcl = document.getElementById('int-kcl').checked;
+  var gtMin = (vol && horas) ? Math.round(vol / (horas * 3)) : null;
+  if (vol && horas) {
+    var hidTxt = num++ + ') ' + sol + ' ' + vol + 'ml EV em ' + horas + 'h';
+    if (gtMin) hidTxt += ' (' + gtMin + ' gts/min)';
+    if (kcl) hidTxt += ' + KCl 19,1% 10ml';
+    linhas.push(hidTxt);
+  }
+
+  // 3. Dipirona
+  if (document.getElementById('int-dipirona').checked)
+    linhas.push(num++ + ') Dipirona 2g (1 amp) + SF 100ml EV — 6/6h — SN (dor/febre)');
+
+  // 4. Bromoprida
+  if (document.getElementById('int-bromoprida').checked)
+    linhas.push(num++ + ') Bromoprida 1 amp + SF 100ml EV — 8/8h — SN (náuseas/vômitos)');
+
+  // 5. Tramadol
+  if (document.getElementById('int-tramadol').checked)
+    linhas.push(num++ + ') Tramadol 100mg (1 amp) + SF 100ml EV — 8/8h — SN (dor intensa)');
+
+  // 6. ATB
+  var atb = document.getElementById('int-atb').value.trim();
+  if (atb) {
+    atb.split('\n').forEach(function(linha) {
+      if (linha.trim()) linhas.push(num++ + ') ' + linha.trim());
+    });
+  }
+
+  // 7. Dextro + Insulina
+  if (document.getElementById('int-dextro').checked) {
+    var proto = document.getElementById('int-dextro-protocolo').value;
+    var nomes = { conservador: 'Conservador', intensivo: 'Intensivo', hospitalar: 'Hospitalar Padrão' };
+    linhas.push(num++ + ') Dextro capilar 6/6h + Insulina Regular SC conforme esquema (' + nomes[proto] + '):');
+    var esquemas = {
+      conservador: [
+        '   ≤140 → Sem insulina',
+        '   141-180 → 2 UI SC',
+        '   181-220 → 4 UI SC',
+        '   221-280 → 6 UI SC',
+        '   281-350 → 8 UI SC',
+        '   >350 → 10 UI SC + Avisar médico'
+      ],
+      intensivo: [
+        '   <70 → HIPOGLICEMIA: Glicose 50% 40ml EV + Avisar médico',
+        '   70-110 → Sem insulina',
+        '   111-140 → 2 UI SC',
+        '   141-180 → 4 UI SC',
+        '   181-240 → 6 UI SC',
+        '   241-300 → 8 UI SC',
+        '   >300 → 10 UI SC + Avisar médico'
+      ],
+      hospitalar: [
+        '   <70 → HIPOGLICEMIA: Glicose 50% 40ml EV + Avisar médico',
+        '   70-140 → Sem insulina',
+        '   141-180 → 2 UI SC',
+        '   181-220 → 4 UI SC',
+        '   221-280 → 6 UI SC',
+        '   281-350 → 8 UI SC',
+        '   >350 → 12 UI SC + Avisar médico'
+      ]
+    };
+    (esquemas[proto] || esquemas.conservador).forEach(function(l) { linhas.push(l); });
+  }
+
+  // 8. Cuidados de enfermagem
+  var cuidados = [];
+  document.querySelectorAll('.int-cuidado:checked').forEach(function(cb) {
+    cuidados.push(cb.value);
+  });
+  if (cuidados.length) linhas.push(num++ + ') Cuidados de enfermagem: ' + cuidados.join('; '));
+
+  // 9. Extras
+  _intExtras.forEach(function(t) {
+    linhas.push(num++ + ') ' + t);
+  });
+
+  return linhas;
+}
+
+function printInternacao() {
+  var perfil = getPerfil();
+  var nome = document.getElementById('int-nome').value.trim() || '___________________________________';
+  var nasc = document.getElementById('int-nasc').value.trim() || '';
+  var peso = document.getElementById('int-peso').value.trim() || '';
+  var diag = document.getElementById('int-diag').value.trim() || '';
+  var alerg = document.getElementById('int-alerg').value.trim() || 'Sem alergias conhecidas';
+  var dataHoje = new Date().toLocaleDateString('pt-BR');
+  var horaAgora = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  var linhas = gerarLinhasInternacao();
+
+  var css = 'body{font-family:Arial,sans-serif;background:white;color:black;margin:0;padding:20px 30px;font-size:11pt}' +
+    'table{width:100%;border-collapse:collapse}' +
+    'td,th{border:1px solid #000;padding:5px 8px;vertical-align:top}' +
+    '.header-inst{text-align:center;font-size:12pt;font-weight:bold;border-bottom:2px solid #000;padding-bottom:8px;margin-bottom:8px}' +
+    '.header-title{text-align:center;font-size:14pt;font-weight:bold;letter-spacing:1px;margin-bottom:10px}' +
+    '.col-num{width:32px;text-align:center;font-weight:bold}' +
+    '.col-rx{width:65%}' +
+    '.col-hora{width:80px;text-align:center}' +
+    '.footer{margin-top:30px;display:flex;justify-content:space-between;align-items:flex-end}' +
+    '.sig{border-top:1px solid #000;width:50%;padding-top:4px;text-align:center;font-size:9.5pt}' +
+    '@page{size:A4;margin:1.5cm 2cm}';
+
+  var rows = linhas.map(function(l, i) {
+    return '<tr><td class="col-num">' + (i+1) + '</td><td class="col-rx">' + l.replace(/^[\d]+\)\s*/, '') + '</td><td class="col-hora"></td></tr>';
+  }).join('');
+
+  var corpo =
+    '<div class="header-inst">' + escapeHtml(perfil.header || 'PREFEITURA MUNICIPAL DE TAQUARITINGA/SP') + '</div>' +
+    '<div class="header-title">PRESCRIÇÃO MÉDICA</div>' +
+    '<table style="margin-bottom:8px;font-size:10pt;">' +
+    '<tr><td><b>Paciente:</b> ' + escapeHtml(nome) + '</td>' +
+    '<td><b>DN/Idade:</b> ' + escapeHtml(nasc) + '</td>' +
+    '<td><b>Peso:</b> ' + escapeHtml(peso) + ' kg</td></tr>' +
+    '<tr><td colspan="2"><b>Diagnóstico:</b> ' + escapeHtml(diag) + '</td>' +
+    '<td><b>Data:</b> ' + dataHoje + '  <b>Hora:</b> ' + horaAgora + '</td></tr>' +
+    '<tr><td colspan="3"><b>Alergias / Comorbidades:</b> ' + escapeHtml(alerg) + '</td></tr>' +
+    '</table>' +
+    '<table>' +
+    '<thead><tr><th class="col-num">Nº</th><th class="col-rx">PRESCRIÇÃO MÉDICA</th><th class="col-hora">HORA</th></tr></thead>' +
+    '<tbody>' + rows + '</tbody>' +
+    '</table>' +
+    '<div class="footer">' +
+    '<div>' + escapeHtml(perfil.cidade || 'Taquaritinga') + ', ' + dataHoje + '</div>' +
+    '<div class="sig">' + escapeHtml(perfil.nome || '') + (perfil.nome ? '<br>' : '') + escapeHtml(perfil.crm || '') + '</div>' +
+    '</div>';
+
+  var win = window.open('', '_blank', 'width=820,height=960,toolbar=0,menubar=0,location=0,status=0,scrollbars=1');
+  win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title> </title><style>' + css + '</style></head><body>' + corpo + '</body></html>');
+  win.document.close();
+  win.focus();
+  setTimeout(function() { win.print(); win.close(); }, 400);
+}
+
+function limparInternacao() {
+  ['int-nome','int-nasc','int-peso','int-diag','int-alerg','int-hid-vol','int-hid-horas','int-atb','int-extra-input'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('int-hid-sol').selectedIndex = 0;
+  document.getElementById('int-dieta').selectedIndex = 0;
+  document.getElementById('int-dextro-protocolo').selectedIndex = 0;
+  document.getElementById('int-dipirona').checked = true;
+  document.getElementById('int-bromoprida').checked = true;
+  document.getElementById('int-tramadol').checked = false;
+  document.getElementById('int-kcl').checked = false;
+  document.getElementById('int-dextro').checked = false;
+  document.getElementById('int-dextro-panel').style.display = 'none';
+  document.getElementById('int-gotejo-result').textContent = '— gotas/min';
+  document.querySelectorAll('.int-cuidado').forEach(function(cb) {
+    cb.checked = ['SSVV 6/6h','Controle de débito hídrico','Decúbito elevado 30°','Acesso venoso pérvio','Avisar médico se: FC>100, FR>20, SpO2<94%, PA<90x60 ou febre'].indexOf(cb.value) >= 0;
+  });
+  _intExtras = [];
+  renderIntExtras();
+}
+
+// setSection patch: adicionar 'internacao' no handler
+// (já funciona pelo data-section genérico — nenhuma mudança necessária)
 </script>
 </div><!-- /.container -->
 </body>
