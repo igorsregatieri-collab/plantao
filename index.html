@@ -2544,8 +2544,18 @@ RETORNO SE NECESSARIO
           <input type="number" id="int-hid-vol" placeholder="500" min="100" step="50" oninput="calcIntGotejo()" style="padding:9px 12px;font-family:var(--font-mono);font-size:14px;font-weight:700;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--cyan);">
         </div>
         <div class="field" style="min-width:90px;">
-          <label>Em (h)</label>
+          <label>Correr em (h)</label>
           <input type="number" id="int-hid-horas" placeholder="6" min="1" max="24" step="1" oninput="calcIntGotejo()" style="padding:9px 12px;font-family:var(--font-mono);font-size:14px;font-weight:700;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--cyan);">
+        </div>
+        <div class="field" style="min-width:120px;">
+          <label>Repetir</label>
+          <select id="int-hid-freq" style="padding:9px 10px;font-family:var(--font-mono);font-size:12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);">
+            <option value="">Dose única</option>
+            <option value="6/6h">6/6h</option>
+            <option value="8/8h">8/8h</option>
+            <option value="12/12h">12/12h</option>
+            <option value="contínuo">Contínuo</option>
+          </select>
         </div>
         <div class="field" style="min-width:140px;flex:1;">
           <div id="int-gotejo-result" style="padding:9px 12px;font-family:var(--font-mono);font-size:13px;color:var(--vital);font-weight:700;background:rgba(0,232,150,0.06);border:1px solid var(--vital-dim);border-radius:8px;">— gotas/min</div>
@@ -6506,10 +6516,12 @@ function gerarLinhasInternacao() {
   var sol = document.getElementById('int-hid-sol').value;
   var vol = document.getElementById('int-hid-vol').value;
   var horas = document.getElementById('int-hid-horas').value;
+  var freq = document.getElementById('int-hid-freq').value;
   var kcl = document.getElementById('int-kcl').checked;
   if (vol && horas) {
     var gtMin = Math.round(vol / (horas * 3));
-    var hidTxt = sol + ' ' + vol + 'ml EV em ' + horas + 'h (' + gtMin + ' gts/min)';
+    var hidTxt = sol + ' ' + vol + 'ml EV — correr em ' + horas + 'h (' + gtMin + ' gts/min)';
+    if (freq) hidTxt += ' — ' + freq;
     if (kcl) hidTxt += ' + KCl 19,1% 10ml';
     linhas.push(hidTxt);
   }
@@ -6569,11 +6581,16 @@ function printInternacao() {
     '.col-hora{width:80px;text-align:center}' +
     '.foot{margin-top:24px;display:flex;justify-content:space-between;align-items:flex-end}' +
     '.sig{border-top:1px solid #000;width:50%;padding-top:4px;text-align:center;font-size:9.5pt}' +
-    '@page{size:A4;margin:1.2cm 1.6cm}';
+    '@page{size:A4 landscape;margin:1cm 1.4cm}';
 
   var rows = linhas.map(function(l, i) {
     return '<tr><td class="col-num">' + (i+1) + '</td><td class="col-rx">' + escapeHtml(l) + '</td><td class="col-hora"></td></tr>';
   }).join('');
+  // Linhas em branco para acrescentar à mão
+  var nBlank = 8;
+  for (var k = 0; k < nBlank; k++) {
+    rows += '<tr><td class="col-num">' + (linhas.length + k + 1) + '</td><td class="col-rx" style="height:32px;">&nbsp;</td><td class="col-hora"></td></tr>';
+  }
 
   var corpo =
     '<div class="h-inst">' + escapeHtml(perfil.header || 'PREFEITURA MUNICIPAL DE TAQUARITINGA/SP') + '</div>' +
@@ -6607,6 +6624,7 @@ function limparInternacao() {
     var el = document.getElementById(id); if (el) el.value = '';
   });
   document.getElementById('int-hid-sol').selectedIndex = 0;
+  document.getElementById('int-hid-freq').selectedIndex = 0;
   document.getElementById('int-dieta').selectedIndex = 0;
   document.getElementById('int-dextro-protocolo').selectedIndex = 0;
   document.getElementById('int-dipirona').checked = true;
