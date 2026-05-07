@@ -2529,41 +2529,57 @@ RETORNO SE NECESSARIO
     <!-- 2. HIDRATAÇÃO -->
     <div class="ef-group">
       <div class="ef-label">2 — Hidratação EV</div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;">
-        <div class="field" style="min-width:140px;">
-          <label>Solução</label>
-          <select id="int-hid-sol" style="padding:9px 12px;font-family:var(--font-mono);font-size:13px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);">
-            <option value="SF 0,9%">SF 0,9%</option>
-            <option value="Glicofisiológico">Glicofisiológico</option>
-            <option value="SG 5%">SG 5%</option>
-            <option value="Ringer Lactato">Ringer Lactato</option>
-          </select>
+      <div style="background:var(--bg-1);border:1px solid var(--cyan-dim);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px;">
+        <!-- Linha 1: Solução + Volume + Tempo + Frequência -->
+        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;">
+          <div class="field" style="min-width:140px;">
+            <label>Solução</label>
+            <select id="int-hid-sol" oninput="calcIntGotejo()" style="padding:9px 12px;font-family:var(--font-mono);font-size:13px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);">
+              <option value="SF 0,9%">SF 0,9%</option>
+              <option value="Glicofisiológico">Glicofisiológico</option>
+              <option value="SG 5%">SG 5%</option>
+              <option value="Ringer Lactato">Ringer Lactato</option>
+              <option value="SG 10%">SG 10%</option>
+              <option value="NaCl 3%">NaCl 3%</option>
+            </select>
+          </div>
+          <div class="field" style="min-width:85px;">
+            <label>Volume (ml)</label>
+            <input type="number" id="int-hid-vol" placeholder="500" min="100" step="50" oninput="calcIntGotejo()" style="padding:9px 12px;font-family:var(--font-mono);font-size:14px;font-weight:700;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--cyan);">
+          </div>
+          <div class="field" style="min-width:85px;">
+            <label>Correr em (h)</label>
+            <input type="number" id="int-hid-horas" placeholder="6" min="1" max="24" step="1" oninput="calcIntGotejo()" style="padding:9px 12px;font-family:var(--font-mono);font-size:14px;font-weight:700;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--cyan);">
+          </div>
+          <div class="field" style="min-width:110px;">
+            <label>Repetir</label>
+            <select id="int-hid-freq" style="padding:9px 10px;font-family:var(--font-mono);font-size:12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);">
+              <option value="">Dose única</option>
+              <option value="6/6h">6/6h</option>
+              <option value="8/8h">8/8h</option>
+              <option value="12/12h">12/12h</option>
+              <option value="24/24h">24/24h</option>
+              <option value="contínuo">Contínuo</option>
+            </select>
+          </div>
         </div>
-        <div class="field" style="min-width:90px;">
-          <label>Volume (ml)</label>
-          <input type="number" id="int-hid-vol" placeholder="500" min="100" step="50" oninput="calcIntGotejo()" style="padding:9px 12px;font-family:var(--font-mono);font-size:14px;font-weight:700;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--cyan);">
+        <!-- Linha 2: Resultado gotejo -->
+        <div id="int-gotejo-result" style="padding:10px 14px;font-family:var(--font-mono);font-size:13px;color:var(--vital);font-weight:700;background:rgba(0,232,150,0.06);border:1px solid var(--vital-dim);border-radius:8px;text-align:center;letter-spacing:0.5px;">— preencha volume e tempo</div>
+        <!-- Linha 3: Aditivos -->
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          <label style="display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;padding:6px 10px;background:var(--bg-2);border:1px solid var(--line);border-radius:6px;">
+            <input type="checkbox" id="int-kcl" style="width:15px;height:15px;accent-color:var(--warn);"> KCl 19,1% 10ml
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;padding:6px 10px;background:var(--bg-2);border:1px solid var(--line);border-radius:6px;">
+            <input type="checkbox" id="int-mgso4" style="width:15px;height:15px;accent-color:var(--warn);"> MgSO4 10% 10ml
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;padding:6px 10px;background:var(--bg-2);border:1px solid var(--line);border-radius:6px;">
+            <input type="checkbox" id="int-glicose" style="width:15px;height:15px;accent-color:var(--warn);"> Glicose 50% 10ml
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;padding:6px 10px;background:var(--bg-2);border:1px solid var(--line);border-radius:6px;">
+            <input type="checkbox" id="int-vitamina-b" style="width:15px;height:15px;accent-color:var(--warn);"> Complexo B 1 amp
+          </label>
         </div>
-        <div class="field" style="min-width:90px;">
-          <label>Correr em (h)</label>
-          <input type="number" id="int-hid-horas" placeholder="6" min="1" max="24" step="1" oninput="calcIntGotejo()" style="padding:9px 12px;font-family:var(--font-mono);font-size:14px;font-weight:700;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--cyan);">
-        </div>
-        <div class="field" style="min-width:120px;">
-          <label>Repetir</label>
-          <select id="int-hid-freq" style="padding:9px 10px;font-family:var(--font-mono);font-size:12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);">
-            <option value="">Dose única</option>
-            <option value="6/6h">6/6h</option>
-            <option value="8/8h">8/8h</option>
-            <option value="12/12h">12/12h</option>
-            <option value="contínuo">Contínuo</option>
-          </select>
-        </div>
-        <div class="field" style="min-width:140px;flex:1;">
-          <div id="int-gotejo-result" style="padding:9px 12px;font-family:var(--font-mono);font-size:13px;color:var(--vital);font-weight:700;background:rgba(0,232,150,0.06);border:1px solid var(--vital-dim);border-radius:8px;">— gotas/min</div>
-        </div>
-      </div>
-      <div style="margin-top:8px;display:flex;align-items:center;gap:10px;padding:8px;background:var(--bg-2);border:1px solid var(--line);border-radius:6px;">
-        <input type="checkbox" id="int-kcl" style="width:16px;height:16px;accent-color:var(--warn);">
-        <label for="int-kcl" style="font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;">Acrescentar KCl 19,1% 10ml no soro</label>
       </div>
     </div>
 
@@ -2606,7 +2622,7 @@ RETORNO SE NECESSARIO
     <div class="ef-group">
       <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg-2);border-radius:8px;border:1px solid var(--line);">
         <input type="checkbox" id="int-dextro" onchange="toggleDextroPanel()" style="width:18px;height:18px;accent-color:var(--warn);">
-        <label for="int-dextro" style="font-family:var(--font-mono);font-size:12px;color:var(--txt);flex:1;cursor:pointer;">5 — Dextro 6/6h + Insulina Regular SC (esquema)</label>
+        <label for="int-dextro" style="font-family:var(--font-mono);font-size:12px;color:var(--txt);flex:1;cursor:pointer;">5 — Dextro 4/4h + Insulina Regular SC — esquema</label>
         <select id="int-dextro-protocolo" onchange="renderEsquemaInsulina()" style="padding:7px 10px;font-family:var(--font-mono);font-size:11px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);">
           <option value="conservador">Conservador</option>
           <option value="intensivo">Intensivo</option>
@@ -2638,9 +2654,57 @@ RETORNO SE NECESSARIO
       </div>
     </div>
 
-    <!-- 7. ITENS ADICIONAIS EDITÁVEIS -->
+    <!-- 7. EXAMES LABORATORIAIS -->
     <div class="ef-group">
-      <div class="ef-label">7 — Itens adicionais</div>
+      <div class="ef-label">7 — Exames Laboratoriais</div>
+      <div style="background:var(--bg-1);border:1px solid var(--line);border-radius:10px;padding:12px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px;">
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-lab" value="Hemograma completo" style="accent-color:var(--cyan);"> Hemograma</label>
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-lab" value="PCR quantitativo" style="accent-color:var(--cyan);"> PCR</label>
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-lab" value="Glicemia de jejum" style="accent-color:var(--cyan);"> Glicemia</label>
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-lab" value="Ureia e Creatinina" style="accent-color:var(--cyan);"> Ureia/Creatinina</label>
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-lab" value="Sódio e Potássio" style="accent-color:var(--cyan);"> Na⁺ / K⁺</label>
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-lab" value="TGO e TGP (AST/ALT)" style="accent-color:var(--cyan);"> TGO / TGP</label>
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-lab" value="Lipase e Amilase" style="accent-color:var(--cyan);"> Lipase/Amilase</label>
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-lab" value="Bilirrubinas total e frações" style="accent-color:var(--cyan);"> Bilirrubinas</label>
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-lab" value="Coagulograma (TP/TTPa/INR)" style="accent-color:var(--cyan);"> Coagulograma</label>
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-lab" value="Gasometria arterial" style="accent-color:var(--cyan);"> Gasometria</label>
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-lab" value="Lactato sérico" style="accent-color:var(--cyan);"> Lactato</label>
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-lab" value="Urina I e Urocultura" style="accent-color:var(--cyan);"> Urina I / Urocultura</label>
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-lab" value="Hemoculturas (2 amostras — antes do ATB)" style="accent-color:var(--cyan);"> Hemoculturas</label>
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-lab" value="TSH e T4 livre" style="accent-color:var(--cyan);"> TSH / T4L</label>
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-lab" value="Troponina I (seriada 3h)" style="accent-color:var(--cyan);"> Troponina</label>
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-lab" value="D-dímero" style="accent-color:var(--cyan);"> D-dímero</label>
+        </div>
+        <div id="int-labs-extras" style="display:flex;flex-direction:column;gap:4px;margin-bottom:6px;"></div>
+        <button type="button" class="ef-pill" onclick="addLabExtra('')">+ Exame livre</button>
+      </div>
+    </div>
+
+    <!-- 8. EXAMES DE IMAGEM -->
+    <div class="ef-group">
+      <div class="ef-label">8 — Exames de Imagem</div>
+      <div style="background:var(--bg-1);border:1px solid var(--line);border-radius:10px;padding:12px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px;">
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-img" value="Rx de tórax PA" style="accent-color:var(--violet);"> Rx Tórax PA</label>
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-img" value="Rx de abdômen (decúbito)" style="accent-color:var(--violet);"> Rx Abdômen</label>
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-img" value="ECG de 12 derivações" style="accent-color:var(--violet);"> ECG 12 deriv.</label>
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-img" value="USG de abdômen total" style="accent-color:var(--violet);"> USG Abdômen Total</label>
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-img" value="TC de abdômen total com contraste EV" style="accent-color:var(--violet);"> TC Abdômen c/ contraste</label>
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-img" value="TC de tórax com contraste EV (angioTC)" style="accent-color:var(--violet);"> TC Tórax / AngioTC</label>
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-img" value="TC de crânio sem contraste" style="accent-color:var(--violet);"> TC Crânio</label>
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-img" value="USG de vias urinárias" style="accent-color:var(--violet);"> USG Vias Urinárias</label>
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-img" value="Ecocardiograma" style="accent-color:var(--violet);"> Ecocardiograma</label>
+          <label style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--txt-2);cursor:pointer;"><input type="checkbox" class="int-img" value="USG Doppler de MMII (TVP)" style="accent-color:var(--violet);"> Doppler MMII</label>
+        </div>
+        <div id="int-imgs-extras" style="display:flex;flex-direction:column;gap:4px;margin-bottom:6px;"></div>
+        <button type="button" class="ef-pill" onclick="addImgExtra('')">+ Exame livre</button>
+      </div>
+    </div>
+
+    <!-- 9. ITENS ADICIONAIS EDITÁVEIS -->
+    <div class="ef-group">
+      <div class="ef-label">9 — Itens adicionais</div>
       <div id="int-extras-list" style="display:flex;flex-direction:column;gap:5px;margin-bottom:8px;"></div>
       <div style="display:flex;flex-wrap:wrap;gap:5px;">
         <button type="button" class="ef-pill" onclick="addExtra('Omeprazol 40mg + AD 10ml EV 1x/dia (jejum)')">+ Omeprazol</button>
@@ -6376,33 +6440,41 @@ function limparScore(id) {
 var _intATBs = [];
 var _intExtras = [];
 var _intInsulina = [];
+var _intLabExtras = [];
+var _intImgExtras = [];
 
+// Protocolos: ADA 2024 / SBD / Protocolo Hospitalar
+// Dextro capilar 4/4h para todos os protocolos
 var INSULINA_PROTOCOLOS = {
+  // Conservador: meta 140-180 — cirurgia geral, enfermaria
   conservador: [
-    ['≤140 mg/dL', 'Sem insulina'],
+    ['< 70 mg/dL', 'HIPOGLICEMIA — Glicose 50% 30ml EV + Avisar médico'],
+    ['70-140 mg/dL', 'Sem insulina'],
     ['141-180 mg/dL', '2 UI SC'],
-    ['181-220 mg/dL', '4 UI SC'],
-    ['221-280 mg/dL', '6 UI SC'],
-    ['281-350 mg/dL', '8 UI SC'],
-    ['>350 mg/dL', '10 UI SC + Avisar médico']
+    ['181-240 mg/dL', '4 UI SC'],
+    ['241-300 mg/dL', '6 UI SC'],
+    ['301-350 mg/dL', '8 UI SC + Avisar médico'],
+    ['> 350 mg/dL', '10 UI SC + Avisar médico urgente']
   ],
+  // Intensivo: meta 110-140 — UTI, pós-op grande porte
   intensivo: [
-    ['<70 mg/dL', 'HIPOGLICEMIA: Glicose 50% 40ml EV + Avisar médico'],
+    ['< 70 mg/dL', 'HIPOGLICEMIA — Glicose 50% 40ml EV + Avisar médico imediato'],
     ['70-110 mg/dL', 'Sem insulina'],
     ['111-140 mg/dL', '2 UI SC'],
     ['141-180 mg/dL', '4 UI SC'],
-    ['181-240 mg/dL', '6 UI SC'],
-    ['241-300 mg/dL', '8 UI SC'],
-    ['>300 mg/dL', '10 UI SC + Avisar médico']
+    ['181-220 mg/dL', '6 UI SC'],
+    ['221-280 mg/dL', '8 UI SC + Avisar médico'],
+    ['> 280 mg/dL', '10 UI SC + Avisar médico']
   ],
+  // Hospitalar padrão: meta 140-180 — DM2 conhecido, enfermaria clínica
   hospitalar: [
-    ['<70 mg/dL', 'HIPOGLICEMIA: Glicose 50% 40ml EV + Avisar médico'],
+    ['< 70 mg/dL', 'HIPOGLICEMIA — Glicose 50% 30ml EV + Avisar médico'],
     ['70-140 mg/dL', 'Sem insulina'],
     ['141-180 mg/dL', '2 UI SC'],
-    ['181-220 mg/dL', '4 UI SC'],
-    ['221-280 mg/dL', '6 UI SC'],
-    ['281-350 mg/dL', '8 UI SC'],
-    ['>350 mg/dL', '12 UI SC + Avisar médico']
+    ['181-240 mg/dL', '4 UI SC'],
+    ['241-300 mg/dL', '6 UI SC'],
+    ['301-400 mg/dL', '8 UI SC + Avisar médico'],
+    ['> 400 mg/dL', '10 UI SC + Insulina Regular EV + Avisar médico urgente']
   ]
 };
 
@@ -6465,6 +6537,44 @@ function renderExtras() {
   }).join('');
 }
 
+// ===== EXAMES EXTRAS =====
+function addLabExtra(text) {
+  _intLabExtras.push(text || '');
+  renderLabExtras();
+  setTimeout(function() {
+    var inputs = document.querySelectorAll('#int-labs-extras input[type="text"]');
+    if (inputs.length) inputs[inputs.length - 1].focus();
+  }, 50);
+}
+function removeLabExtra(idx) { _intLabExtras.splice(idx, 1); renderLabExtras(); }
+function renderLabExtras() {
+  var el = document.getElementById('int-labs-extras');
+  if (!el) return;
+  el.innerHTML = _intLabExtras.map(function(t, i) {
+    return '<div style="display:flex;gap:6px;align-items:center;">' +
+      '<input type="text" value="' + escapeHtml(t) + '" oninput="_intLabExtras[' + i + ']=this.value" placeholder="Ex: Procalcitonina" style="flex:1;padding:7px 10px;font-family:var(--font-mono);font-size:11.5px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--txt);">' +
+      '<button type="button" onclick="removeLabExtra(' + i + ')" style="background:none;border:1px solid var(--line);border-radius:6px;color:var(--pulse);cursor:pointer;font-size:13px;padding:4px 8px;">✕</button></div>';
+  }).join('');
+}
+function addImgExtra(text) {
+  _intImgExtras.push(text || '');
+  renderImgExtras();
+  setTimeout(function() {
+    var inputs = document.querySelectorAll('#int-imgs-extras input[type="text"]');
+    if (inputs.length) inputs[inputs.length - 1].focus();
+  }, 50);
+}
+function removeImgExtra(idx) { _intImgExtras.splice(idx, 1); renderImgExtras(); }
+function renderImgExtras() {
+  var el = document.getElementById('int-imgs-extras');
+  if (!el) return;
+  el.innerHTML = _intImgExtras.map(function(t, i) {
+    return '<div style="display:flex;gap:6px;align-items:center;">' +
+      '<input type="text" value="' + escapeHtml(t) + '" oninput="_intImgExtras[' + i + ']=this.value" placeholder="Ex: TC de pelve com contraste" style="flex:1;padding:7px 10px;font-family:var(--font-mono);font-size:11.5px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--txt);">' +
+      '<button type="button" onclick="removeImgExtra(' + i + ')" style="background:none;border:1px solid var(--line);border-radius:6px;color:var(--pulse);cursor:pointer;font-size:13px;padding:4px 8px;">✕</button></div>';
+  }).join('');
+}
+
 // ===== DEXTRO + INSULINA =====
 function toggleDextroPanel() {
   var cb = document.getElementById('int-dextro');
@@ -6517,12 +6627,17 @@ function gerarLinhasInternacao() {
   var vol = document.getElementById('int-hid-vol').value;
   var horas = document.getElementById('int-hid-horas').value;
   var freq = document.getElementById('int-hid-freq').value;
-  var kcl = document.getElementById('int-kcl').checked;
+  var aditivos = [];
+  if (document.getElementById('int-kcl').checked) aditivos.push('KCl 19,1% 10ml');
+  if (document.getElementById('int-mgso4').checked) aditivos.push('MgSO4 10% 10ml');
+  if (document.getElementById('int-glicose').checked) aditivos.push('Glicose 50% 10ml');
+  if (document.getElementById('int-vitamina-b').checked) aditivos.push('Complexo B 1 amp');
   if (vol && horas) {
     var gtMin = Math.round(vol / (horas * 3));
-    var hidTxt = sol + ' ' + vol + 'ml EV — correr em ' + horas + 'h (' + gtMin + ' gts/min)';
+    var mlH = Math.round(vol / horas);
+    var hidTxt = sol + ' ' + vol + 'ml EV — ' + horas + 'h (' + gtMin + ' gts/min | ' + mlH + ' ml/h)';
     if (freq) hidTxt += ' — ' + freq;
-    if (kcl) hidTxt += ' + KCl 19,1% 10ml';
+    if (aditivos.length) hidTxt += ' + ' + aditivos.join(' + ');
     linhas.push(hidTxt);
   }
 
@@ -6537,14 +6652,13 @@ function gerarLinhasInternacao() {
   // 4. ATBs
   _intATBs.forEach(function(t) { if (t.trim()) linhas.push(t.trim()); });
 
-  // 5. Dextro + Insulina
+  // 5. Dextro + Insulina — UMA linha por extenso
   if (document.getElementById('int-dextro').checked) {
     var proto = document.getElementById('int-dextro-protocolo').value;
     var nomes = { conservador: 'Conservador', intensivo: 'Intensivo', hospitalar: 'Hospitalar Padrão' };
-    linhas.push('Dextro capilar 6/6h + Insulina Regular SC conforme esquema (' + nomes[proto] + '):');
-    _intInsulina.forEach(function(r) {
-      if (r[0] || r[1]) linhas.push('   ' + r[0] + ' → ' + r[1]);
-    });
+    var faixas = _intInsulina.filter(function(r){ return r[0] || r[1]; })
+      .map(function(r){ return r[0] + ': ' + r[1]; }).join(' | ');
+    linhas.push('Dextro capilar 4/4h + Insulina Regular SC (' + nomes[proto] + '): ' + faixas);
   }
 
   // 6. Cuidados
@@ -6552,7 +6666,19 @@ function gerarLinhasInternacao() {
   document.querySelectorAll('.int-cuidado:checked').forEach(function(cb) { cuidados.push(cb.value); });
   if (cuidados.length) linhas.push('Cuidados de enfermagem: ' + cuidados.join('; '));
 
-  // 7. Extras
+  // 7. Exames laboratoriais
+  var labs = [];
+  document.querySelectorAll('.int-lab:checked').forEach(function(cb) { labs.push(cb.value); });
+  _intLabExtras.forEach(function(t) { if (t.trim()) labs.push(t.trim()); });
+  if (labs.length) linhas.push('Exames laboratoriais: ' + labs.join(' | '));
+
+  // 8. Exames de imagem
+  var imgs = [];
+  document.querySelectorAll('.int-img:checked').forEach(function(cb) { imgs.push(cb.value); });
+  _intImgExtras.forEach(function(t) { if (t.trim()) imgs.push(t.trim()); });
+  if (imgs.length) linhas.push('Exames de imagem: ' + imgs.join(' | '));
+
+  // 9. Extras
   _intExtras.forEach(function(t) { if (t.trim()) linhas.push(t.trim()); });
 
   return linhas;
@@ -6631,6 +6757,9 @@ function limparInternacao() {
   document.getElementById('int-bromoprida').checked = true;
   document.getElementById('int-tramadol').checked = false;
   document.getElementById('int-kcl').checked = false;
+  document.getElementById('int-mgso4').checked = false;
+  document.getElementById('int-glicose').checked = false;
+  document.getElementById('int-vitamina-b').checked = false;
   document.getElementById('int-dextro').checked = false;
   document.getElementById('int-dextro-panel').style.display = 'none';
   document.getElementById('int-gotejo-result').textContent = '— gotas/min';
@@ -6640,8 +6769,13 @@ function limparInternacao() {
   _intATBs = [];
   _intExtras = [];
   _intInsulina = [];
+  _intLabExtras = [];
+  _intImgExtras = [];
   renderATBs();
   renderExtras();
+  renderLabExtras();
+  renderImgExtras();
+  document.querySelectorAll('.int-lab, .int-img').forEach(function(cb){ cb.checked = false; });
 }
 
 // =================== INIT ===================
