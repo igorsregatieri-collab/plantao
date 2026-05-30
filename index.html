@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Plantão 3.0 // Sistema Operacional</title>
+<title>MedDeck — Painel Clínico</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -99,6 +99,7 @@
   body::before {
     content: '';
     position: fixed;
+    top: 0; right: 0; bottom: 0; left: 0;
     inset: 0;
     background-image:
       linear-gradient(var(--line) 1px, transparent 1px),
@@ -107,6 +108,7 @@
     opacity: 0.12;
     pointer-events: none;
     z-index: 0;
+    -webkit-mask-image: radial-gradient(ellipse at center top, black 30%, transparent 80%);
     mask-image: radial-gradient(ellipse at center top, black 30%, transparent 80%);
   }
 
@@ -114,6 +116,7 @@
   body::after {
     content: '';
     position: fixed;
+    top: 0; right: 0; bottom: 0; left: 0;
     inset: 0;
     background: repeating-linear-gradient(
       0deg,
@@ -1697,6 +1700,356 @@
   .drag-over { border: 2px dashed var(--cyan) !important; opacity: 0.7; }
   .drag-hint { font-family: var(--font-mono); font-size: 9px; color: var(--txt-4); letter-spacing: 1px; margin-bottom: 4px; }
 
+
+  /* ============================================================
+     MEDDECK — REFINAMENTO VISUAL v1
+     (sobrescreve seletivamente para tornar tudo mais fluido)
+     ============================================================ */
+
+  :root {
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.25);
+    --shadow-md: 0 8px 28px rgba(0,0,0,0.35);
+    --shadow-lg: 0 18px 60px rgba(0,0,0,0.5);
+    --shadow-glow: 0 0 32px rgba(0,212,255,0.18);
+    --accent-grad: linear-gradient(135deg, #00d4ff 0%, #7c5cff 60%, #b07efa 100%);
+  }
+
+  /* Fundo com aurora sutil em vez de só grid */
+  body::before {
+    background-image:
+      radial-gradient(ellipse 80% 50% at 20% 0%, rgba(0,212,255,0.06), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 0%, rgba(176,126,250,0.05), transparent 60%),
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 56px 56px, 56px 56px;
+    opacity: 0.85;
+    -webkit-mask-image: radial-gradient(ellipse at center top, black 25%, transparent 85%);
+    mask-image: radial-gradient(ellipse at center top, black 25%, transparent 85%);
+  }
+  body::after { opacity: 0.5; }
+
+  /* Header polido */
+  header {
+    border-radius: 18px;
+    padding: 16px 22px;
+    background:
+      linear-gradient(135deg, rgba(0,212,255,0.04), rgba(176,126,250,0.03)),
+      linear-gradient(180deg, var(--bg-2), var(--bg-1));
+    border: 1px solid rgba(255,255,255,0.04);
+    box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.04);
+    transition: all 0.4s var(--ease);
+  }
+  header::before {
+    width: 4px;
+    background: var(--accent-grad);
+    border-radius: 4px;
+    box-shadow: 0 0 16px var(--cyan);
+  }
+
+  /* Logo MedDeck */
+  .logo {
+    width: 42px; height: 42px;
+    background: var(--accent-grad);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 800;
+    box-shadow:
+      0 4px 14px rgba(0,212,255,0.35),
+      inset 0 1px 0 rgba(255,255,255,0.3);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    transition: transform 0.4s var(--ease);
+  }
+  .logo::after { display: none; }
+  .logo:hover { transform: rotate(-6deg) scale(1.05); }
+
+  .brand-text h1 {
+    font-family: var(--font-sans);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--cyan); /* fallback navegadores antigos */
+    background: var(--accent-grad);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  /* Se -webkit-background-clip:text não funcionar (ex: Firefox antigo), volta a mostrar cor */
+  @supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+    .brand-text h1 { -webkit-text-fill-color: var(--cyan); color: var(--cyan); background: none; }
+  }
+  .brand-text .sub {
+    letter-spacing: 1.4px;
+    font-size: 9.5px;
+    color: var(--txt-3);
+  }
+  .live-dot {
+    width: 7px; height: 7px;
+    background: var(--vital);
+    box-shadow: 0 0 10px var(--vital), 0 0 4px var(--vital);
+  }
+
+  /* Tabs mais fluidas */
+  .tabs {
+    border-radius: 14px;
+    padding: 5px;
+    background: var(--bg-1);
+    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: var(--shadow-sm);
+    gap: 2px;
+  }
+  .tab {
+    border-right: none;
+    border-radius: 10px;
+    transition: all 0.3s var(--ease);
+  }
+  .tab:hover {
+    color: var(--txt);
+    background: rgba(255,255,255,0.03);
+  }
+  .tab.active {
+    background: linear-gradient(135deg, rgba(0,212,255,0.12), rgba(176,126,250,0.08));
+    color: var(--cyan);
+    box-shadow: inset 0 0 0 1px rgba(0,212,255,0.2), 0 4px 14px rgba(0,212,255,0.08);
+  }
+  .tab.active::after { display: none; }
+
+  /* Icon btns refinados */
+  .icon-btn {
+    border-radius: 12px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: all 0.3s var(--ease);
+  }
+  .icon-btn:hover {
+    background: rgba(0,212,255,0.1);
+    border-color: rgba(0,212,255,0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,212,255,0.2);
+  }
+
+  /* Cards mais fluidos */
+  .card {
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.05);
+    background: linear-gradient(135deg, var(--bg-1), rgba(20,28,48,0.85));
+    transition: all 0.35s var(--ease);
+  }
+  .card::before { width: 3px; border-radius: 14px 0 0 14px; }
+  .card:hover {
+    border-color: rgba(0,212,255,0.25);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md), 0 0 0 1px rgba(0,212,255,0.06);
+  }
+  .card.selected {
+    border-color: var(--cyan);
+    box-shadow: 0 0 0 1px var(--cyan), var(--shadow-glow);
+  }
+  .card-header { padding: 15px 18px 15px 22px; }
+  .card-title { font-weight: 600; letter-spacing: -0.2px; }
+  .card-tag {
+    border-radius: 999px;
+    font-size: 8.5px;
+    letter-spacing: 1.2px;
+    padding: 4px 10px;
+  }
+
+  /* Buttons mais fluidos */
+  .btn-primary, .btn-secondary, .btn-danger, .copy-btn {
+    border-radius: 10px;
+    transition: all 0.25s var(--ease);
+    letter-spacing: 1.2px;
+  }
+  .btn-primary {
+    background: var(--accent-grad);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 14px rgba(0,212,255,0.25);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(0,212,255,0.4);
+    color: white;
+  }
+  .copy-btn {
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.4);
+    border-radius: 10px;
+  }
+  .copy-btn:hover {
+    background: var(--accent-grad);
+    color: white;
+    border-color: transparent;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(0,212,255,0.3);
+  }
+
+  /* Inputs / Selects */
+  #search, #search-minhas, #search-rx, #search-ped,
+  .field input, .field select, .edit-form input, .edit-form textarea, .edit-form select {
+    border-radius: 12px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: all 0.25s var(--ease);
+  }
+  #search:focus, #search-minhas:focus, #search-rx:focus, #search-ped:focus,
+  .field input:focus, .field select:focus, .edit-form input:focus, .edit-form textarea:focus, .edit-form select:focus {
+    border-color: var(--cyan);
+    background: rgba(0,212,255,0.04);
+    box-shadow: 0 0 0 3px rgba(0,212,255,0.12), 0 4px 18px rgba(0,0,0,0.2);
+  }
+
+  /* Cats / Pills */
+  .cat-btn, .ef-pill, .ef-sinal, .diag-pill {
+    border-radius: 999px;
+    transition: all 0.25s var(--ease);
+  }
+  .cat-btn:hover, .ef-pill:hover, .diag-pill:hover { transform: translateY(-1px); }
+  .cat-btn.active {
+    background: var(--accent-grad);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 14px rgba(0,212,255,0.3);
+  }
+
+  /* Panels */
+  .panel {
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--bg-1), rgba(20,28,48,0.7));
+    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* Anam */
+  .anam-btn {
+    border-radius: 12px;
+    border-left-width: 3px;
+    background: linear-gradient(135deg, var(--bg-1), rgba(0,212,255,0.02));
+    transition: all 0.3s var(--ease);
+  }
+  .anam-btn:hover {
+    transform: translateY(-2px);
+    background: rgba(0,212,255,0.06);
+    box-shadow: var(--shadow-md);
+  }
+  .anam-box {
+    border-radius: 14px;
+    border-color: rgba(0,212,255,0.4);
+    box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.04);
+    animation: slideDown 0.35s var(--ease);
+  }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Hist items */
+  .hist-item {
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.05);
+    border-left: 3px solid var(--cyan);
+    transition: all 0.25s var(--ease);
+  }
+  .hist-item:hover {
+    background: var(--bg-2);
+    transform: translateX(2px);
+  }
+
+  /* Combo bar */
+  .combo-bar {
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(0,212,255,0.08), rgba(176,126,250,0.06));
+    border: 1px solid rgba(0,212,255,0.3);
+    backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-lg), 0 0 0 1px rgba(0,212,255,0.1);
+  }
+
+  /* Result */
+  .result {
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(0,212,255,0.06), rgba(0,212,255,0.02));
+  }
+
+  /* Chevron animação */
+  .chevron { transition: transform 0.35s var(--ease); }
+
+  /* Scrollbar refinada */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(0,212,255,0.3), rgba(176,126,250,0.2));
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--cyan), var(--violet));
+  }
+
+  /* Score items */
+  .score-item {
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: all 0.2s var(--ease);
+  }
+  .score-item:hover { transform: translateX(2px); }
+
+  /* Animação suave no fade-in das sections */
+  .section.active { animation: fadeUp 0.45s var(--ease); }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Selection */
+  ::selection { background: rgba(0,212,255,0.3); color: white; }
+
+  /* ===== EMOJI PICKER ===== */
+  .emoji-picker-row {
+    display: flex; align-items: flex-start; gap: 8px;
+    margin: 8px 0 10px; flex-wrap: wrap;
+  }
+  .emoji-picker-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--txt-3);
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding-top: 8px;
+  }
+  .emoji-picker {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    flex: 1; min-width: 220px;
+    padding: 6px;
+    background: var(--bg);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 10px;
+    max-height: 110px;
+    overflow-y: auto;
+  }
+  .emoji-pick {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 17px;
+    line-height: 1.1;
+    cursor: pointer;
+    transition: all 0.2s var(--ease);
+    font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
+  }
+  .emoji-pick:hover {
+    background: rgba(0,212,255,0.1);
+    transform: scale(1.15);
+  }
+  .emoji-pick.on {
+    background: rgba(0,212,255,0.2);
+    border-color: var(--cyan);
+    box-shadow: 0 0 12px rgba(0,212,255,0.3);
+    transform: scale(1.1);
+  }
+
 </style>
 </head>
 <body>
@@ -1704,10 +2057,10 @@
 
 <header class="no-print">
   <div class="brand">
-    <div class="logo">Rx</div>
+    <div class="logo">M</div>
     <div class="brand-text">
-      <h1>PLANTÃO // 3.0</h1>
-      <div class="sub"><span class="live-dot"></span>SISTEMA OPERACIONAL</div>
+      <h1>MEDDECK</h1>
+      <div class="sub"><span class="live-dot"></span>PAINEL CLÍNICO</div>
     </div>
   </div>
   <div class="header-actions">
@@ -2042,6 +2395,7 @@ PIFR SEM DEFICTS FOCAIS, FORÇA MOTORA PRESERVADA EM MEMBROS, MIMICA FACIAL RPES
   <div id="conduta-editor-box" style="display:none;background:var(--bg-1);border:1px solid var(--vital);border-radius:10px;padding:16px;margin-bottom:12px;">
     <div style="font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:2px;color:var(--vital);margin-bottom:10px;">✏️ NOVO MODELO DE CONDUTA</div>
     <input type="text" id="conduta-editor-nome" placeholder="Nome do modelo" style="width:100%;padding:9px 12px;font-family:var(--font-mono);font-size:13px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);margin-bottom:8px;">
+    <div id="conduta-editor-emoji-area"></div>
     <textarea id="conduta-editor-texto" placeholder="Texto da conduta..." style="width:100%;min-height:100px;padding:10px 12px;font-family:var(--font-mono);font-size:12px;line-height:1.7;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);resize:vertical;text-transform:uppercase;"></textarea>
     <div style="display:flex;gap:8px;margin-top:8px;">
       <button class="btn-primary" onclick="saveCondutaModel()">SALVAR</button>
@@ -3782,7 +4136,7 @@ function renderMinhas() {
     card.innerHTML = `
       <div class="card-header" onclick="toggleMinhas('${item.id}')">
         <div class="card-title-wrap">
-          <span class="card-title">${item.title}</span>
+          <span class="card-title">${item.emoji ? item.emoji + ' ' : ''}${item.title}</span>
           <span class="card-tag tag-vo">${item.cat}</span>
         </div>
         <div class="header-right">
@@ -4708,7 +5062,7 @@ function renderCustom() {
     <div class="card">
       <div class="card-header" onclick="toggleCustom('${item.id}')" style="cursor:pointer;">
         <div class="card-title-wrap">
-          <span class="card-title">${item.title}</span>
+          <span class="card-title">${item.emoji ? item.emoji + ' ' : ''}${item.title}</span>
           <span class="card-tag tag-vo">${item.cat || 'CUSTOM'}</span>
         </div>
         <div class="header-right" onclick="event.stopPropagation();">
@@ -4770,6 +5124,7 @@ function showEditForm(item) {
       <input type="text" id="ef-title" placeholder="Ex: IVAS criança com vômito" value="${escapeHtml(item.title)}">
       <label>Categoria</label>
       <input type="text" id="ef-cat" placeholder="Ex: IVAS, DOR, ITU..." value="${escapeHtml(item.cat || '')}">
+      ${buildEmojiPickerHTML('ef-emoji', item.emoji || '')}
       <label>Prescrição (livre)</label>
       <textarea id="ef-rx" placeholder="Cole ou digite a receita inteira...">${escapeHtml(item.rx)}</textarea>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -4779,6 +5134,7 @@ function showEditForm(item) {
       </div>
     </div>
   `;
+  wireEmojiPickers(el);
   el.scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -4791,9 +5147,11 @@ async function saveEditForm(id) {
   const title = document.getElementById('ef-title').value.trim();
   const cat = document.getElementById('ef-cat').value.trim().toUpperCase() || 'CUSTOM';
   const rx = document.getElementById('ef-rx').value.trim();
+  var emojiEl = document.getElementById('ef-emoji');
+  var emoji = emojiEl ? emojiEl.value : '';
   if (!title || !rx) { alert('Preencha título e prescrição.'); return; }
   const idx = CUSTOM.findIndex(c => c.id === id);
-  const obj = { id, title, cat, rx };
+  const obj = { id, title, cat, rx, emoji: emoji };
   if (idx >= 0) CUSTOM[idx] = obj;
   else CUSTOM.push(obj);
   saveCustomLocal();
@@ -5116,8 +5474,10 @@ function buildCatsRx() {
 }
 
 function renderRx() {
-  const q = (document.getElementById('search-rx')?.value || '').toLowerCase().trim();
-  const peso = parseFloat(document.getElementById('peso-rx')?.value) || 0;
+  var _srx = document.getElementById('search-rx');
+  var _prx = document.getElementById('peso-rx');
+  const q = ((_srx && _srx.value) || '').toLowerCase().trim();
+  const peso = parseFloat(_prx && _prx.value) || 0;
   const el = document.getElementById('list-rx');
   if (!el) return;
   el.innerHTML = '';
@@ -5251,8 +5611,10 @@ function calcPedDose(d, peso) {
 }
 
 function renderPed() {
-  const q = (document.getElementById('search-ped')?.value || '').toLowerCase().trim();
-  const peso = parseFloat(document.getElementById('peso-ped')?.value) || 0;
+  var _spd = document.getElementById('search-ped');
+  var _ppd = document.getElementById('peso-ped');
+  const q = ((_spd && _spd.value) || '').toLowerCase().trim();
+  const peso = parseFloat(_ppd && _ppd.value) || 0;
   const el = document.getElementById('list-ped');
   if (!el) return;
   el.innerHTML = '';
@@ -5608,9 +5970,10 @@ function renderCondutaModelBtns() {
   if (!bar || !boxes) return;
 
   bar.innerHTML = CONDUTA_MODELS.map(function(m, i) {
+    var emj = m.emoji ? (m.emoji + ' ') : '';
     return '<div class="draggable-item" draggable="true" data-idx="' + i + '" data-type="cond" style="display:flex;align-items:center;gap:2px;">' +
       '<span style="color:var(--txt-4);font-size:12px;cursor:grab;padding:0 4px;" title="Arrastar">⠿</span>' +
-      '<button class="anam-btn" style="border-left-color:var(--vital);" data-cid="' + m.id + '" data-action="open">' + m.name + '</button>' +
+      '<button class="anam-btn" style="border-left-color:var(--vital);" data-cid="' + m.id + '" data-action="open">' + emj + m.name + '</button>' +
       '<button style="background:none;border:none;color:var(--pulse);cursor:pointer;font-size:14px;padding:0 4px;" data-cid="' + m.id + '" data-action="del" title="Excluir">✕</button>' +
       '</div>';
   }).join('');
@@ -5639,28 +6002,76 @@ function renderCondutaModelBtns() {
 
 function toggleCondutaEditor() {
   var box = document.getElementById('conduta-editor-box');
-  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  var nowShow = box.style.display === 'none';
+  box.style.display = nowShow ? 'block' : 'none';
+  if (nowShow) {
+    var area = document.getElementById('conduta-editor-emoji-area');
+    if (area) {
+      area.innerHTML = buildEmojiPickerHTML('conduta-editor-emoji', '');
+      wireEmojiPickers(area);
+    }
+  }
+}
+
+// ===== EMOJI PICKER =====
+window.EMOJIS_LIST = ['🤧','🤮','🦠','💊','🔬','💉','🫁','👂','🌀','🧠','🌸','🔴','🩸','🩹','🦴','🧵','🫘','🔥','👁','🫀','🤰','💎','😰','🩺','🌡️','💧','✨','📋','⭐','💡','🤒','🦷','💪','🍼','👶','⚕️','🆘','🚑'];
+
+function buildEmojiPickerHTML(inputId, currentEmoji) {
+  currentEmoji = currentEmoji || '';
+  var pills = window.EMOJIS_LIST.map(function(e) {
+    var on = (e === currentEmoji) ? ' on' : '';
+    return '<button type="button" class="emoji-pick' + on + '" data-emoji="' + e + '">' + e + '</button>';
+  }).join('');
+  return '<div class="emoji-picker-row">' +
+    '<div class="emoji-picker-label">Emoji</div>' +
+    '<input type="hidden" id="' + inputId + '" value="' + currentEmoji + '">' +
+    '<div class="emoji-picker" data-for="' + inputId + '">' + pills + '</div>' +
+    '</div>';
+}
+
+function wireEmojiPickers(scope) {
+  scope = scope || document;
+  scope.querySelectorAll('.emoji-picker').forEach(function(grid) {
+    var inputId = grid.getAttribute('data-for');
+    var input = document.getElementById(inputId);
+    if (!input) return;
+    grid.querySelectorAll('.emoji-pick').forEach(function(btn) {
+      btn.onclick = function() {
+        var e = btn.getAttribute('data-emoji');
+        if (input.value === e) {
+          input.value = '';
+          btn.classList.remove('on');
+        } else {
+          grid.querySelectorAll('.emoji-pick.on').forEach(function(b){ b.classList.remove('on'); });
+          input.value = e;
+          btn.classList.add('on');
+        }
+      };
+    });
+  });
 }
 
 function saveCondutaModel() {
   var nome = document.getElementById('conduta-editor-nome').value.trim().toUpperCase();
   var texto = document.getElementById('conduta-editor-texto').value.trim().toUpperCase();
+  var emojiEl = document.getElementById('conduta-editor-emoji');
+  var emoji = emojiEl ? emojiEl.value : '';
   if (!nome || !texto) { alert('Preencha nome e texto.'); return; }
   pedirSenha(function() {
     var id = 'cm_' + Date.now();
-    var model = { id: id, name: nome, text: texto };
+    var model = { id: id, name: nome, text: texto, emoji: emoji };
     CONDUTA_MODELS.push(model);
     localStorage.setItem('plantao_conduta_models', JSON.stringify(CONDUTA_MODELS));
     syncCondutaToCloud();
-    var customItem = { id: id, title: nome, cat: 'CONDUTA', rx: texto, _minhas: true };
+    var customItem = { id: id, title: nome, cat: 'CONDUTA', rx: texto, emoji: emoji, _minhas: true };
     CUSTOM.push(customItem);
     saveCustomLocal();
     renderCustom();
     // Salvar também em Minhas
     var extras = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]');
-    extras.push({ id: id, cat: 'CONDUTA', title: nome, rx: texto, _minhas: true });
+    extras.push({ id: id, cat: 'CONDUTA', title: nome, rx: texto, emoji: emoji, _minhas: true });
     localStorage.setItem('plantao_minhas_extra', JSON.stringify(extras));
-    saveCustomCloud({ id: id, title: nome, cat: 'CONDUTA', rx: texto, _minhas: true });
+    saveCustomCloud({ id: id, title: nome, cat: 'CONDUTA', rx: texto, emoji: emoji, _minhas: true });
     buildCatsMinhas();
     renderMinhas();
     document.getElementById('conduta-editor-nome').value = '';
@@ -6050,11 +6461,13 @@ function saveEditFormToMinhas(id) {
   var title = document.getElementById('ef-title').value.trim();
   var cat = document.getElementById('ef-cat').value.trim().toUpperCase() || 'CUSTOM';
   var rx = document.getElementById('ef-rx').value.trim();
+  var emojiEl = document.getElementById('ef-emoji');
+  var emoji = emojiEl ? emojiEl.value : '';
   if (!title || !rx) { alert('Preencha título e prescrição.'); return; }
-  
+
   // Salvar no CUSTOM (lista do editor) também
   var idx2 = CUSTOM.findIndex(function(c) { return c.id === id; });
-  var obj = { id: id, title: title, cat: cat, rx: rx };
+  var obj = { id: id, title: title, cat: cat, rx: rx, emoji: emoji };
   if (idx2 >= 0) CUSTOM[idx2] = obj;
   else CUSTOM.push(obj);
   saveCustomLocal();
@@ -6063,13 +6476,13 @@ function saveEditFormToMinhas(id) {
   // Salvar em MINHAS_EXTRA (localStorage) para aparecer na lista Minhas
   var extras = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]');
   var idx3 = extras.findIndex(function(e) { return e.id === id; });
-  var extraObj = { id: id, cat: cat, title: title, rx: rx, _minhas: true };
+  var extraObj = { id: id, cat: cat, title: title, rx: rx, emoji: emoji, _minhas: true };
   if (idx3 >= 0) extras[idx3] = extraObj;
   else extras.push(extraObj);
   localStorage.setItem('plantao_minhas_extra', JSON.stringify(extras));
 
   // Subir para nuvem com flag _minhas
-  saveCustomCloud({ id: id, title: title, cat: cat, rx: rx, _minhas: true });
+  saveCustomCloud({ id: id, title: title, cat: cat, rx: rx, emoji: emoji, _minhas: true });
 
   // Re-renderizar Minhas
   buildCatsMinhas();
