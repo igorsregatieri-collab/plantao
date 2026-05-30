@@ -2499,6 +2499,15 @@ RETORNO SE NECESSARIO
     <h2>🏥 GERADOR DE PRESCRIÇÃO HOSPITALAR</h2>
     <div class="desc">Tudo editável. Edite valores antes de imprimir.</div>
 
+    <!-- PERFIL DE CABEÇALHO -->
+    <div style="display:flex;align-items:center;gap:10px;margin:10px 0;flex-wrap:wrap;">
+      <label style="font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt-3);">Cabeçalho:</label>
+      <select id="int-perfil-header" style="flex:1;min-width:220px;padding:9px 12px;font-family:var(--font-mono);font-size:13px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);">
+        <option value="padrao">Padrão (perfil do Editor)</option>
+        <option value="santacasa">Santa Casa de Misericórdia de Monte Alto</option>
+      </select>
+    </div>
+
     <!-- CABEÇALHO PACIENTE -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0 10px;">
       <div class="field"><label>Nome do Paciente</label><input type="text" id="int-nome" placeholder="Nome completo"></div>
@@ -2513,7 +2522,7 @@ RETORNO SE NECESSARIO
     <!-- 1. DIETA -->
     <div class="ef-group">
       <div class="ef-label">1 — Dieta</div>
-      <select id="int-dieta" style="width:100%;padding:9px 12px;font-family:var(--font-mono);font-size:13px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);">
+      <select id="int-dieta" onchange="toggleDietaLivre()" style="width:100%;padding:9px 12px;font-family:var(--font-mono);font-size:13px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--txt);">
         <option value="Dieta geral">Dieta geral</option>
         <option value="Dieta para idade">Dieta para idade</option>
         <option value="Dieta zero (jejum)">Dieta zero (jejum)</option>
@@ -2523,7 +2532,9 @@ RETORNO SE NECESSARIO
         <option value="Dieta pastosa">Dieta pastosa</option>
         <option value="Dieta líquida">Dieta líquida</option>
         <option value="Dieta por SNE">Dieta por SNE</option>
+        <option value="__livre__">✏️ Outra (escrever livremente)</option>
       </select>
+      <input type="text" id="int-dieta-livre" placeholder="Digite a dieta..." style="display:none;width:100%;margin-top:8px;padding:9px 12px;font-family:var(--font-mono);font-size:13px;border:1px solid var(--vital);border-radius:8px;background:var(--bg);color:var(--txt);">
     </div>
 
     <!-- 2. HIDRATAÇÃO -->
@@ -3600,6 +3611,7 @@ function setSection(s) {
   if (s === 'hist') renderHist();
   if (s === 'scores') renderScores();
   if (s === 'calc') setTimeout(initCalcLimparBtns, 100);
+  if (s === 'minhas') { buildCatsMinhas(); renderMinhas(); }
 }
 
 // =================== CONDUTAS RENDER ===================
@@ -3697,6 +3709,7 @@ function renderList() {
 }
 
 function toggle(id) {
+  Object.keys(STATE.openCards).forEach(function(k) { if (k !== id) STATE.openCards[k] = false; });
   STATE.openCards[id] = !STATE.openCards[id];
   if (document.getElementById('list')) renderList();
 }
@@ -3855,7 +3868,9 @@ function toggleAnam(t) {
 
 function copyAnam(t, btn) {
   const el = document.getElementById('anam-' + t);
-  const txt = el.innerText.replace('Copiar', '').trim();
+  const clone = el.cloneNode(true);
+  clone.querySelectorAll('button').forEach(b => b.remove());
+  const txt = clone.innerText.trim();
   navigator.clipboard.writeText(txt).then(() => {
     btn.textContent = '✓';
     btn.classList.add('copied');
@@ -4712,6 +4727,7 @@ function renderCustom() {
 
 function toggleCustom(id) {
   if (!STATE.openCustom) STATE.openCustom = {};
+  Object.keys(STATE.openCustom).forEach(function(k) { if (k !== id) STATE.openCustom[k] = false; });
   STATE.openCustom[id] = !STATE.openCustom[id];
   renderCustom();
 }
@@ -4901,7 +4917,7 @@ function printReceita(title, rx) {
   var conteudo = area.innerHTML;
   area.style.display = 'none';
   // Abrir em janela dedicada sem URL/titulo do navegador
-  var css = 'body{font-family:Arial,sans-serif;background:white;color:black;margin:0;padding:0}' +
+  var css = 'body{font-family:Arial,sans-serif;background:white;color:black;margin:0;padding:1.5cm 2cm}' +
     '.upa-receituario{padding:20px 30px}' +
     '.upa-header{display:flex;align-items:center;margin-bottom:8px;border-bottom:2px solid #000;padding-bottom:8px;gap:16px}' +
     '.upa-logo{height:55px;object-fit:contain}' +
@@ -4912,12 +4928,26 @@ function printReceita(title, rx) {
     '.upa-conteudo{font-size:11pt;line-height:1.7;white-space:pre-line;min-height:200px;margin:10px 0}' +
     '.upa-footer{margin-top:30px;display:flex;justify-content:space-between;align-items:flex-end;font-size:10pt}' +
     '.upa-assinatura{border-top:1px solid #000;width:55%;padding-top:4px;text-align:center;font-size:9.5pt}' +
-    '@page{size:A4;margin:1.5cm 2cm}';
-  var win = window.open('', '_blank', 'width=820,height=960,toolbar=0,menubar=0,location=0,status=0,scrollbars=1');
-  win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title> </title><style>' + css + '</style></head><body>' + conteudo + '</body></html>');
-  win.document.close();
-  win.focus();
-  setTimeout(function() { win.print(); win.close(); }, 400);
+    '@page{size:A4;margin:0}';
+  printViaIframe(css, conteudo);
+}
+
+// Imprime via iframe oculto (sem "about:blank" e sem barra de URL/data do navegador)
+function printViaIframe(css, bodyHTML) {
+  var old = document.getElementById('__print_iframe__');
+  if (old) old.parentNode.removeChild(old);
+  var iframe = document.createElement('iframe');
+  iframe.id = '__print_iframe__';
+  iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden;';
+  document.body.appendChild(iframe);
+  var doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open();
+  doc.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title></title><style>' + css + '</style></head><body>' + bodyHTML + '</body></html>');
+  doc.close();
+  setTimeout(function() {
+    try { iframe.contentWindow.focus(); iframe.contentWindow.print(); } catch(e) { console.error(e); }
+    setTimeout(function() { if (iframe.parentNode) iframe.parentNode.removeChild(iframe); }, 1000);
+  }, 300);
 }
 
 function printCustom(id) {
@@ -5267,7 +5297,11 @@ function renderPed() {
   });
 }
 
-function togglePed(id) { openPed[id] = !openPed[id]; renderPed(); }
+function togglePed(id) {
+  Object.keys(openPed).forEach(function(k) { if (k !== id) openPed[k] = false; });
+  openPed[id] = !openPed[id];
+  renderPed();
+}
 
 function copyPed(id, btn, peso) {
   const item = DATA_PED.find(d => d.id === id);
@@ -5310,7 +5344,7 @@ function printAtestado() {
     'h3{font-size:13pt;font-weight:bold;margin-bottom:8px;text-align:center}' +
     '.footer{display:flex;justify-content:space-between;align-items:flex-end;font-size:10pt;margin-top:40px}' +
     '.sig{border-top:1px solid #000;width:50%;padding-top:4px;text-align:center;font-size:9pt}' +
-    '@page{size:A4;margin:1.5cm 2cm}';
+    '@page{size:A4;margin:0}';
 
   var corpo = '<h2>' + escapeHtml(perfil.header || 'PREFEITURA MUNICIPAL DE TAQUARITINGA/SP') + '</h2>' +
     '<h3>ATESTADO MÉDICO</h3>' +
@@ -5327,11 +5361,7 @@ function printAtestado() {
     '<div class="sig">' + escapeHtml(perfil.nome || '') + (perfil.nome ? '<br>' : '') + escapeHtml(perfil.crm || '') + '</div>' +
     '</div>';
 
-  var win = window.open('', '_blank', 'width=820,height=960,toolbar=0,menubar=0,location=0,status=0,scrollbars=1');
-  win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title> </title><style>' + css + '</style></head><body>' + corpo + '</body></html>');
-  win.document.close();
-  win.focus();
-  setTimeout(function() { win.print(); win.close(); }, 400);
+  printViaIframe(css, corpo);
 }
 
 function limparAtestado() {
@@ -5622,10 +5652,17 @@ function saveCondutaModel() {
     CONDUTA_MODELS.push(model);
     localStorage.setItem('plantao_conduta_models', JSON.stringify(CONDUTA_MODELS));
     syncCondutaToCloud();
-    var customItem = { id: id, title: nome, cat: 'CONDUTA', rx: texto };
+    var customItem = { id: id, title: nome, cat: 'CONDUTA', rx: texto, _minhas: true };
     CUSTOM.push(customItem);
     saveCustomLocal();
     renderCustom();
+    // Salvar também em Minhas
+    var extras = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]');
+    extras.push({ id: id, cat: 'CONDUTA', title: nome, rx: texto, _minhas: true });
+    localStorage.setItem('plantao_minhas_extra', JSON.stringify(extras));
+    saveCustomCloud({ id: id, title: nome, cat: 'CONDUTA', rx: texto, _minhas: true });
+    buildCatsMinhas();
+    renderMinhas();
     document.getElementById('conduta-editor-nome').value = '';
     document.getElementById('conduta-editor-texto').value = '';
     document.getElementById('conduta-editor-box').style.display = 'none';
@@ -5634,6 +5671,9 @@ function saveCondutaModel() {
 }
 
 function toggleCondutaModel(id) {
+  document.querySelectorAll('[id^="conduta-model-"]').forEach(function(b) {
+    if (b.id !== 'conduta-model-' + id) b.classList.remove('open');
+  });
   var box = document.getElementById('conduta-model-' + id);
   if (box) box.classList.toggle('open');
 }
@@ -5672,7 +5712,9 @@ function toggleCondutaBox(id) {
 function copyCondutaBox(id, btn) {
   var box = document.getElementById('cbox-' + id);
   if (!box) return;
-  var txt = box.innerText.replace('Copiar', '').trim();
+  var clone = box.cloneNode(true);
+  clone.querySelectorAll('button').forEach(function(b) { b.remove(); });
+  var txt = clone.innerText.trim();
   navigator.clipboard.writeText(txt).then(function() {
     btn.textContent = '✓'; btn.classList.add('copied');
     setTimeout(function() { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 1500);
@@ -6203,6 +6245,9 @@ ${m.text}
 }
 
 function toggleAnamCustom(id) {
+  document.querySelectorAll('.anam-box').forEach(function(b) {
+    if (b.id !== 'anam-' + id) b.classList.remove('open');
+  });
   const box = document.getElementById('anam-' + id);
   if (box) box.classList.toggle('open');
 }
@@ -6615,12 +6660,30 @@ function renderInsulinaRows() {
   }).join('');
 }
 
+function toggleDietaLivre() {
+  var sel = document.getElementById('int-dieta');
+  var inp = document.getElementById('int-dieta-livre');
+  if (!sel || !inp) return;
+  if (sel.value === '__livre__') {
+    inp.style.display = 'block';
+    inp.focus();
+  } else {
+    inp.style.display = 'none';
+  }
+}
+
 // ===== GERAÇÃO E IMPRESSÃO =====
 function gerarLinhasInternacao() {
   var linhas = [];
 
   // 1. Dieta
-  linhas.push(document.getElementById('int-dieta').value);
+  var dietaSel = document.getElementById('int-dieta').value;
+  if (dietaSel === '__livre__') {
+    var dietaLivre = document.getElementById('int-dieta-livre').value.trim();
+    if (dietaLivre) linhas.push(dietaLivre);
+  } else {
+    linhas.push(dietaSel);
+  }
 
   // 2. Hidratação
   var sol = document.getElementById('int-hid-sol').value;
@@ -6697,7 +6760,15 @@ function printInternacao() {
 
   if (!linhas.length) { alert('Nenhuma prescrição preenchida.'); return; }
 
-  var css = 'body{font-family:Arial,sans-serif;background:white;color:black;margin:0;padding:18px 26px;font-size:11pt}' +
+  var perfilHeaderTipo = (document.getElementById('int-perfil-header') || {}).value || 'padrao';
+
+  if (perfilHeaderTipo === 'santacasa') {
+    printInternacaoSantaCasa(perfil, nome, nasc, peso, diag, alerg, dataHoje, horaAgora, linhas);
+    return;
+  }
+
+  // ====== MODELO PADRÃO (UPA Taquaritinga) ======
+  var css = 'body{font-family:Arial,sans-serif;background:white;color:black;margin:0;padding:1cm 1.4cm;font-size:11pt}' +
     'table{width:100%;border-collapse:collapse}' +
     'td,th{border:1px solid #000;padding:5px 8px;vertical-align:top;font-size:10.5pt}' +
     '.h-inst{text-align:center;font-size:12pt;font-weight:bold;border-bottom:2px solid #000;padding-bottom:6px;margin-bottom:6px}' +
@@ -6707,7 +6778,7 @@ function printInternacao() {
     '.col-hora{width:80px;text-align:center}' +
     '.foot{margin-top:24px;display:flex;justify-content:space-between;align-items:flex-end}' +
     '.sig{border-top:1px solid #000;width:50%;padding-top:4px;text-align:center;font-size:9.5pt}' +
-    '@page{size:A4 landscape;margin:1cm 1.4cm}';
+    '@page{size:A4 landscape;margin:0}';
 
   var rows = linhas.map(function(l, i) {
     return '<tr><td class="col-num">' + (i+1) + '</td><td class="col-rx">' + escapeHtml(l) + '</td><td class="col-hora"></td></tr>';
@@ -6738,11 +6809,77 @@ function printInternacao() {
     '<div class="sig">' + escapeHtml(perfil.nome || '') + (perfil.nome ? '<br>' : '') + escapeHtml(perfil.crm || '') + '</div>' +
     '</div>';
 
-  var win = window.open('', '_blank', 'width=820,height=960,toolbar=0,menubar=0,location=0,status=0,scrollbars=1');
-  win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title> </title><style>' + css + '</style></head><body>' + corpo + '</body></html>');
-  win.document.close();
-  win.focus();
-  setTimeout(function() { win.print(); win.close(); }, 400);
+  printViaIframe(css, corpo);
+}
+
+// ====== MODELO SANTA CASA DE MISERICÓRDIA DE MONTE ALTO ======
+function printInternacaoSantaCasa(perfil, nome, nasc, peso, diag, alerg, dataHoje, horaAgora, linhas) {
+  var css =
+    '*{box-sizing:border-box}' +
+    'body{font-family:Arial,sans-serif;background:white;color:black;margin:0;padding:1cm 1.2cm;font-size:10.5pt}' +
+    '.sc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:6px}' +
+    '.sc-titulo{flex:1;text-align:center;line-height:1.35}' +
+    '.sc-titulo .nome{font-size:13pt;font-weight:bold;letter-spacing:0.5px}' +
+    '.sc-titulo .end{font-size:9.5pt}' +
+    '.sc-titulo .cnpj{font-size:9.5pt}' +
+    '.sc-leito{border:1px solid #000;min-width:130px;min-height:55px;padding:4px 8px;font-size:9pt}' +
+    '.sc-leito .lbl{font-size:8pt;color:#444}' +
+    '.sc-meta{display:flex;justify-content:space-between;border-top:1px solid #000;border-bottom:1px solid #000;padding:4px 0;font-size:10pt;margin-bottom:6px}' +
+    '.sc-paciente{border:1px solid #000;padding:5px 8px;margin-bottom:6px;font-size:10pt;line-height:1.5}' +
+    '.sc-h{text-align:center;font-size:12pt;font-weight:bold;letter-spacing:1px;margin:4px 0 6px}' +
+    'table{width:100%;border-collapse:collapse}' +
+    'th,td{border:1px solid #000;padding:4px 6px;vertical-align:top;font-size:10pt}' +
+    'thead th{background:#eee;text-align:center;font-size:10pt;font-weight:bold}' +
+    '.c-rx{width:auto}' +
+    '.c-h{width:70px;text-align:center}' +
+    '.c-v{width:55px;text-align:center}' +
+    '.c-ev{width:140px}' +
+    '.sc-foot{margin-top:14px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr;gap:10px;font-size:8.5pt;text-align:center}' +
+    '.sc-foot .sig{border-top:1px solid #000;padding-top:3px;font-style:italic}' +
+    '.sc-cod{font-size:8pt;color:#555;margin-top:6px}' +
+    '@page{size:A4 portrait;margin:0}';
+
+  // monta linhas (prescritas + brancas)
+  var nBlank = 14;
+  var rows = linhas.map(function(l) {
+    return '<tr><td class="c-rx">' + escapeHtml(l) + '</td><td class="c-h"></td><td class="c-v"></td><td class="c-ev"></td></tr>';
+  }).join('');
+  for (var k = 0; k < nBlank; k++) {
+    rows += '<tr><td class="c-rx" style="height:26px;">&nbsp;</td><td class="c-h"></td><td class="c-v"></td><td class="c-ev"></td></tr>';
+  }
+
+  var corpo =
+    '<div class="sc-top">' +
+      '<div class="sc-titulo">' +
+        '<div class="nome">SANTA CASA DE MISERICÓRDIA DE MONTE ALTO</div>' +
+        '<div class="end">RUA CARLOS KIELANDER, 396 - CENTRO - MONTE ALTO - SP - 15910-000</div>' +
+        '<div class="cnpj">CNPJ: 52.852.100/0001-40</div>' +
+      '</div>' +
+      '<div class="sc-leito"><div class="lbl">Leito / Quarto:</div></div>' +
+    '</div>' +
+    '<div class="sc-meta">' +
+      '<div><b>Data:</b> ' + dataHoje + '</div>' +
+      '<div><b>Horário:</b> ' + horaAgora + '</div>' +
+    '</div>' +
+    '<div class="sc-paciente">' +
+      '<div><b>Paciente:</b> ' + escapeHtml(nome) + '</div>' +
+      '<div><b>DN/Idade:</b> ' + escapeHtml(nasc) + ' &emsp; <b>Peso:</b> ' + escapeHtml(peso) + ' kg &emsp; <b>Diagnóstico:</b> ' + escapeHtml(diag) + '</div>' +
+      '<div><b>Alergias / Comorbidades:</b> ' + escapeHtml(alerg) + '</div>' +
+    '</div>' +
+    '<div class="sc-h">PRESCRIÇÃO MÉDICA</div>' +
+    '<table>' +
+      '<thead><tr><th class="c-rx">PRESCRIÇÃO</th><th class="c-h">HORÁRIO</th><th class="c-v">VIA</th><th class="c-ev">EVOLUÇÃO MÉDICA</th></tr></thead>' +
+      '<tbody>' + rows + '</tbody>' +
+    '</table>' +
+    '<div class="sc-foot">' +
+      '<div class="sig">' + escapeHtml(perfil.nome || '') + (perfil.nome ? ' — ' : '') + escapeHtml(perfil.crm || '') + '<div>Assinatura Médico</div></div>' +
+      '<div class="sig">Téc. Enf. Manhã</div>' +
+      '<div class="sig">Téc. Enf. Tarde</div>' +
+      '<div class="sig">Téc. Enf. Noite</div>' +
+      '<div class="sig">Farmacêutico(a)</div>' +
+    '</div>';
+
+  printViaIframe(css, corpo);
 }
 
 function limparInternacao() {
@@ -6752,6 +6889,8 @@ function limparInternacao() {
   document.getElementById('int-hid-sol').selectedIndex = 0;
   document.getElementById('int-hid-freq').selectedIndex = 0;
   document.getElementById('int-dieta').selectedIndex = 0;
+  var dietaLivreEl = document.getElementById('int-dieta-livre');
+  if (dietaLivreEl) { dietaLivreEl.value = ''; dietaLivreEl.style.display = 'none'; }
   document.getElementById('int-dextro-protocolo').selectedIndex = 0;
   document.getElementById('int-dipirona').checked = true;
   document.getElementById('int-bromoprida').checked = true;
