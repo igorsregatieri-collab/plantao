@@ -4150,6 +4150,8 @@ function renderMinhas() {
           <button class="copy-btn" style="flex:1;" onclick="printMinhaRx('${item.id}')">Imprimir</button>
           <button class="copy-btn" style="flex:1;background:var(--warn-dim);border-color:var(--warn);" onclick="editarParaImprimir('${item.id}')">Editar</button>
         </div>
+        ${item.id === 'm_geca2' ? `
+        <button class="copy-btn" style="margin-bottom:10px;background:${STATE.gecaSwap ? 'var(--vital-dim)' : 'rgba(255,184,0,0.1)'};border-color:${STATE.gecaSwap ? 'var(--vital)' : 'var(--warn)'};color:${STATE.gecaSwap ? 'var(--vital)' : 'var(--warn)'};" onclick="toggleGecaSwap()">${STATE.gecaSwap ? '↩ VOLTAR ONDANSETRONA' : '🔄 SUBSTITUIR ONDANSETRONA POR BROMOPRIDA'}</button>` : ''}
         <div id="edit-tmp-${item.id}" style="display:none;margin-bottom:10px;">
           <textarea id="edit-tmp-txt-${item.id}" style="width:100%;min-height:120px;padding:10px;font-family:ui-monospace,Consolas,Monaco,monospace;font-size:12px;line-height:1.6;background:var(--bg-2);color:var(--txt);border:1px solid var(--warn);border-radius:8px;resize:vertical;"></textarea>
           <div style="display:flex;gap:6px;margin-top:6px;">
@@ -4166,7 +4168,7 @@ function renderMinhas() {
             oninput="calcDoseMinhas('${item.id}')">
           <span style="font-family:var(--font-mono);font-size:9px;color:var(--txt-3);">Digite para calcular doses</span>
         </div>` : ''}
-        <div id="${rxId}" class="rx-item" style="white-space:pre-line;font-family:ui-monospace,Consolas,Monaco,monospace;font-size:12.5px;line-height:1.6;">${item.rx}</div>
+        <div id="${rxId}" class="rx-item" style="white-space:pre-line;font-family:ui-monospace,Consolas,Monaco,monospace;font-size:12.5px;line-height:1.6;">${getRxForItem(item)}</div>
       </div>
     `;
     el.appendChild(card);
@@ -5267,7 +5269,9 @@ function printReceita(title, rx) {
     </div>
   `;
   // Pedir nome do paciente
-  var nomePac = prompt('Nome do paciente (ou deixe em branco):', '') || '_______________________________________________';
+  var nomePacInput = prompt('Nome do paciente (ou deixe em branco):', '');
+  STATE.lastPatientName = (nomePacInput && nomePacInput.trim()) ? nomePacInput.trim() : '';
+  var nomePac = nomePacInput || '_______________________________________________';
   area.style.display = 'block';
   // Atualizar linha do nome
   var nomeEl = area.querySelector('.upa-nome-linha');
@@ -5310,7 +5314,7 @@ function printViaIframe(css, bodyHTML) {
 
 function printCustom(id) {
   const item = CUSTOM.find(c => c.id === id);
-  if (item) printReceita(item.title, item.rx);
+  if (item) { printReceita(item.title, item.rx); perguntarAtestadoAposPrint(item); }
 }
 
 // printMinha substituída por printMinhaRx
@@ -5565,6 +5569,7 @@ function printRxCasa(id) {
   if (!item || !item.casa) return;
   const txt = item.casa.map((r,i) => `${i+1}) ${r.n}\n${r.p}`).join('\n\n');
   printReceita(item.title, txt);
+  perguntarAtestadoAposPrint(item);
 }
 
 // =================== RENDER PEDIATRIA ===================
@@ -6330,9 +6335,10 @@ function calcDoseMinhas(itemId) {
   var rxEl = document.getElementById('rx-min-' + itemId);
   if (!pesoEl || !rxEl) return;
   var peso = parseFloat(pesoEl.value);
-  if (!peso || peso <= 0) { rxEl.textContent = item.rx; return; }
+  var rxBase = getRxForItem(item);
+  if (!peso || peso <= 0) { rxEl.textContent = rxBase; return; }
 
-  var txt = item.rx;
+  var txt = rxBase;
   var up = txt.toUpperCase();
 
   // Processar cada bloco de medicamento
@@ -6432,6 +6438,84 @@ function copyMinhasRx(id, btn) {
   });
 }
 
+// ===== GECA PED: substituição Ondansetrona → Bromoprida =====
+STATE.gecaSwap = false;
+
+function applyGecaSwap(rx) {
+  if (!STATE.gecaSwap || !rx) return rx;
+  var lines = rx.split('\n');
+  var ondIdx = -1, bromIdx = -1;
+  for (var i = 0; i < lines.length; i++) {
+    if (ondIdx < 0 && /^2\)\s*ONDANSETRONA/i.test(lines[i])) ondIdx = i;
+    if (bromIdx < 0 && /^6\)\s*BROMOPRIDA/i.test(lines[i])) bromIdx = i;
+  }
+  if (ondIdx < 0 || bromIdx < 0) return rx;
+  var newOnd = '2) BROMOPRIDA 4 MG/ML-----------------------------------1 FRASCO\nTOMAR 1 GOTAS POR KG DE 8/8 HORAS SE NAUSEA OU VOMITO';
+  var out = [];
+  var i = 0;
+  while (i < lines.length) {
+    if (i === ondIdx) { out.push(newOnd); i += 3; continue; }
+    if (i === bromIdx) {
+      if (out.length && out[out.length - 1].trim() === '') out.pop();
+      i += 2; continue;
+    }
+    out.push(lines[i]);
+    i++;
+  }
+  return out.join('\n');
+}
+
+function getRxForItem(item) {
+  if (!item) return '';
+  var rx = item.rx;
+  if (item.id === 'm_geca2') rx = applyGecaSwap(rx);
+  return rx;
+}
+
+function toggleGecaSwap() {
+  STATE.gecaSwap = !STATE.gecaSwap;
+  renderMinhas();
+}
+
+// ===== ATESTADO RÁPIDO APÓS IMPRESSÃO =====
+var CID_MAP = {
+  'IVAS': 'J06.9', 'GECA': 'A09', 'ITU': 'N39.0', 'DOR': 'R52',
+  'ENXAQUECA': 'G43', 'ASMA': 'J45', 'OTITE': 'H66.9', 'VERTIGEM': 'H81.3',
+  'ALERGIA': 'T78.4', 'HERPES': 'B00.9', 'HEMORROIDA': 'I84.9', 'PELE': 'L00',
+  'ORTOPEDICO': 'M25.5', 'SUTURA': 'T14.1', 'COLICA NEFRETICA': 'N23',
+  'DRGE': 'K21', 'HORDEOLO': 'H00.0', 'AVC': 'I64', 'GESTANTE': 'Z34',
+  'GOTA': 'M10', 'CONJUNTIVITE': 'H10.9', 'TAG': 'F41.1', 'GINECO': 'N94.6',
+  'GINECOLOGIA': 'N94.6', 'GASTROINTESTINAL': 'A09'
+};
+
+function gerarAtestadoRapido(nomeDefault, cidDefault) {
+  var nome = prompt('🩺 Nome do paciente para o atestado:', nomeDefault || '');
+  if (!nome) return;
+  var dias = prompt('Dias de afastamento:', '1');
+  if (!dias) return;
+  var hoje = new Date();
+  var setVal = function(id, v) { var el = document.getElementById(id); if (el) el.value = v; };
+  setVal('at-nome', nome);
+  setVal('at-cpf', '');
+  setVal('at-cid', cidDefault || '');
+  setVal('at-dias', dias);
+  setVal('at-obs', '');
+  setVal('at-dia', hoje.getDate());
+  setVal('at-mes', hoje.getMonth() + 1);
+  setVal('at-ano', hoje.getFullYear());
+  if (typeof printAtestado === 'function') printAtestado();
+}
+
+function perguntarAtestadoAposPrint(item) {
+  setTimeout(function() {
+    if (!confirm('📋 Gerar atestado também para este paciente?')) return;
+    var cat = (item && item.cat) ? String(item.cat).toUpperCase() : '';
+    var cid = (item && item.cid) || CID_MAP[cat] || '';
+    var nome = STATE.lastPatientName || '';
+    gerarAtestadoRapido(nome, cid);
+  }, 700);
+}
+
 function printMinhaRx(id) {
   // Se painel de edição estiver aberto, imprime o editado
   var editDiv = document.getElementById('edit-tmp-' + id);
@@ -6449,9 +6533,10 @@ function printMinhaRx(id) {
   var extras = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]');
   var extra = extras.find(function(d){ return d.id === id; });
   var rxEl = document.getElementById('rx-min-' + id);
-  var txt = (rxEl ? rxEl.textContent : '') || (extra ? extra.rx : '') || (item ? item.rx : '');
+  var txt = (rxEl ? rxEl.textContent : '') || (extra ? extra.rx : '') || (item ? getRxForItem(item) : '');
   var title = (item ? item.title : '') || (extra ? extra.title : '') || id;
   printReceita(title, txt);
+  perguntarAtestadoAposPrint(item || extra);
 }
 
 
@@ -6859,6 +6944,12 @@ function imprimirEditado(id, title) {
   var ta = document.getElementById('edit-tmp-txt-' + id);
   if (!ta) return;
   printReceita(title, ta.value);
+  var item = MINHAS.find(function(d){ return d.id === id; });
+  if (!item) {
+    var extras = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]');
+    item = extras.find(function(d){ return d.id === id; });
+  }
+  perguntarAtestadoAposPrint(item);
 }
 
 // =================== LIMPAR CALCULADORAS ===================
