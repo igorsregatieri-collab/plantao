@@ -2551,7 +2551,11 @@ RETORNO SE NECESSARIO
     </div>
     <div class="field-row">
       <div class="field"><label>Dias de afastamento</label><input type="number" id="at-dias" placeholder="2" min="1"></div>
-      <div class="field"><label>CID-10</label><input type="text" id="at-cid" placeholder="Ex: J00 — Resfriado comum"></div>
+      <div class="field" style="position:relative;">
+        <label>CID-10 <span style="color:var(--txt-4);font-size:8px;">(digite código ou nome)</span></label>
+        <input type="text" id="at-cid" placeholder="Ex: J00 — Resfriado comum" oninput="searchCID()" onfocus="searchCID()" onblur="setTimeout(hideCIDList,200)" autocomplete="off">
+        <div id="cid-results" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:50;max-height:240px;overflow-y:auto;background:var(--bg-1);border:1px solid var(--cyan);border-radius:10px;margin-top:4px;box-shadow:var(--shadow-lg);"></div>
+      </div>
     </div>
     <div class="field-row">
       <div class="field">
@@ -6019,7 +6023,188 @@ function toggleCondutaEditor() {
 }
 
 // ===== EMOJI PICKER =====
-window.EMOJIS_LIST = ['🤧','🤮','🦠','💊','🔬','💉','🫁','👂','🌀','🧠','🌸','🔴','🩸','🩹','🦴','🧵','🫘','🔥','👁','🫀','🤰','💎','😰','🩺','🌡️','💧','✨','📋','⭐','💡','🤒','🦷','💪','🍼','👶','⚕️','🆘','🚑'];
+window.EMOJIS_LIST = [
+  // Sintomas / queixas
+  '🤧','🤮','🤢','🤒','😷','🥴','😵','🤕','😰','😖','😩','🥵','🥶','🤯','😴','😪','💩','🥱','😣','🫨',
+  // Anatomia
+  '🧠','🫀','🫁','🦴','🦷','👁️','👂','👃','👅','💪','🦾','🦶','🦵','🤚','🩸','🍑','🫦',
+  // Medicamentos / itens
+  '💊','💉','🩺','🩹','🩻','🧪','🧬','🧫','🌡️','🛏️','🚑','🏥','⚕️','🆘','🩼','🚨','💊','🧴',
+  // Doenças / categorias
+  '🦠','🌸','🔬','🔴','🔥','🫘','💎','🫧','⚡','❤️‍🩹','💔','🌀','💧','💦',
+  // Pediatria / gestação
+  '👶','🤰','🤱','🍼','🧒','🧓',
+  // Profissionais / ações
+  '👨‍⚕️','👩‍⚕️','🧑‍⚕️','🏃','🤸','🧘','🛌',
+  // Genéricos úteis
+  '✨','⭐','💡','📋','📝','✅','⚠️','❗','❓','📌','🔖','⏰','📅','🆕','🔝','🟢','🟡','🔵','🟣','⚫'
+];
+
+// ===== BASE DE CIDs MAIS COMUNS (UPA / atendimento ambulatorial) =====
+window.CID_DB = [
+  {c:'A09', d:'Diarreia e gastroenterite (GECA)'},
+  {c:'A90', d:'Dengue clássica'},
+  {c:'A91', d:'Dengue hemorrágica'},
+  {c:'B00', d:'Herpes simples'},
+  {c:'B01', d:'Varicela (catapora)'},
+  {c:'B02', d:'Herpes zoster'},
+  {c:'B05', d:'Sarampo'},
+  {c:'B06', d:'Rubéola'},
+  {c:'B26', d:'Caxumba'},
+  {c:'B27', d:'Mononucleose'},
+  {c:'B35', d:'Dermatofitose (micose)'},
+  {c:'B37', d:'Candidíase'},
+  {c:'B86', d:'Escabiose (sarna)'},
+  {c:'E10', d:'Diabetes tipo 1'},
+  {c:'E11', d:'Diabetes tipo 2'},
+  {c:'E78', d:'Dislipidemia'},
+  {c:'E86', d:'Depleção de volume / desidratação'},
+  {c:'E87', d:'Distúrbio eletrolítico'},
+  {c:'F32', d:'Episódio depressivo'},
+  {c:'F41.0', d:'Transtorno de pânico'},
+  {c:'F41.1', d:'Transtorno de ansiedade generalizada (TAG)'},
+  {c:'F43', d:'Reação ao estresse grave'},
+  {c:'F51', d:'Insônia não orgânica'},
+  {c:'G40', d:'Epilepsia'},
+  {c:'G43', d:'Enxaqueca / migrânea'},
+  {c:'G44', d:'Outras cefaleias'},
+  {c:'G45', d:'AIT (ataque isquêmico transitório)'},
+  {c:'G50', d:'Nevralgia do trigêmeo'},
+  {c:'H00.0', d:'Hordéolo (terçol)'},
+  {c:'H10', d:'Conjuntivite'},
+  {c:'H16', d:'Ceratite'},
+  {c:'H66', d:'Otite média'},
+  {c:'H66.9', d:'Otite média não especificada'},
+  {c:'H81.1', d:'VPPB (vertigem postural)'},
+  {c:'H81.3', d:'Vertigem (outras)'},
+  {c:'I10', d:'Hipertensão arterial sistêmica (HAS)'},
+  {c:'I20', d:'Angina pectoris'},
+  {c:'I21', d:'Infarto agudo do miocárdio (IAM)'},
+  {c:'I50', d:'Insuficiência cardíaca'},
+  {c:'I63', d:'Infarto cerebral'},
+  {c:'I64', d:'AVC não especificado'},
+  {c:'I80', d:'Tromboflebite'},
+  {c:'I84', d:'Hemorroidas'},
+  {c:'I95', d:'Hipotensão'},
+  {c:'J00', d:'Nasofaringite aguda (resfriado comum)'},
+  {c:'J01', d:'Sinusite aguda'},
+  {c:'J02', d:'Faringite aguda'},
+  {c:'J03', d:'Amigdalite aguda'},
+  {c:'J04', d:'Laringotraqueíte'},
+  {c:'J05', d:'Crupe (laringite obstrutiva)'},
+  {c:'J06', d:'IVAS'},
+  {c:'J06.9', d:'IVAS não especificada'},
+  {c:'J11', d:'Influenza (gripe)'},
+  {c:'J18', d:'Pneumonia'},
+  {c:'J20', d:'Bronquite aguda'},
+  {c:'J21', d:'Bronquiolite aguda'},
+  {c:'J30', d:'Rinite alérgica'},
+  {c:'J44', d:'DPOC'},
+  {c:'J45', d:'Asma'},
+  {c:'K04', d:'Doenças da polpa dentária'},
+  {c:'K21', d:'DRGE (refluxo)'},
+  {c:'K25', d:'Úlcera gástrica'},
+  {c:'K29', d:'Gastrite / duodenite'},
+  {c:'K30', d:'Dispepsia'},
+  {c:'K35', d:'Apendicite aguda'},
+  {c:'K40', d:'Hérnia inguinal'},
+  {c:'K52', d:'Gastroenterite não infecciosa'},
+  {c:'K57', d:'Diverticulose'},
+  {c:'K59', d:'Constipação / transtornos funcionais'},
+  {c:'K80', d:'Colelitíase'},
+  {c:'K85', d:'Pancreatite aguda'},
+  {c:'L01', d:'Impetigo'},
+  {c:'L02', d:'Abscesso / furúnculo'},
+  {c:'L03', d:'Celulite (erisipela)'},
+  {c:'L20', d:'Dermatite atópica'},
+  {c:'L23', d:'Dermatite alérgica de contato'},
+  {c:'L29', d:'Prurido'},
+  {c:'L30', d:'Outras dermatites'},
+  {c:'L50', d:'Urticária'},
+  {c:'M10', d:'Gota'},
+  {c:'M25.5', d:'Dor articular'},
+  {c:'M54', d:'Dorsalgia'},
+  {c:'M54.5', d:'Lombalgia'},
+  {c:'M62', d:'Transtornos musculares'},
+  {c:'M79', d:'Reumatismo / dor em tecidos moles'},
+  {c:'N10', d:'Pielonefrite aguda'},
+  {c:'N18', d:'Doença renal crônica'},
+  {c:'N20', d:'Litíase renal / ureteral'},
+  {c:'N23', d:'Cólica nefrética'},
+  {c:'N30', d:'Cistite'},
+  {c:'N39.0', d:'ITU (infecção urinária)'},
+  {c:'N76', d:'Vulvovaginite'},
+  {c:'N92', d:'Menstruação excessiva'},
+  {c:'N94', d:'Dismenorreia'},
+  {c:'N94.6', d:'Dismenorreia não especificada'},
+  {c:'N95', d:'Climatério / menopausa'},
+  {c:'O20', d:'Hemorragia no início da gravidez'},
+  {c:'O21', d:'Hiperêmese gravídica'},
+  {c:'R05', d:'Tosse'},
+  {c:'R06', d:'Dispneia'},
+  {c:'R10', d:'Dor abdominal'},
+  {c:'R11', d:'Náusea e vômitos'},
+  {c:'R17', d:'Icterícia'},
+  {c:'R21', d:'Eritema / exantema'},
+  {c:'R30', d:'Disúria'},
+  {c:'R31', d:'Hematúria'},
+  {c:'R50', d:'Febre'},
+  {c:'R51', d:'Cefaleia'},
+  {c:'R52', d:'Dor não classificada'},
+  {c:'R55', d:'Síncope / lipotimia'},
+  {c:'R56', d:'Convulsões'},
+  {c:'R60', d:'Edema'},
+  {c:'R73', d:'Hiperglicemia'},
+  {c:'S00', d:'Trauma superficial da cabeça'},
+  {c:'S01', d:'Ferimento na cabeça'},
+  {c:'S06', d:'TCE'},
+  {c:'S20', d:'Trauma superficial do tórax'},
+  {c:'S40', d:'Trauma superficial ombro/braço'},
+  {c:'S51', d:'Ferimento do antebraço'},
+  {c:'S60', d:'Trauma superficial punho/mão'},
+  {c:'S61', d:'Ferimento punho/mão'},
+  {c:'S70', d:'Trauma superficial quadril/coxa'},
+  {c:'S80', d:'Trauma superficial perna'},
+  {c:'S81', d:'Ferimento perna'},
+  {c:'S90', d:'Trauma superficial tornozelo/pé'},
+  {c:'S93', d:'Entorse de tornozelo/pé'},
+  {c:'T14', d:'Traumatismo não especificado'},
+  {c:'T14.1', d:'Ferimento aberto não especificado'},
+  {c:'T78.4', d:'Alergia não especificada'},
+  {c:'Z00', d:'Exame médico geral'},
+  {c:'Z34', d:'Supervisão de gravidez normal'},
+  {c:'Z51', d:'Outros cuidados médicos'}
+];
+
+function searchCID() {
+  var input = document.getElementById('at-cid');
+  var box = document.getElementById('cid-results');
+  if (!input || !box) return;
+  var q = (input.value || '').trim().toLowerCase();
+  if (!q) { box.style.display = 'none'; return; }
+  // Não buscar se já tem código completo selecionado (formato AXX.X — texto)
+  var matches = window.CID_DB.filter(function(it) {
+    return it.c.toLowerCase().indexOf(q) >= 0 || it.d.toLowerCase().indexOf(q) >= 0;
+  }).slice(0, 25);
+  if (!matches.length) { box.innerHTML = '<div style="padding:10px 12px;color:var(--txt-4);font-size:11px;">Nenhum CID encontrado</div>'; box.style.display = 'block'; return; }
+  box.innerHTML = matches.map(function(it) {
+    return '<div class="cid-row" data-c="' + it.c + '" data-d="' + escapeHtml(it.d) + '" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--line);font-family:var(--font-mono);font-size:11.5px;transition:background 0.15s;" onmouseover="this.style.background=\'rgba(0,212,255,0.08)\'" onmouseout="this.style.background=\'transparent\'">' +
+      '<strong style="color:var(--cyan);">' + it.c + '</strong> — ' + escapeHtml(it.d) +
+      '</div>';
+  }).join('');
+  box.querySelectorAll('.cid-row').forEach(function(row) {
+    row.onclick = function() {
+      input.value = row.getAttribute('data-c');
+      box.style.display = 'none';
+    };
+  });
+  box.style.display = 'block';
+}
+
+function hideCIDList() {
+  var box = document.getElementById('cid-results');
+  if (box) box.style.display = 'none';
+}
 
 function buildEmojiPickerHTML(inputId, currentEmoji) {
   currentEmoji = currentEmoji || '';
@@ -7337,11 +7522,11 @@ function printInternacaoSantaCasa(perfil, nome, nasc, peso, diag, alerg, dataHoj
     '.c-rx{width:auto}' +
     '.c-h{width:70px;text-align:center}' +
     '.c-v{width:55px;text-align:center}' +
-    '.c-ev{width:140px}' +
+    '.c-ev{width:200px}' +
     '.sc-foot{margin-top:14px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr;gap:10px;font-size:8.5pt;text-align:center}' +
     '.sc-foot .sig{border-top:1px solid #000;padding-top:3px;font-style:italic}' +
     '.sc-cod{font-size:8pt;color:#555;margin-top:6px}' +
-    '@page{size:A4 portrait;margin:0}';
+    '@page{size:A4 landscape;margin:0}';
 
   // monta linhas (prescritas + brancas)
   var nBlank = 14;
