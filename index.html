@@ -2604,6 +2604,7 @@ RETORNO SE NECESSARIO
 
   <div class="editor-actions">
     <button class="btn-primary" onclick="novaConduta()">➕ Nova conduta</button>
+    <button class="btn-primary" style="background:rgba(0,232,150,0.12);color:var(--vital);border-color:var(--vital);" onclick="enviarTodasParaMinhas()">📌 Enviar TODAS para Minhas</button>
     <button class="btn-secondary" onclick="syncFromCloud()">Sincronizar</button>
     <button class="btn-secondary" onclick="exportData()">📤 Exportar JSON</button>
     <button class="btn-secondary" onclick="document.getElementById('import-file').click()">📥 Importar JSON</button>
@@ -5499,9 +5500,11 @@ function confirmarSaveMin() {
   var cat = document.getElementById('sm-cat').value.trim().toUpperCase() || 'CUSTOM';
   var rx = document.getElementById('sm-rx').value.trim();
   if (!title || !rx) { alert('Preencha título e prescrição.'); return; }
-  salvarCondutaMinhas('cm_' + Date.now(), title, cat, rx, '');
-  fecharSaveMin();
-  alert('✅ Salvo em Minhas — categoria "' + cat + '".');
+  pedirSenha(function() {
+    salvarCondutaMinhas('cm_' + Date.now(), title, cat, rx, '');
+    fecharSaveMin();
+    alert('✅ Salvo em Minhas — categoria "' + cat + '".');
+  });
 }
 
 // Salva/atualiza uma conduta em Minhas: localStorage + CUSTOM (com flag _minhas) + nuvem
@@ -7361,6 +7364,32 @@ function printMinhaRx(id) {
 }
 
 
+
+// Envia TODAS as condutas do editor (CUSTOM) para Minhas de uma vez
+function enviarTodasParaMinhas() {
+  if (typeof CUSTOM === 'undefined' || !CUSTOM.length) { alert('Nenhuma conduta no editor.'); return; }
+  pedirSenha(function() {
+    if (!confirm('Enviar TODAS as ' + CUSTOM.length + ' condutas do editor para Minhas?')) return;
+    var extras = [];
+    try { extras = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]'); } catch(e) {}
+    var n = 0;
+    CUSTOM.forEach(function(c) {
+      if (!c || !c.id || !c.rx) return;
+      c._minhas = true;
+      var obj = { id: c.id, title: c.title, cat: c.cat || 'CUSTOM', rx: c.rx, emoji: c.emoji || '', _minhas: true };
+      var j = extras.findIndex(function(e) { return e.id === c.id; });
+      if (j >= 0) extras[j] = obj; else extras.push(obj);
+      n++;
+      if (typeof saveCustomCloud === 'function') saveCustomCloud(obj);
+    });
+    localStorage.setItem('plantao_minhas_extra', JSON.stringify(extras));
+    if (typeof saveCustomLocal === 'function') saveCustomLocal();
+    if (typeof renderCustom === 'function') renderCustom();
+    buildCatsMinhas();
+    renderMinhas();
+    alert('✅ ' + n + ' conduta(s) enviada(s) para Minhas!');
+  });
+}
 
 function saveEditFormToMinhas(id) {
   pedirSenha(function() {
