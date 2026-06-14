@@ -622,6 +622,21 @@
     letter-spacing: 0.3px;
   }
 
+  .ped-head-dose {
+    display: block;
+    width: 100%;
+    margin-top: 5px;
+    color: var(--vital);
+    font-size: 11.5px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    background: var(--vital-glow);
+    border-left: 3px solid var(--vital);
+    padding: 5px 9px;
+    border-radius: 0 4px 4px 0;
+    letter-spacing: 0.3px;
+  }
+
   .copy-btn {
     width: 100%;
     margin-top: 12px;
@@ -2091,6 +2106,75 @@
   <button class="tab" data-section="internacao" onclick="setSection('internacao')">Internação</button>
 </div>
 
+<!-- =================== MODAIS (impressão + salvar em Minhas) =================== -->
+<style>
+.pm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.62);backdrop-filter:blur(3px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;}
+.pm-box{background:var(--bg-2,#16181d);border:1px solid var(--line,#2a2d35);border-radius:16px;width:100%;max-width:560px;max-height:92vh;overflow:auto;box-shadow:0 24px 70px rgba(0,0,0,0.55);}
+.pm-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line,#2a2d35);font-weight:700;font-size:15px;color:var(--txt,#e8eaed);}
+.pm-x{background:none;border:none;color:var(--txt-3,#9aa0aa);font-size:18px;cursor:pointer;line-height:1;padding:2px 6px;border-radius:6px;}
+.pm-x:hover{background:var(--bg-3,#22252c);color:var(--txt,#fff);}
+.pm-body{padding:16px 18px;}
+.pm-lbl{display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:var(--txt-3,#9aa0aa);margin:0 0 6px;}
+.pm-inp{width:100%;padding:10px 12px;font-size:14px;background:var(--bg,#0e0f12);color:var(--txt,#e8eaed);border:1px solid var(--line,#2a2d35);border-radius:9px;margin-bottom:14px;box-sizing:border-box;}
+.pm-inp:focus{outline:none;border-color:var(--cyan,#00d4ff);}
+.pm-ta{width:100%;min-height:150px;padding:11px 12px;font-family:ui-monospace,Consolas,Monaco,monospace;font-size:12.5px;line-height:1.6;background:var(--bg,#0e0f12);color:var(--txt,#e8eaed);border:1px solid var(--line,#2a2d35);border-radius:9px;margin-bottom:14px;resize:vertical;box-sizing:border-box;}
+.pm-ta:focus{outline:none;border-color:var(--cyan,#00d4ff);}
+.pm-row{display:flex;gap:12px;}
+.pm-atest{background:var(--bg,#0e0f12);border:1px solid var(--line,#2a2d35);border-radius:11px;padding:12px 14px;margin-top:2px;}
+.pm-check{display:flex;align-items:center;gap:9px;font-size:13.5px;font-weight:600;color:var(--txt,#e8eaed);cursor:pointer;user-select:none;}
+.pm-check input{width:17px;height:17px;accent-color:var(--cyan,#00d4ff);cursor:pointer;}
+.pm-foot{display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end;padding:14px 18px;border-top:1px solid var(--line,#2a2d35);}
+.pm-btn{padding:10px 16px;font-size:13.5px;font-weight:700;border-radius:9px;cursor:pointer;border:1px solid var(--line,#2a2d35);background:var(--bg-3,#22252c);color:var(--txt,#e8eaed);}
+.pm-btn:hover{filter:brightness(1.12);}
+.pm-go{background:var(--cyan,#00d4ff);border-color:var(--cyan,#00d4ff);color:#03121a;}
+.pm-ghost{background:transparent;}
+.pm-save{background:rgba(0,232,150,0.12);border-color:var(--vital,#00e896);color:var(--vital,#00e896);}
+</style>
+
+<div id="print-modal" class="pm-overlay" style="display:none;" onclick="if(event.target===this)fecharPrintModal()">
+  <div class="pm-box">
+    <div class="pm-head"><span id="pm-title">🖨️ Imprimir receita</span><button class="pm-x" onclick="fecharPrintModal()">✕</button></div>
+    <div class="pm-body">
+      <label class="pm-lbl">Nome do paciente</label>
+      <input id="pm-nome" class="pm-inp" type="text" placeholder="Nome do paciente (opcional)" autocomplete="off">
+      <label class="pm-lbl">Prescrição <span style="text-transform:none;font-weight:400;color:var(--txt-4,#6b7280);">— edite se precisar</span></label>
+      <textarea id="pm-rx" class="pm-ta"></textarea>
+      <div class="pm-atest">
+        <label class="pm-check"><input type="checkbox" id="pm-atest-on" onchange="pmToggleAtest()"><span>📋 Gerar atestado médico junto</span></label>
+        <div id="pm-atest-fields" style="display:none;margin-top:12px;">
+          <div class="pm-row">
+            <div style="flex:1;"><label class="pm-lbl">Dias de afastamento</label><input id="pm-dias" class="pm-inp" type="number" min="1" value="1"></div>
+            <div style="flex:1.6;"><label class="pm-lbl">CID-10 (opcional)</label><input id="pm-cid" class="pm-inp" type="text" placeholder="Ex: J06.9" autocomplete="off"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pm-foot">
+      <button class="pm-btn pm-save" onclick="pmSalvarMinhas()">💾 Salvar em Minhas</button>
+      <button class="pm-btn pm-ghost" onclick="fecharPrintModal()">Cancelar</button>
+      <button class="pm-btn pm-go" onclick="pmConfirmar()">🖨️ Imprimir</button>
+    </div>
+  </div>
+</div>
+
+<div id="savemin-modal" class="pm-overlay" style="display:none;" onclick="if(event.target===this)fecharSaveMin()">
+  <div class="pm-box" style="max-width:480px;">
+    <div class="pm-head"><span>💾 Salvar conduta em Minhas</span><button class="pm-x" onclick="fecharSaveMin()">✕</button></div>
+    <div class="pm-body">
+      <label class="pm-lbl">Título</label>
+      <input id="sm-title" class="pm-inp" type="text" placeholder="Ex: IVAS adulto com vômito">
+      <label class="pm-lbl">Categoria</label>
+      <input id="sm-cat" class="pm-inp" type="text" placeholder="Ex: IVAS, DOR, ITU...">
+      <label class="pm-lbl">Prescrição</label>
+      <textarea id="sm-rx" class="pm-ta"></textarea>
+    </div>
+    <div class="pm-foot">
+      <button class="pm-btn pm-ghost" onclick="fecharSaveMin()">Cancelar</button>
+      <button class="pm-btn pm-go" onclick="confirmarSaveMin()">Salvar em Minhas</button>
+    </div>
+  </div>
+</div>
+
 <!-- =================== SEÇÃO MINHAS CONDUTAS (BLOCO ORIGINAL) =================== -->
 <div class="section active" id="section-minhas">
   <div class="search-row">
@@ -2843,8 +2927,8 @@ RETORNO SE NECESSARIO
 <!-- =================== SEÇÃO HISTÓRICO =================== -->
 <div class="section" id="section-hist">
   <div class="panel">
-    <h2>🕘 Receitas copiadas nesta sessão</h2>
-    <div class="desc">O histórico é zerado quando você fechar a página</div>
+    <h2>🕘 Histórico de receitas</h2>
+    <div class="desc">Últimas receitas copiadas e impressas (salvas neste aparelho). Você pode reimprimir ou salvar em Minhas.</div>
     <div id="hist-list"></div>
     <button class="hist-clear" onclick="clearHist()" style="margin-top:10px;">🗑️ Limpar histórico</button>
   </div>
@@ -4075,7 +4159,7 @@ function toggle(id) {
 // =================== MINHAS CONDUTAS RENDER ===================
 function buildCatsMinhas() {
   // Recalcular categorias incluindo extras
-  var extras2 = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]');
+  var extras2 = (typeof getMinhasExtras === 'function') ? getMinhasExtras() : JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]');
   CATS_MINHAS = ['TODAS', ...Array.from(new Set(MINHAS.concat(extras2).map(function(d){return d.cat;})))];
   var mOrder = JSON.parse(localStorage.getItem('plantao_cats_minhas_order') || 'null');
   if (mOrder && mOrder.length) {
@@ -4106,8 +4190,8 @@ function renderMinhas() {
   const el = document.getElementById('list-minhas');
   el.innerHTML = '';
 
-  // Incluir extras salvos pelo editor
-  var extras = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]');
+  // Incluir extras salvos pelo editor (minhas_extra + CUSTOM marcados _minhas)
+  var extras = getMinhasExtras();
   var todosMinhas = MINHAS.concat(extras);
   let filtered = todosMinhas;
   if (STATE.activeCatMinhas !== 'TODAS') {
@@ -4156,6 +4240,8 @@ function renderMinhas() {
         </div>
         ${item.id === 'm_geca2' ? `
         <button class="copy-btn" style="margin-bottom:10px;background:${STATE.gecaSwap ? 'var(--vital-dim)' : 'rgba(255,184,0,0.1)'};border-color:${STATE.gecaSwap ? 'var(--vital)' : 'var(--warn)'};color:${STATE.gecaSwap ? 'var(--vital)' : 'var(--warn)'};" onclick="toggleGecaSwap()">${STATE.gecaSwap ? '↩ VOLTAR ONDANSETRONA' : '🔄 SUBSTITUIR ONDANSETRONA POR BROMOPRIDA'}</button>` : ''}
+        ${item.id === 'm_ivas3' ? `
+        <button class="copy-btn" style="margin-bottom:10px;background:${STATE.ivasSwap ? 'var(--vital-dim)' : 'rgba(255,184,0,0.1)'};border-color:${STATE.ivasSwap ? 'var(--vital)' : 'var(--warn)'};color:${STATE.ivasSwap ? 'var(--vital)' : 'var(--warn)'};" onclick="toggleIvasSwap()">${STATE.ivasSwap ? '↩ VOLTAR CETOPROFENO' : '🔄 SUBSTITUIR CETOPROFENO POR PREDISIM'}</button>` : ''}
         <div id="edit-tmp-${item.id}" style="display:none;margin-bottom:10px;">
           <textarea id="edit-tmp-txt-${item.id}" style="width:100%;min-height:120px;padding:10px;font-family:ui-monospace,Consolas,Monaco,monospace;font-size:12px;line-height:1.6;background:var(--bg-2);color:var(--txt);border:1px solid var(--warn);border-radius:8px;resize:vertical;"></textarea>
           <div style="display:flex;gap:6px;margin-top:6px;">
@@ -4163,6 +4249,7 @@ function renderMinhas() {
             <button class="copy-btn" style="flex:1;" onclick="imprimirEditado('${item.id}', '${item.title}')">Imprimir</button>
             <button class="copy-btn" style="flex:1;background:var(--bg-3);border-color:var(--line);" onclick="fecharEdicaoTemp('${item.id}')">x Fechar</button>
           </div>
+          <button class="copy-btn" style="width:100%;margin-top:6px;background:rgba(0,232,150,0.1);border-color:var(--vital);color:var(--vital);" onclick="salvarEditadoEmMinhas('${item.id}')">💾 Salvar como nova em Minhas</button>
         </div>
         ${showPeso ? `
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:8px 10px;background:var(--warn-glow);border:1px solid var(--warn);border-radius:8px;">
@@ -4208,12 +4295,7 @@ function copyRx(id, btn) {
     setTimeout(() => { btn.textContent = 'Copiar receita'; btn.classList.remove('copied'); }, 1800);
 
     // Adiciona ao histórico
-    STATE.history.unshift({
-      title: item.title,
-      content: txt,
-      time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-    });
-    if (STATE.history.length > 50) STATE.history.pop();
+    addHist(item.title, txt);
   });
 }
 
@@ -4241,15 +4323,21 @@ function copyAnam(t, btn) {
 // =================== HISTÓRICO ===================
 function renderHist() {
   const el = document.getElementById('hist-list');
+  if (!el) return;
   if (STATE.history.length === 0) {
-    el.innerHTML = '<div class="empty">Nenhuma receita copiada ainda nesta sessão.</div>';
+    el.innerHTML = '<div class="empty">Nenhuma receita criada ainda. Ao copiar ou imprimir uma receita ela aparece aqui.</div>';
     return;
   }
-  el.innerHTML = STATE.history.map(h => `
+  el.innerHTML = STATE.history.map((h, i) => `
     <div class="hist-item">
-      <div class="hist-title">${h.title}</div>
-      <div class="hist-time">${h.time}</div>
-      <div class="hist-content">${h.content}</div>
+      <div class="hist-title">${escapeHtml(h.title)}</div>
+      <div class="hist-time">${escapeHtml(h.time || '')}</div>
+      <div class="hist-content">${escapeHtml(h.content)}</div>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+        <button class="copy-btn" style="flex:1;min-width:90px;" onclick="copiarHist(${i}, this)">Copiar</button>
+        <button class="copy-btn" style="flex:1;min-width:90px;" onclick="imprimirHist(${i})">🖨️ Imprimir</button>
+        <button class="copy-btn" style="flex:1;min-width:120px;background:rgba(0,232,150,0.1);border-color:var(--vital);color:var(--vital);" onclick="salvarHistEmMinhas(${i})">💾 Salvar em Minhas</button>
+      </div>
     </div>
   `).join('');
 }
@@ -4257,6 +4345,7 @@ function renderHist() {
 function clearHist() {
   if (confirm('Limpar todo o histórico?')) {
     STATE.history = [];
+    try { localStorage.removeItem('plantao_history'); } catch(e) {}
     renderHist();
   }
 }
@@ -4963,9 +5052,31 @@ function loadCustom() {
   // Local primeiro
   try { CUSTOM = JSON.parse(localStorage.getItem('plantao_custom') || '[]'); }
   catch(e) { CUSTOM = []; }
+  migrarMinhasParaCustom();
   renderCustom();
   // Cloud sync
   syncFromCloud();
+}
+
+// Garante que TODA conduta de Minhas (incl. as antigas que só estavam em
+// minhas_extra) exista no CUSTOM com flag _minhas — assim sobem para a nuvem
+// e passam a aparecer em Minhas em todos os PCs.
+function migrarMinhasParaCustom() {
+  var extras = [];
+  try { extras = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]'); } catch(e) {}
+  var byId = {};
+  CUSTOM.forEach(function(c) { byId[c.id] = c; });
+  var mudou = false;
+  extras.forEach(function(e) {
+    if (!e || !e.id) return;
+    if (byId[e.id]) {
+      if (!byId[e.id]._minhas) { byId[e.id]._minhas = true; mudou = true; }
+    } else {
+      CUSTOM.push({ id: e.id, cat: e.cat || 'CUSTOM', title: e.title || '', rx: e.rx || '', emoji: e.emoji || '', _minhas: true });
+      mudou = true;
+    }
+  });
+  if (mudou) saveCustomLocal();
 }
 
 async function syncFromCloud() {
@@ -4980,27 +5091,34 @@ async function syncFromCloud() {
     // 3. Subir conduta models
     await apiPost({ action: 'saveCondutaModels', data: CONDUTA_MODELS });
 
-    // 4. Baixar condutas custom da nuvem
+    // 4. Baixar condutas custom da nuvem e MESCLAR (nunca apaga itens locais)
     const r = await apiCall({ action: 'list' });
     if (r && r.items) {
-      CUSTOM = r.items.map(c => ({
-        id: c.id,
-        cat: c.cat || c.categoria || 'GERAL',
-        title: c.title || c.titulo || '',
-        rx: c.rx || c.prescricao || '',
-        _minhas: c._minhas || false
-      }));
+      var merged = {};
+      // base: o que já temos localmente
+      CUSTOM.forEach(function(c) { merged[c.id] = c; });
+      // sobrepõe com o que veio da nuvem
+      r.items.forEach(function(c) {
+        if (!c || !c.id) return;
+        merged[c.id] = {
+          id: c.id,
+          cat: c.cat || c.categoria || 'GERAL',
+          title: c.title || c.titulo || '',
+          rx: c.rx || c.prescricao || '',
+          emoji: c.emoji || (merged[c.id] && merged[c.id].emoji) || '',
+          _minhas: (typeof c._minhas !== 'undefined') ? c._minhas : (merged[c.id] && merged[c.id]._minhas) || false
+        };
+      });
+      CUSTOM = Object.keys(merged).map(function(k) { return merged[k]; });
       saveCustomLocal();
       renderCustom();
-      // Restaurar minhas_extra dos itens com flag _minhas
+      // Reconstrói minhas_extra a partir dos itens marcados _minhas
       var minhasExtra = CUSTOM.filter(function(c){ return c._minhas; }).map(function(c){
-        return { id: c.id, cat: c.cat, title: c.title, rx: c.rx };
+        return { id: c.id, cat: c.cat, title: c.title, rx: c.rx, emoji: c.emoji || '', _minhas: true };
       });
-      if (minhasExtra.length > 0) {
-        localStorage.setItem('plantao_minhas_extra', JSON.stringify(minhasExtra));
-        buildCatsMinhas();
-        renderMinhas();
-      }
+      localStorage.setItem('plantao_minhas_extra', JSON.stringify(minhasExtra));
+      buildCatsMinhas();
+      renderMinhas();
     }
 
     // 5. Baixar anam models
@@ -5039,6 +5157,7 @@ async function saveCustomCloud(item) {
     cat: item.cat,
     title: item.title,
     rx: item.rx,
+    emoji: item.emoji || '',
     _minhas: item._minhas || false
   });
   if (r && r.ok) {
@@ -5099,7 +5218,7 @@ function copyCustom(id, btn) {
     btn.textContent = '✓ COPIADO';
     btn.classList.add('copied');
     setTimeout(() => { btn.textContent = 'COPIAR'; btn.classList.remove('copied'); }, 1800);
-    STATE.history.unshift({ title: item.title + ' (custom)', content: item.rx, time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) });
+    addHist(item.title + ' (custom)', item.rx);
   });
 }
 
@@ -5244,7 +5363,11 @@ function formatData() {
 
 const UPA_LOGO_B64 = "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";
 
-function printReceita(title, rx) {
+function printReceita(title, rx, opts) {
+  openPrintModal(Object.assign({ title: title, rx: rx }, opts || {}));
+}
+
+function printReceitaDireto(title, rx, patientName) {
   const perfil = getPerfil();
   const cidade = perfil.cidade || 'Taquaritinga';
   const nome = perfil.nome || '';
@@ -5272,10 +5395,8 @@ function printReceita(title, rx) {
       </div>
     </div>
   `;
-  // Pedir nome do paciente
-  var nomePacInput = prompt('Nome do paciente (ou deixe em branco):', '');
-  STATE.lastPatientName = (nomePacInput && nomePacInput.trim()) ? nomePacInput.trim() : '';
-  var nomePac = nomePacInput || '_______________________________________________';
+  var nomePac = (patientName && patientName.trim()) ? patientName.trim() : '_______________________________________________';
+  STATE.lastPatientName = (patientName && patientName.trim()) ? patientName.trim() : '';
   area.style.display = 'block';
   // Atualizar linha do nome
   var nomeEl = area.querySelector('.upa-nome-linha');
@@ -5295,6 +5416,7 @@ function printReceita(title, rx) {
     '.upa-footer{margin-top:30px;display:flex;justify-content:space-between;align-items:flex-end;font-size:10pt}' +
     '.upa-assinatura{border-top:1px solid #000;width:55%;padding-top:4px;text-align:center;font-size:9.5pt}' +
     '@page{size:A4;margin:0}';
+  addHist(title, rx);
   printViaIframe(css, conteudo);
 }
 
@@ -5316,9 +5438,155 @@ function printViaIframe(css, bodyHTML) {
   }, 300);
 }
 
+// =================== MODAL DE IMPRESSÃO UNIFICADO ===================
+var PM_CTX = {};
+function openPrintModal(opts) {
+  PM_CTX = opts || {};
+  var m = document.getElementById('print-modal');
+  if (!m) { printReceitaDireto(PM_CTX.title || 'Receita', PM_CTX.rx || '', ''); return; }
+  document.getElementById('pm-title').textContent = '🖨️ Imprimir — ' + (PM_CTX.title || 'receita');
+  document.getElementById('pm-nome').value = '';
+  document.getElementById('pm-rx').value = PM_CTX.rx || '';
+  document.getElementById('pm-atest-on').checked = false;
+  document.getElementById('pm-atest-fields').style.display = 'none';
+  document.getElementById('pm-dias').value = '1';
+  var cat = (PM_CTX.cat || '').toString().toUpperCase();
+  var mapCid = (typeof CID_MAP !== 'undefined') ? CID_MAP[cat] : '';
+  document.getElementById('pm-cid').value = PM_CTX.cid || mapCid || '';
+  m.style.display = 'flex';
+  setTimeout(function() { try { document.getElementById('pm-nome').focus(); } catch(e){} }, 60);
+}
+function fecharPrintModal() { var m = document.getElementById('print-modal'); if (m) m.style.display = 'none'; }
+function pmToggleAtest() {
+  var on = document.getElementById('pm-atest-on').checked;
+  document.getElementById('pm-atest-fields').style.display = on ? 'block' : 'none';
+}
+function pmConfirmar() {
+  var nome = document.getElementById('pm-nome').value.trim();
+  var rx = document.getElementById('pm-rx').value;
+  var atestOn = document.getElementById('pm-atest-on').checked;
+  var dias = document.getElementById('pm-dias').value || '1';
+  var cid = document.getElementById('pm-cid').value.trim();
+  var title = PM_CTX.title || 'Receita';
+  fecharPrintModal();
+  printReceitaDireto(title, rx, nome);
+  if (atestOn) {
+    setTimeout(function() {
+      var hoje = new Date();
+      printAtestadoComDados({ nome: nome, cpf: '', dias: dias, cid: cid, obs: '', dia: hoje.getDate(), mes: hoje.getMonth() + 1, ano: hoje.getFullYear() });
+    }, 900);
+  }
+}
+function pmSalvarMinhas() {
+  var rx = document.getElementById('pm-rx').value;
+  var title = PM_CTX.title || '';
+  var cat = PM_CTX.cat || '';
+  fecharPrintModal();
+  abrirSaveMin(title, cat, rx);
+}
+
+// =================== MODAL "SALVAR EM MINHAS" ===================
+function abrirSaveMin(title, cat, rx) {
+  document.getElementById('sm-title').value = title || '';
+  document.getElementById('sm-cat').value = cat || '';
+  document.getElementById('sm-rx').value = rx || '';
+  document.getElementById('savemin-modal').style.display = 'flex';
+  setTimeout(function() { try { document.getElementById('sm-title').focus(); } catch(e){} }, 60);
+}
+function fecharSaveMin() { var m = document.getElementById('savemin-modal'); if (m) m.style.display = 'none'; }
+function confirmarSaveMin() {
+  var title = document.getElementById('sm-title').value.trim();
+  var cat = document.getElementById('sm-cat').value.trim().toUpperCase() || 'CUSTOM';
+  var rx = document.getElementById('sm-rx').value.trim();
+  if (!title || !rx) { alert('Preencha título e prescrição.'); return; }
+  salvarCondutaMinhas('cm_' + Date.now(), title, cat, rx, '');
+  fecharSaveMin();
+  alert('✅ Salvo em Minhas — categoria "' + cat + '".');
+}
+
+// Salva/atualiza uma conduta em Minhas: localStorage + CUSTOM (com flag _minhas) + nuvem
+function salvarCondutaMinhas(id, title, cat, rx, emoji) {
+  var obj = { id: id, title: title, cat: cat, rx: rx, emoji: emoji || '', _minhas: true };
+  // 1. CUSTOM (lista do editor) — é o que sobe para a nuvem
+  var i = CUSTOM.findIndex(function(c) { return c.id === id; });
+  if (i >= 0) CUSTOM[i] = obj; else CUSTOM.push(obj);
+  saveCustomLocal();
+  if (typeof renderCustom === 'function') renderCustom();
+  // 2. minhas_extra (fonte da aba Minhas)
+  var extras = [];
+  try { extras = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]'); } catch(e) {}
+  var j = extras.findIndex(function(e) { return e.id === id; });
+  if (j >= 0) extras[j] = obj; else extras.push(obj);
+  localStorage.setItem('plantao_minhas_extra', JSON.stringify(extras));
+  // 3. Nuvem
+  saveCustomCloud(obj);
+  // 4. Re-render
+  buildCatsMinhas();
+  renderMinhas();
+}
+
+// Lista unificada de condutas "Minhas" do usuário (minhas_extra + qualquer CUSTOM marcado _minhas)
+function getMinhasExtras() {
+  var byId = {};
+  var extras = [];
+  try { extras = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]'); } catch(e) {}
+  extras.forEach(function(e) { if (e && e.id) byId[e.id] = e; });
+  (typeof CUSTOM !== 'undefined' ? CUSTOM : []).forEach(function(c) {
+    if (c && c._minhas && !byId[c.id]) {
+      byId[c.id] = { id: c.id, cat: c.cat, title: c.title, rx: c.rx, emoji: c.emoji, _minhas: true };
+    }
+  });
+  return Object.keys(byId).map(function(k) { return byId[k]; });
+}
+
+// Salvar (como NOVA) a conduta sendo editada no painel rápido de Minhas
+function salvarEditadoEmMinhas(id) {
+  var ta = document.getElementById('edit-tmp-txt-' + id);
+  if (!ta) return;
+  var fonte = MINHAS.concat(getMinhasExtras());
+  var item = fonte.find(function(d) { return d.id === id; });
+  abrirSaveMin(item ? item.title : '', item ? item.cat : '', ta.value);
+}
+
+// =================== HISTÓRICO (persistente) ===================
+function loadHist() {
+  try { STATE.history = JSON.parse(localStorage.getItem('plantao_history') || '[]'); }
+  catch(e) { STATE.history = []; }
+}
+function addHist(title, content) {
+  if (!content) return;
+  STATE.history.unshift({
+    title: title || 'Receita',
+    content: typeof content === 'string' ? content : String(content),
+    time: new Date().toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+  });
+  if (STATE.history.length > 30) STATE.history.length = 30;
+  try { localStorage.setItem('plantao_history', JSON.stringify(STATE.history)); } catch(e) {}
+  if (STATE.section === 'hist') renderHist();
+}
+function salvarHistEmMinhas(idx) {
+  var h = STATE.history[idx];
+  if (!h) return;
+  var title = (h.title || '').replace(/\s*\((custom|PS|Casa|conduta)\)\s*$/i, '').trim();
+  abrirSaveMin(title, '', h.content);
+}
+function imprimirHist(idx) {
+  var h = STATE.history[idx];
+  if (!h) return;
+  openPrintModal({ title: (h.title || 'Receita'), rx: h.content });
+}
+function copiarHist(idx, btn) {
+  var h = STATE.history[idx];
+  if (!h) return;
+  navigator.clipboard.writeText(h.content).then(function() {
+    var old = btn.textContent; btn.textContent = '✓';
+    setTimeout(function() { btn.textContent = old; }, 1400);
+  });
+}
+
 function printCustom(id) {
   const item = CUSTOM.find(c => c.id === id);
-  if (item) { printReceita(item.title, item.rx); perguntarAtestadoAposPrint(item); }
+  if (item) { printReceita(item.title, item.rx, { cat: item.cat, cid: item.cid, id: item.id }); }
 }
 
 // printMinha substituída por printMinhaRx
@@ -5417,13 +5685,13 @@ const DATA_PED = [
 
   { id:'ped7', cat:'Analgésico Pediátrico', tag:'DIPIRONA', tagClass:'tag-vo',
     title:'Dipirona gotas 500mg/ml',
-    doses:[{med:'Dipirona', mgkg:25, conc:500, unit:'gt', freq:'6/6h', max:1000, obs:'1 gota/kg por dose. 20 gotas = 1ml'}] },
+    doses:[{med:'Dipirona', mgkg:25, conc:500, unit:'gt', freq:'6/6h', max:1000, obs:'1 gota/kg por dose (10-12mg/kg). Máx 200mg ou 20 gotas/dose. 20 gotas = 1ml'}] },
   { id:'ped8', cat:'Analgésico Pediátrico', tag:'PARACETAMOL', tagClass:'tag-vo',
     title:'Paracetamol gotas 200mg/ml',
-    doses:[{med:'Paracetamol', mgkg:10, conc:200, unit:'gt', freq:'6/6h', max:750, obs:'10-15 mg/kg por dose'}] },
+    doses:[{med:'Paracetamol', mgkg:10, conc:200, unit:'gt', freq:'6/6h', max:750, obs:'10-15 mg/kg por dose. 1 gota = 5mg. Máx 750mg/dose'}] },
   { id:'ped9', cat:'Analgésico Pediátrico', tag:'IBUPROFENO', tagClass:'tag-vo',
     title:'Ibuprofeno gotas 50mg/ml',
-    doses:[{med:'Ibuprofeno', mgkg:7, conc:50, unit:'gt', freq:'8/8h', max:400, obs:'5-10 mg/kg por dose. Não usar <6m'}] },
+    doses:[{med:'Ibuprofeno', mgkg:7, conc:50, unit:'gt', freq:'8/8h', max:400, obs:'5-10 mg/kg por dose. Não usar <6m. Máx 35 gotas/dose'}] },
 
   { id:'ped10', cat:'Resp. Pediátrico', tag:'PREDNISOLONA', tagClass:'tag-vo',
     title:'Prednisolona suspensão 3mg/ml',
@@ -5450,7 +5718,117 @@ const DATA_PED = [
     doses:[{med:'Adrenalina', mgkg:0.01, conc:1, unit:'ml', freq:'3-5min', max:1, obs:'0,01 mg/kg IV/IO (1:10.000). Diluir 1ml em 9ml AD = 0,1mg/ml. Dose prática: Peso×0,1ml'}] },
   { id:'ped17', cat:'Emergência Pediátrica', tag:'MIDAZOLAM', tagClass:'tag-emerg',
     title:'Midazolam — Sedação/convulsão',
-    doses:[{med:'Midazolam', mgkg:0.2, conc:5, unit:'ml', freq:'dose única', max:5, obs:'0,2 mg/kg IM (amp 5mg/ml = 1ml). Alternativa: 0,5mg/kg intranasal'}] },
+    doses:[{med:'Midazolam', mgkg:0.2, conc:5, unit:'ml', freq:'dose única', max:10, obs:'0,2 mg/kg IM/IV (amp 15mg/3ml = 5mg/ml). Máx 10mg. Alternativa: 0,3mg/kg intranasal'}] },
+
+  // ===== ANTIEMÉTICOS =====
+  { id:'ped18', cat:'Antiemético Pediátrico', tag:'ONDANSETRONA IV', tagClass:'tag-iv',
+    title:'Ondansetrona injetável 2mg/ml',
+    doses:[{med:'Ondansetrona', mgkg:0.15, conc:2, unit:'ml', freq:'8/8h', max:4, obs:'0,1-0,3 mg/kg/dose IV lento. Máx 4mg/dose (amp 2mg/ml)'}] },
+  { id:'ped19', cat:'Antiemético Pediátrico', tag:'BROMOPRIDA gts', tagClass:'tag-vo',
+    title:'Bromoprida gotas 4mg/ml',
+    doses:[{med:'Bromoprida', mgkg:0.2, conc:4, unit:'gt', freq:'8/8h', max:20, obs:'~1 gota/kg/dose (0,17mg/kg). >1 ano. Máx 20mg/dose'}] },
+  { id:'ped20', cat:'Antiemético Pediátrico', tag:'BROMOPRIDA IV', tagClass:'tag-iv',
+    title:'Bromoprida injetável 5mg/ml',
+    doses:[{med:'Bromoprida', mgkg:0.2, conc:5, unit:'ml', freq:'8/8h', max:20, obs:'0,2 mg/kg/dose IV/IM. Máx 20mg/dose (amp 5mg/ml)'}] },
+  { id:'ped21', cat:'Antiemético Pediátrico', tag:'DRAMIN B6', tagClass:'tag-vo',
+    title:'Dramin B6 oral 25mg/ml (gotas)',
+    doses:[{med:'Dimenidrinato', mgkg:1.25, conc:25, unit:'gt', freq:'6/6h', max:25, obs:'1,25 mg/kg/dose. >2 anos. Máx 25mg/dose. (B6 DL 30mg/10ml EV; 50mg/1ml IM)'}] },
+
+  // ===== ANTIALÉRGICOS =====
+  { id:'ped22', cat:'Antialérgico Pediátrico', tag:'HIDROXIZINA', tagClass:'tag-vo',
+    title:'Hidroxizina solução 2mg/ml',
+    doses:[{med:'Hidroxizina', mgkg:0.7, conc:2, unit:'ml', freq:'8/8h', max:0, obs:'0,7 mg/kg/dose, qualquer idade. Máx 2mg/kg/dia (até 40kg)'}] },
+  { id:'ped23', cat:'Antialérgico Pediátrico', tag:'PROMETAZINA', tagClass:'tag-iv',
+    title:'Prometazina injetável 25mg/ml',
+    doses:[{med:'Prometazina', mgkg:0.3, conc:25, unit:'ml', freq:'6/6h', max:25, obs:'0,3 mg/kg/dose IM. >2 anos. Máx 25mg/dose'}] },
+  { id:'ped24', cat:'Antialérgico Pediátrico', tag:'DIFENIDRAMINA', tagClass:'tag-iv',
+    title:'Difenidramina injetável 50mg/ml',
+    doses:[{med:'Difenidramina', mgkg:1.25, conc:50, unit:'ml', freq:'6/6h', max:50, obs:'1-1,6 mg/kg/dose IM. Máx 50mg/dose, 300mg/dia'}] },
+  { id:'ped25', cat:'Antialérgico Pediátrico', tag:'DESLORATADINA', tagClass:'tag-vo',
+    title:'Desloratadina solução 0,5mg/ml',
+    doses:[{med:'Desloratadina', mgkg:0, conc:0, unit:'ml', freq:'1x/dia', max:0, obs:'Dose por idade: 6m-1a = 2ml; 1-5a = 2,5ml; 6-11a = 5ml; ≥12a = 10ml, 1x/dia'}] },
+
+  // ===== CORTICOIDES INJETÁVEIS =====
+  { id:'ped26', cat:'Corticoide Pediátrico', tag:'HIDROCORTISONA', tagClass:'tag-iv',
+    title:'Hidrocortisona 100mg (pó)',
+    doses:[{med:'Hidrocortisona', mgkg:4, conc:0, unit:'mg', freq:'6/6h', max:100, obs:'4 mg/kg/dose EV ou IM. Reconstituir. Anafilaxia/asma grave'}] },
+  { id:'ped27', cat:'Corticoide Pediátrico', tag:'METILPREDNISOLONA', tagClass:'tag-iv',
+    title:'Metilprednisolona 125mg (pó)',
+    doses:[{med:'Metilprednisolona', mgkg:1, conc:0, unit:'mg', freq:'6/6h', max:125, obs:'1 mg/kg/dose EV/IM. Máx 125mg/dia'}] },
+  { id:'ped28', cat:'Corticoide Pediátrico', tag:'DEXAMETASONA', tagClass:'tag-iv',
+    title:'Dexametasona injetável 4mg/ml',
+    doses:[{med:'Dexametasona', mgkg:0.6, conc:4, unit:'ml', freq:'1x/dia', max:16, obs:'0,6 mg/kg/DIA EV/IM (1x/dia). Máx 12-16mg/dia. Crupe/laringite'}] },
+
+  // ===== ANAFILAXIA =====
+  { id:'ped29', cat:'Emergência Pediátrica', tag:'ADRENALINA IM', tagClass:'tag-emerg',
+    title:'Adrenalina IM — Anafilaxia 1mg/ml',
+    doses:[{med:'Adrenalina', mgkg:0.01, conc:1, unit:'ml', freq:'5-15min', max:0.5, obs:'0,01 mg/kg IM (1:1000) face lateral da coxa. Máx 0,3mg (<30kg) a 0,5mg. Repetir 5-15min'}] },
+
+  // ===== RCP =====
+  { id:'ped30', cat:'Emergência Pediátrica', tag:'AMIODARONA', tagClass:'tag-emerg',
+    title:'Amiodarona PCR 50mg/ml',
+    doses:[{med:'Amiodarona', mgkg:5, conc:50, unit:'ml', freq:'PCR', max:300, obs:'5 mg/kg IV/IO em bolus na PCR (FV/TV sem pulso). Máx 300mg. Repetir até 3x'}] },
+  { id:'ped31', cat:'Emergência Pediátrica', tag:'ATROPINA', tagClass:'tag-emerg',
+    title:'Atropina 0,25mg/ml — Bradicardia',
+    doses:[{med:'Atropina', mgkg:0.02, conc:0.25, unit:'ml', freq:'dose única', max:0.5, obs:'0,02 mg/kg IV. Mín 0,1mg. Máx 0,5mg/dose. Repetir 1x'}] },
+
+  // ===== ASMA GRAVE =====
+  { id:'ped32', cat:'Resp. Pediátrico', tag:'SULFATO MG', tagClass:'tag-iv',
+    title:'Sulfato de Magnésio 50% (500mg/ml)',
+    doses:[{med:'Sulfato de Magnésio', mgkg:50, conc:500, unit:'ml', freq:'dose única', max:2000, obs:'25-75 mg/kg/dose IV em 20min. Máx 2g. Asma grave refratária'}] },
+
+  // ===== SEDAÇÃO / IOT =====
+  { id:'ped33', cat:'Sedação/IOT Pediátrica', tag:'CETAMINA', tagClass:'tag-emerg',
+    title:'Cetamina 50mg/ml',
+    doses:[{med:'Cetamina', mgkg:1.5, conc:50, unit:'ml', freq:'indução', max:0, obs:'1-2 mg/kg IV (4-5mg/kg IM). Máx 13mg/kg. Broncoespasmo/instabilidade'}] },
+  { id:'ped34', cat:'Sedação/IOT Pediátrica', tag:'ETOMIDATO', tagClass:'tag-emerg',
+    title:'Etomidato 2mg/ml',
+    doses:[{med:'Etomidato', mgkg:0.3, conc:2, unit:'ml', freq:'indução', max:20, obs:'0,2-0,3 mg/kg IV. Máx 20mg/dose. Estável hemodinamicamente'}] },
+  { id:'ped35', cat:'Sedação/IOT Pediátrica', tag:'FENTANIL', tagClass:'tag-emerg',
+    title:'Fentanil 50mcg/ml',
+    doses:[{med:'Fentanil', mgkg:0.003, conc:0.05, unit:'ml', freq:'indução', max:0.05, obs:'2-4 mcg/kg IV lento. Máx 50mcg/dose. Analgesia/IOT'}] },
+  { id:'ped36', cat:'Sedação/IOT Pediátrica', tag:'ROCURÔNIO', tagClass:'tag-emerg',
+    title:'Rocurônio 10mg/ml',
+    doses:[{med:'Rocurônio', mgkg:1, conc:10, unit:'ml', freq:'BNM', max:0, obs:'1-1,2 mg/kg IV. Bloqueador neuromuscular para IOT'}] },
+  { id:'ped37', cat:'Sedação/IOT Pediátrica', tag:'SUCCINILCOLINA', tagClass:'tag-emerg',
+    title:'Succinilcolina 10mg/ml',
+    doses:[{med:'Succinilcolina', mgkg:1.5, conc:10, unit:'ml', freq:'BNM', max:150, obs:'1-2 mg/kg IV. Máx 150mg/dose. BNM despolarizante para IOT'}] },
+
+  // ===== ANTICONVULSIVANTES =====
+  { id:'ped38', cat:'Emergência Pediátrica', tag:'FENITOÍNA', tagClass:'tag-emerg',
+    title:'Fenitoína 50mg/ml — EME',
+    doses:[{med:'Fenitoína', mgkg:20, conc:50, unit:'ml', freq:'ataque', max:1000, obs:'20 mg/kg IV em 20min (máx 50mg/min). 2ª linha no estado de mal'}] },
+  { id:'ped39', cat:'Emergência Pediátrica', tag:'FENOBARBITAL', tagClass:'tag-emerg',
+    title:'Fenobarbital 100mg/ml — EME',
+    doses:[{med:'Fenobarbital', mgkg:20, conc:100, unit:'ml', freq:'ataque', max:0, obs:'20 mg/kg IV em 20min. Pode repetir até 40mg/kg. Cuidado: depressão SNC'}] },
+
+  // ===== ATB VO (adicionais) =====
+  { id:'ped40', cat:'ATB Pediátrico', tag:'CLARITROMICINA', tagClass:'tag-vo',
+    title:'Claritromicina suspensão 250mg/5ml',
+    doses:[{med:'Claritromicina', mgkg:7.5, conc:50, unit:'ml', freq:'12/12h', max:500, obs:'15 mg/kg/dia ÷ 2 doses. Máx 500mg/dose. 7-10 dias'}] },
+  { id:'ped41', cat:'ATB Pediátrico', tag:'CEFACLOR', tagClass:'tag-vo',
+    title:'Cefaclor suspensão 250mg/5ml',
+    doses:[{med:'Cefaclor', mgkg:15, conc:50, unit:'ml', freq:'12/12h', max:500, obs:'20-40 mg/kg/dia ÷ 2-3 doses. Máx 1g/dia'}] },
+  { id:'ped42', cat:'ATB Pediátrico', tag:'CEFUROXIMA', tagClass:'tag-vo',
+    title:'Axetilcefuroxima suspensão 250mg/5ml',
+    doses:[{med:'Cefuroxima', mgkg:15, conc:50, unit:'ml', freq:'12/12h', max:500, obs:'20-30 mg/kg/dia ÷ 2 doses. 10 dias'}] },
+
+  // ===== ATB EV (adicionais) =====
+  { id:'ped43', cat:'ATB Pediátrico', tag:'AMPICILINA IV', tagClass:'tag-iv',
+    title:'Ampicilina sódica 1g (pó)',
+    doses:[{med:'Ampicilina', mgkg:50, conc:0, unit:'mg', freq:'6/6h', max:3000, obs:'200 mg/kg/dia ÷ 4 doses = 50mg/kg/dose. Máx 12g/dia'}] },
+  { id:'ped44', cat:'ATB Pediátrico', tag:'OXACILINA', tagClass:'tag-iv',
+    title:'Oxacilina 500mg (pó)',
+    doses:[{med:'Oxacilina', mgkg:25, conc:0, unit:'mg', freq:'6/6h', max:2000, obs:'100-200 mg/kg/dia ÷ 4 doses. Máx 12g/dia. Infecção de pele/osso'}] },
+  { id:'ped45', cat:'ATB Pediátrico', tag:'CLINDAMICINA', tagClass:'tag-iv',
+    title:'Clindamicina 150mg/ml',
+    doses:[{med:'Clindamicina', mgkg:10, conc:150, unit:'ml', freq:'8/8h', max:600, obs:'30-40 mg/kg/dia ÷ 3-4 doses. Máx 2,7g/dia'}] },
+  { id:'ped46', cat:'ATB Pediátrico', tag:'GENTAMICINA', tagClass:'tag-iv',
+    title:'Gentamicina 40mg/ml',
+    doses:[{med:'Gentamicina', mgkg:7, conc:40, unit:'ml', freq:'1x/dia', max:0, obs:'5-7,5 mg/kg/dia 1x/dia IV. Monitorar função renal'}] },
+  { id:'ped47', cat:'ATB Pediátrico', tag:'VANCOMICINA', tagClass:'tag-iv',
+    title:'Vancomicina 500mg (frasco)',
+    doses:[{med:'Vancomicina', mgkg:15, conc:0, unit:'mg', freq:'6/6h', max:1000, obs:'60 mg/kg/dia ÷ 4 doses. Infundir em ≥60min. Dosar nível sérico'}] },
 ];
 
 // =================== RENDER PRESCRIÇÕES ===================
@@ -5553,7 +5931,7 @@ function copyRxPS(id, btn) {
   navigator.clipboard.writeText(txt).then(() => {
     btn.textContent='✓ COPIADO';btn.classList.add('copied');
     setTimeout(()=>{btn.textContent='COPIAR PS';btn.classList.remove('copied');},1800);
-    STATE.history.unshift({title:item.title+' (PS)',content:txt,time:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})});
+    addHist(item.title + ' (PS)', txt);
   });
 }
 
@@ -5564,7 +5942,7 @@ function copyRxCasa(id, btn) {
   navigator.clipboard.writeText(txt).then(() => {
     btn.textContent='✓ COPIADO';btn.classList.add('copied');
     setTimeout(()=>{btn.textContent='COPIAR RECEITA';btn.classList.remove('copied');},1800);
-    STATE.history.unshift({title:item.title+' (Casa)',content:txt,time:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})});
+    addHist(item.title + ' (Casa)', txt);
   });
 }
 
@@ -5572,8 +5950,7 @@ function printRxCasa(id) {
   const item = DATA_RX.find(d => d.id === id);
   if (!item || !item.casa) return;
   const txt = item.casa.map((r,i) => `${i+1}) ${r.n}\n${r.p}`).join('\n\n');
-  printReceita(item.title, txt);
-  perguntarAtestadoAposPrint(item);
+  printReceita(item.title, txt, { cat: item.cat, cid: item.cid, id: item.id });
 }
 
 // =================== RENDER PEDIATRIA ===================
@@ -5641,11 +6018,21 @@ function renderPed() {
     const isOpen = openPed[item.id];
     const card = document.createElement('div');
     card.className = 'card';
+    // dose calculada para mostrar já no cabeçalho (sem precisar abrir)
+    let headDose = '';
+    if (peso) {
+      const parts = item.doses.map(d => {
+        const c = calcPedDose(d, peso);
+        return c ? c.replace(/<[^>]+>/g,'') : null;
+      }).filter(Boolean);
+      if (parts.length) headDose = parts.join(' + ');
+    }
     card.innerHTML = `
       <div class="card-header" onclick="togglePed('${item.id}')">
         <div class="card-title-wrap">
           <span class="card-title">${item.title}</span>
           <span class="card-tag ${item.tagClass}">${item.tag}</span>
+          ${headDose ? `<span class="ped-head-dose">⚖️ ${peso}kg → ${headDose}</span>` : ''}
         </div>
         <span class="chevron ${isOpen?'open':''}">▼</span>
       </div>
@@ -5657,7 +6044,7 @@ function renderPed() {
               <div class="rx-name">${d.med}</div>
               <div class="rx-pos">${d.obs}</div>
               ${calcResult ? `<div class="rx-ped">⚖️ ${peso}kg → ${calcResult} (${d.freq})</div>` : 
-                peso ? `<div class="rx-ped" style="color:var(--txt-4)">Digite o peso para calcular</div>` : ''}
+                peso ? `<div class="rx-ped" style="color:var(--txt-4)">Dose fixa / por idade — ver descrição</div>` : ''}
             </div>
           `;
         }).join('')}
@@ -5692,17 +6079,31 @@ function copyPed(id, btn, peso) {
 
 // =================== ATESTADO ===================
 function printAtestado() {
+  var d = {
+    nome: document.getElementById('at-nome').value.trim(),
+    cpf: document.getElementById('at-cpf').value.trim(),
+    dias: document.getElementById('at-dias').value.trim(),
+    cid: document.getElementById('at-cid').value.trim(),
+    obs: document.getElementById('at-obs').value.trim(),
+    dia: parseInt(document.getElementById('at-dia').value),
+    mes: parseInt(document.getElementById('at-mes').value),
+    ano: parseInt(document.getElementById('at-ano').value)
+  };
+  if (!d.dias) { alert('Preencha os dias de afastamento.'); return; }
+  printAtestadoComDados(d);
+}
+
+function printAtestadoComDados(d) {
   const perfil = getPerfil();
-  const nome = document.getElementById('at-nome').value.trim() || '___________________________________';
-  const cpf = document.getElementById('at-cpf').value.trim();
-  const dias = document.getElementById('at-dias').value.trim();
-  const cid = document.getElementById('at-cid').value.trim();
-  const obs = document.getElementById('at-obs').value.trim();
-  const dia = parseInt(document.getElementById('at-dia').value);
-  const mes = parseInt(document.getElementById('at-mes').value);
-  const ano = parseInt(document.getElementById('at-ano').value);
-  
-  if (!dias) { alert('Preencha os dias de afastamento.'); return; }
+  const nome = (d.nome && d.nome.trim()) ? d.nome.trim() : '___________________________________';
+  const cpf = d.cpf || '';
+  const dias = String(d.dias || '1');
+  const cid = d.cid || '';
+  const obs = d.obs || '';
+  var hoje = new Date();
+  const dia = d.dia || hoje.getDate();
+  const mes = d.mes || (hoje.getMonth() + 1);
+  const ano = d.ano || hoje.getFullYear();
 
   const dataIniObj = new Date(ano, mes - 1, dia);
   const dataFormatada = dataIniObj.toLocaleDateString('pt-BR');
@@ -6173,7 +6574,214 @@ window.CID_DB = [
   {c:'T78.4', d:'Alergia não especificada'},
   {c:'Z00', d:'Exame médico geral'},
   {c:'Z34', d:'Supervisão de gravidez normal'},
-  {c:'Z51', d:'Outros cuidados médicos'}
+  {c:'Z51', d:'Outros cuidados médicos'},
+  // ===== Infecciosas =====
+  {c:'A04', d:'Outras infecções intestinais bacterianas'},
+  {c:'A08', d:'Gastroenterite viral'},
+  {c:'A15', d:'Tuberculose respiratória'},
+  {c:'A37', d:'Coqueluche'},
+  {c:'A38', d:'Escarlatina'},
+  {c:'A46', d:'Erisipela'},
+  {c:'A49', d:'Infecção bacteriana não especificada'},
+  {c:'A54', d:'Gonorreia (infecção gonocócica)'},
+  {c:'A56', d:'Infecção por clamídia'},
+  {c:'A63', d:'Outras IST'},
+  {c:'A77', d:'Febre maculosa (riquetsiose)'},
+  {c:'B07', d:'Verrugas virais'},
+  {c:'B08', d:'Mão-pé-boca / exantema viral'},
+  {c:'B19', d:'Hepatite viral não especificada'},
+  {c:'B34', d:'Infecção viral não especificada'},
+  {c:'B49', d:'Micose não especificada'},
+  {c:'B54', d:'Malária'},
+  {c:'B58', d:'Toxoplasmose'},
+  // ===== Sangue / Endócrino =====
+  {c:'D50', d:'Anemia por deficiência de ferro'},
+  {c:'D64', d:'Anemia não especificada'},
+  {c:'D69', d:'Púrpura / alterações de coagulação'},
+  {c:'E03', d:'Hipotireoidismo'},
+  {c:'E05', d:'Hipertireoidismo'},
+  {c:'E16', d:'Hipoglicemia'},
+  {c:'E66', d:'Obesidade'},
+  {c:'E83', d:'Distúrbio do metabolismo de minerais'},
+  // ===== Psiquiatria =====
+  {c:'F10', d:'Transtorno por uso de álcool'},
+  {c:'F17', d:'Tabagismo (uso de tabaco)'},
+  {c:'F19', d:'Uso de múltiplas drogas'},
+  {c:'F20', d:'Esquizofrenia'},
+  {c:'F29', d:'Psicose não orgânica'},
+  {c:'F31', d:'Transtorno afetivo bipolar'},
+  {c:'F40', d:'Transtornos fóbico-ansiosos'},
+  {c:'F45', d:'Transtorno somatoforme'},
+  {c:'F90', d:'TDAH'},
+  // ===== Neurologia =====
+  {c:'G20', d:'Doença de Parkinson'},
+  {c:'G35', d:'Esclerose múltipla'},
+  {c:'G47', d:'Distúrbios do sono'},
+  {c:'G56', d:'Síndrome do túnel do carpo'},
+  {c:'G62', d:'Polineuropatia'},
+  {c:'G81', d:'Hemiplegia'},
+  // ===== Oftalmo =====
+  {c:'H01', d:'Blefarite'},
+  {c:'H04', d:'Doenças do aparelho lacrimal'},
+  {c:'H11', d:'Pterígio'},
+  {c:'H40', d:'Glaucoma'},
+  {c:'H52', d:'Erros de refração'},
+  {c:'H53', d:'Distúrbios visuais'},
+  {c:'H57', d:'Dor ocular / outros do olho'},
+  // ===== Otorrino =====
+  {c:'H60', d:'Otite externa'},
+  {c:'H61', d:'Cerume impactado'},
+  {c:'H65', d:'Otite média não supurativa'},
+  {c:'H72', d:'Perfuração de membrana timpânica'},
+  {c:'H81', d:'Distúrbios da função vestibular'},
+  {c:'H83', d:'Labirintite / outras do ouvido interno'},
+  {c:'H91', d:'Perda auditiva'},
+  {c:'H92', d:'Otalgia'},
+  {c:'H93', d:'Zumbido (tinnitus)'},
+  // ===== Cardiovascular =====
+  {c:'I26', d:'Embolia pulmonar'},
+  {c:'I44', d:'Bloqueio atrioventricular'},
+  {c:'I48', d:'Fibrilação / flutter atrial'},
+  {c:'I49', d:'Arritmia cardíaca'},
+  {c:'I70', d:'Aterosclerose'},
+  {c:'I73', d:'Doença vascular periférica'},
+  {c:'I83', d:'Varizes de membros inferiores'},
+  {c:'I88', d:'Linfadenite inespecífica'},
+  // ===== Respiratório =====
+  {c:'J22', d:'Infecção respiratória inferior aguda'},
+  {c:'J32', d:'Sinusite crônica'},
+  {c:'J35', d:'Doenças crônicas das amígdalas/adenoides'},
+  {c:'J38', d:'Doenças da laringe / cordas vocais'},
+  {c:'J40', d:'Bronquite não especificada'},
+  {c:'J42', d:'Bronquite crônica'},
+  {c:'J81', d:'Edema pulmonar'},
+  {c:'J90', d:'Derrame pleural'},
+  {c:'J93', d:'Pneumotórax'},
+  {c:'J98', d:'Outros transtornos respiratórios'},
+  // ===== Digestório =====
+  {c:'K02', d:'Cárie dentária'},
+  {c:'K05', d:'Gengivite / doença periodontal'},
+  {c:'K12', d:'Estomatite / aftas'},
+  {c:'K20', d:'Esofagite'},
+  {c:'K26', d:'Úlcera duodenal'},
+  {c:'K31', d:'Outras doenças do estômago e duodeno'},
+  {c:'K37', d:'Apendicite não especificada'},
+  {c:'K42', d:'Hérnia umbilical'},
+  {c:'K56', d:'Íleo / obstrução intestinal'},
+  {c:'K58', d:'Síndrome do intestino irritável'},
+  {c:'K60', d:'Fissura anal'},
+  {c:'K61', d:'Abscesso anal / perianal'},
+  {c:'K62', d:'Outras doenças do ânus e reto'},
+  {c:'K70', d:'Doença hepática alcoólica'},
+  {c:'K73', d:'Hepatite crônica'},
+  {c:'K74', d:'Cirrose hepática'},
+  {c:'K76', d:'Outras doenças do fígado'},
+  {c:'K81', d:'Colecistite'},
+  {c:'K92', d:'Hemorragia digestiva'},
+  // ===== Pele =====
+  {c:'L08', d:'Infecção da pele e tecido subcutâneo'},
+  {c:'L21', d:'Dermatite seborreica'},
+  {c:'L22', d:'Dermatite das fraldas'},
+  {c:'L24', d:'Dermatite de contato por irritantes'},
+  {c:'L40', d:'Psoríase'},
+  {c:'L42', d:'Pitiríase rósea'},
+  {c:'L53', d:'Eritema / outras erupções'},
+  {c:'L55', d:'Queimadura solar'},
+  {c:'L60', d:'Doenças das unhas (encravada)'},
+  {c:'L70', d:'Acne'},
+  {c:'L71', d:'Rosácea'},
+  {c:'L72', d:'Cisto folicular / sebáceo'},
+  {c:'L73', d:'Foliculite'},
+  {c:'L98', d:'Outros transtornos da pele'},
+  // ===== Osteomuscular =====
+  {c:'M06', d:'Artrite reumatoide'},
+  {c:'M13', d:'Artrite não especificada'},
+  {c:'M15', d:'Poliartrose'},
+  {c:'M17', d:'Gonartrose (artrose do joelho)'},
+  {c:'M23', d:'Lesão interna do joelho (menisco)'},
+  {c:'M24', d:'Outras lesões articulares'},
+  {c:'M51', d:'Hérnia de disco lombar'},
+  {c:'M53.1', d:'Cervicobraquialgia'},
+  {c:'M54.2', d:'Cervicalgia'},
+  {c:'M65', d:'Sinovite / tenossinovite'},
+  {c:'M70', d:'Bursite / lesão por esforço'},
+  {c:'M75', d:'Lesões do ombro'},
+  {c:'M77', d:'Epicondilite'},
+  {c:'M81', d:'Osteoporose'},
+  // ===== Geniturinário =====
+  {c:'N17', d:'Insuficiência renal aguda'},
+  {c:'N21', d:'Cálculo do trato urinário inferior'},
+  {c:'N34', d:'Uretrite'},
+  {c:'N40', d:'Hiperplasia da próstata'},
+  {c:'N41', d:'Prostatite'},
+  {c:'N43', d:'Hidrocele'},
+  {c:'N45', d:'Orquite / epididimite'},
+  {c:'N47', d:'Fimose / parafimose'},
+  {c:'N48', d:'Outros transtornos do pênis'},
+  {c:'N61', d:'Mastite'},
+  {c:'N70', d:'Salpingite / ooforite'},
+  {c:'N72', d:'Cervicite'},
+  {c:'N73', d:'Doença inflamatória pélvica'},
+  {c:'N83', d:'Cisto ovariano'},
+  {c:'N89', d:'Outros transtornos da vagina'},
+  {c:'N91', d:'Amenorreia'},
+  {c:'N93', d:'Sangramento uterino anormal'},
+  // ===== Obstetrícia =====
+  {c:'O00', d:'Gravidez ectópica'},
+  {c:'O03', d:'Aborto espontâneo'},
+  {c:'O23', d:'Infecção urinária na gravidez'},
+  {c:'O26', d:'Outras afecções ligadas à gravidez'},
+  // ===== Sintomas / Sinais =====
+  {c:'R00', d:'Palpitações / anormalidades do ritmo'},
+  {c:'R04', d:'Epistaxe / hemorragia respiratória'},
+  {c:'R07', d:'Dor torácica / na garganta'},
+  {c:'R09', d:'Outros sintomas respiratórios'},
+  {c:'R12', d:'Pirose (azia)'},
+  {c:'R13', d:'Disfagia'},
+  {c:'R14', d:'Flatulência / distensão'},
+  {c:'R18', d:'Ascite'},
+  {c:'R19', d:'Outros sintomas abdominais'},
+  {c:'R22', d:'Tumefação / nódulo localizado'},
+  {c:'R29', d:'Outros sintomas neuromusculares'},
+  {c:'R33', d:'Retenção urinária'},
+  {c:'R35', d:'Poliúria'},
+  {c:'R39', d:'Outros sintomas urinários'},
+  {c:'R40', d:'Sonolência / torpor / coma'},
+  {c:'R41', d:'Confusão mental / desorientação'},
+  {c:'R42', d:'Tontura e instabilidade'},
+  {c:'R45', d:'Sintomas referentes ao humor / nervosismo'},
+  {c:'R53', d:'Mal-estar e fadiga'},
+  {c:'R57', d:'Choque'},
+  {c:'R58', d:'Hemorragia não classificada'},
+  {c:'R59', d:'Linfonodos aumentados'},
+  {c:'R63', d:'Sintomas relativos à ingestão (anorexia)'},
+  {c:'R68', d:'Outros sintomas gerais'},
+  // ===== Trauma / Fraturas =====
+  {c:'S02', d:'Fratura do crânio e ossos da face'},
+  {c:'S22', d:'Fratura de costelas / tórax'},
+  {c:'S32', d:'Fratura da coluna lombar / pelve'},
+  {c:'S42', d:'Fratura do ombro e braço'},
+  {c:'S52', d:'Fratura do antebraço'},
+  {c:'S62', d:'Fratura ao nível do punho e mão'},
+  {c:'S72', d:'Fratura do fêmur'},
+  {c:'S82', d:'Fratura da perna / tornozelo'},
+  {c:'S92', d:'Fratura do pé'},
+  {c:'T14.0', d:'Contusão / trauma superficial não especificado'},
+  // ===== Corpos estranhos / Queimaduras / Tóxico =====
+  {c:'T15', d:'Corpo estranho no olho'},
+  {c:'T16', d:'Corpo estranho no ouvido'},
+  {c:'T17', d:'Corpo estranho nas vias respiratórias'},
+  {c:'T18', d:'Corpo estranho no trato digestivo'},
+  {c:'T20', d:'Queimadura da cabeça e pescoço'},
+  {c:'T23', d:'Queimadura do punho e mão'},
+  {c:'T30', d:'Queimadura de região não especificada'},
+  {c:'T63', d:'Efeito tóxico (picada/contato animal peçonhento)'},
+  {c:'T78', d:'Efeito adverso / reação alérgica / anafilaxia'},
+  // ===== Fatores / Cuidados =====
+  {c:'Z03', d:'Observação por suspeita de doença'},
+  {c:'Z20', d:'Contato / exposição a doença transmissível'},
+  {c:'Z23', d:'Necessidade de imunização (vacina)'},
+  {c:'Z71', d:'Aconselhamento médico'}
 ];
 
 function searchCID() {
@@ -6285,7 +6893,7 @@ function copyCondutaModel(id, btn) {
   navigator.clipboard.writeText(m.text).then(function() {
     btn.textContent = '✓'; btn.classList.add('copied');
     setTimeout(function() { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 1500);
-    STATE.history.unshift({ title: m.name + ' (conduta)', content: m.text, time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) });
+    addHist(m.name + ' (conduta)', m.text);
   });
 }
 
@@ -6319,7 +6927,7 @@ function copyCondutaBox(id, btn) {
   navigator.clipboard.writeText(txt).then(function() {
     btn.textContent = '✓'; btn.classList.add('copied');
     setTimeout(function() { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 1500);
-    STATE.history.unshift({ title: id, content: txt, time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) });
+    addHist(id, txt);
   });
 }
 
@@ -6619,7 +7227,7 @@ function copyMinhasRx(id, btn) {
   navigator.clipboard.writeText(txt).then(function() {
     btn.textContent = '✓ COPIADO'; btn.classList.add('copied');
     setTimeout(function() { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 1800);
-    STATE.history.unshift({ title: item.title, content: txt, time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) });
+    addHist(item.title, txt);
   });
 }
 
@@ -6654,11 +7262,44 @@ function getRxForItem(item) {
   if (!item) return '';
   var rx = item.rx;
   if (item.id === 'm_geca2') rx = applyGecaSwap(rx);
+  if (item.id === 'm_ivas3') rx = applyIvasSwap(rx);
   return rx;
 }
 
 function toggleGecaSwap() {
   STATE.gecaSwap = !STATE.gecaSwap;
+  renderMinhas();
+}
+
+// ===== IVAS PED: substituição Cetoprofeno → Predisim =====
+STATE.ivasSwap = false;
+
+function applyIvasSwap(rx) {
+  if (!STATE.ivasSwap || !rx) return rx;
+  var lines = rx.split('\n');
+  var cetoIdx = -1, predIdx = -1;
+  for (var i = 0; i < lines.length; i++) {
+    if (cetoIdx < 0 && /^2\)\s*CETOPROFENO/i.test(lines[i])) cetoIdx = i;
+    if (predIdx < 0 && /^5\)\s*PREDNISOLONA/i.test(lines[i])) predIdx = i;
+  }
+  if (cetoIdx < 0 || predIdx < 0) return rx;
+  var newCeto = '2)PREDNISOLONA 3MG/ML---------------------------------1 FRASCO\nTOMAR 1 ML POR DIA POR 5 DIAS';
+  var out = [];
+  var i = 0;
+  while (i < lines.length) {
+    if (i === cetoIdx) { out.push(newCeto); i += 2; continue; }
+    if (i === predIdx) {
+      if (out.length && out[out.length - 1].trim() === '') out.pop();
+      i += 2; continue;
+    }
+    out.push(lines[i]);
+    i++;
+  }
+  return out.join('\n');
+}
+
+function toggleIvasSwap() {
+  STATE.ivasSwap = !STATE.ivasSwap;
   renderMinhas();
 }
 
@@ -6702,64 +7343,36 @@ function perguntarAtestadoAposPrint(item) {
 }
 
 function printMinhaRx(id) {
-  // Se painel de edição estiver aberto, imprime o editado
+  var item = MINHAS.find(function(d) { return d.id === id; });
+  var extra = getMinhasExtras().find(function(d){ return d.id === id; });
+  var ref = item || extra || {};
+  // Se painel de edição estiver aberto, usa o texto editado
   var editDiv = document.getElementById('edit-tmp-' + id);
   var ta = document.getElementById('edit-tmp-txt-' + id);
+  var txt;
   if (editDiv && editDiv.style.display !== 'none' && ta && ta.value.trim()) {
-    var item2 = MINHAS.find(function(d){ return d.id === id; });
-    var extras2 = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]');
-    var extra2 = extras2.find(function(d){ return d.id === id; });
-    var title2 = (item2 ? item2.title : '') || (extra2 ? extra2.title : '') || id;
-    printReceita(title2, ta.value);
-    return;
+    txt = ta.value;
+  } else {
+    var rxEl = document.getElementById('rx-min-' + id);
+    txt = (rxEl ? rxEl.textContent : '') || (extra ? extra.rx : '') || (item ? getRxForItem(item) : '');
   }
-  // Caso contrário imprime original
-  var item = MINHAS.find(function(d) { return d.id === id; });
-  var extras = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]');
-  var extra = extras.find(function(d){ return d.id === id; });
-  var rxEl = document.getElementById('rx-min-' + id);
-  var txt = (rxEl ? rxEl.textContent : '') || (extra ? extra.rx : '') || (item ? getRxForItem(item) : '');
-  var title = (item ? item.title : '') || (extra ? extra.title : '') || id;
-  printReceita(title, txt);
-  perguntarAtestadoAposPrint(item || extra);
+  var title = ref.title || id;
+  printReceita(title, txt, { cat: ref.cat, cid: ref.cid, id: id });
 }
 
 
 
 function saveEditFormToMinhas(id) {
   pedirSenha(function() {
-  var title = document.getElementById('ef-title').value.trim();
-  var cat = document.getElementById('ef-cat').value.trim().toUpperCase() || 'CUSTOM';
-  var rx = document.getElementById('ef-rx').value.trim();
-  var emojiEl = document.getElementById('ef-emoji');
-  var emoji = emojiEl ? emojiEl.value : '';
-  if (!title || !rx) { alert('Preencha título e prescrição.'); return; }
-
-  // Salvar no CUSTOM (lista do editor) também
-  var idx2 = CUSTOM.findIndex(function(c) { return c.id === id; });
-  var obj = { id: id, title: title, cat: cat, rx: rx, emoji: emoji };
-  if (idx2 >= 0) CUSTOM[idx2] = obj;
-  else CUSTOM.push(obj);
-  saveCustomLocal();
-  renderCustom();
-
-  // Salvar em MINHAS_EXTRA (localStorage) para aparecer na lista Minhas
-  var extras = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]');
-  var idx3 = extras.findIndex(function(e) { return e.id === id; });
-  var extraObj = { id: id, cat: cat, title: title, rx: rx, emoji: emoji, _minhas: true };
-  if (idx3 >= 0) extras[idx3] = extraObj;
-  else extras.push(extraObj);
-  localStorage.setItem('plantao_minhas_extra', JSON.stringify(extras));
-
-  // Subir para nuvem com flag _minhas
-  saveCustomCloud({ id: id, title: title, cat: cat, rx: rx, emoji: emoji, _minhas: true });
-
-  // Re-renderizar Minhas
-  buildCatsMinhas();
-  renderMinhas();
-  
-  document.getElementById('editor-form-area').innerHTML = '';
-  alert('✅ Salvo em Minhas na categoria "' + cat + '"!');
+    var title = document.getElementById('ef-title').value.trim();
+    var cat = document.getElementById('ef-cat').value.trim().toUpperCase() || 'CUSTOM';
+    var rx = document.getElementById('ef-rx').value.trim();
+    var emojiEl = document.getElementById('ef-emoji');
+    var emoji = emojiEl ? emojiEl.value : '';
+    if (!title || !rx) { alert('Preencha título e prescrição.'); return; }
+    salvarCondutaMinhas(id, title, cat, rx, emoji);
+    document.getElementById('editor-form-area').innerHTML = '';
+    alert('✅ Salvo em Minhas na categoria "' + cat + '"!');
   });
 }
 
@@ -6770,6 +7383,15 @@ function deleteMinhasExtra(id) {
   var extras = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]');
   extras = extras.filter(function(e) { return e.id !== id; });
   localStorage.setItem('plantao_minhas_extra', JSON.stringify(extras));
+  // Remover também do CUSTOM e da nuvem para não voltar no próximo sync
+  var hadCustom = false;
+  if (typeof CUSTOM !== 'undefined') {
+    var before = CUSTOM.length;
+    CUSTOM = CUSTOM.filter(function(c) { return c.id !== id; });
+    hadCustom = CUSTOM.length !== before;
+    if (hadCustom) { saveCustomLocal(); if (typeof renderCustom === 'function') renderCustom(); }
+  }
+  if (hadCustom && typeof deleteCustomCloud === 'function') deleteCustomCloud(id);
   buildCatsMinhas();
   renderMinhas();
 }
@@ -7128,13 +7750,8 @@ function copiarEditado(id, btn) {
 function imprimirEditado(id, title) {
   var ta = document.getElementById('edit-tmp-txt-' + id);
   if (!ta) return;
-  printReceita(title, ta.value);
-  var item = MINHAS.find(function(d){ return d.id === id; });
-  if (!item) {
-    var extras = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]');
-    item = extras.find(function(d){ return d.id === id; });
-  }
-  perguntarAtestadoAposPrint(item);
+  var item = MINHAS.find(function(d){ return d.id === id; }) || getMinhasExtras().find(function(d){ return d.id === id; }) || {};
+  printReceita(title || item.title || id, ta.value, { cat: item.cat, cid: item.cid, id: id });
 }
 
 // =================== LIMPAR CALCULADORAS ===================
@@ -7607,6 +8224,7 @@ function limparInternacao() {
 }
 
 // =================== INIT ===================
+loadHist();
 loadPerfil();
 loadCustom();
 loadAnamFromCloud();
@@ -7659,15 +8277,17 @@ renderPed();
   if (!tabBar) return;
   var tabs = Array.from(tabBar.querySelectorAll('.tab'));
   var order = JSON.parse(localStorage.getItem('plantao_tabs_order') || 'null');
-  var currentSecs = tabs.map(function(t){ return t.dataset.section; });
-  // Invalidate stale order (missing tabs from app updates)
-  if (order && order.length && currentSecs.every(function(s){ return order.indexOf(s) >= 0; })) {
+  // Reaplica a ordem salva MESCLANDO: primeiro os que estão na ordem salva,
+  // depois quaisquer abas novas (de updates do app) ao final. Nunca descarta.
+  if (order && order.length) {
+    var ordered = [];
     order.forEach(function(sec) {
       var found = tabs.find(function(t){ return t.dataset.section === sec; });
-      if (found) tabBar.insertBefore(found, tabBar.querySelector('.tab-actions'));
+      if (found && ordered.indexOf(found) === -1) ordered.push(found);
     });
-  } else if (order) {
-    localStorage.removeItem('plantao_tabs_order');
+    tabs.forEach(function(t) { if (ordered.indexOf(t) === -1) ordered.push(t); });
+    ordered.forEach(function(t) { tabBar.appendChild(t); });
+    tabs = ordered;
   }
   tabs.forEach(function(t, i) {
     t.setAttribute('draggable','true');
