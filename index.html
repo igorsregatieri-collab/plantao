@@ -622,6 +622,33 @@
     letter-spacing: 0.3px;
   }
 
+  .user-bar {
+    display: flex; flex-wrap: wrap; gap: 7px;
+    margin-bottom: 12px;
+  }
+  .user-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 13px;
+    font-size: 12.5px; font-weight: 700;
+    background: var(--bg-2); color: var(--txt-2);
+    border: 1px solid var(--line); border-radius: 20px;
+    cursor: pointer; transition: all .15s;
+    font-family: var(--font-mono); letter-spacing: .3px;
+  }
+  .user-pill:hover { border-color: var(--cyan); color: var(--cyan); }
+  .user-pill.active {
+    background: var(--cyan-glow); color: var(--cyan);
+    border-color: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan-glow);
+  }
+  .user-pill.add { color: var(--vital); border-color: var(--vital-dim); border-style: dashed; }
+  .user-pill.add:hover { background: var(--vital-glow); border-color: var(--vital); }
+  .user-pill .user-x {
+    font-size: 11px; opacity: .55; padding: 0 2px;
+    border-radius: 50%;
+  }
+  .user-pill .user-x:hover { opacity: 1; color: var(--pulse); }
+
   .ped-head-dose {
     display: block;
     width: 100%;
@@ -2079,6 +2106,7 @@
     </div>
   </div>
   <div class="header-actions">
+    <button class="icon-btn" onclick="abrirMedSearch()" title="Buscar medicação / posologia">🔎</button>
     <button class="icon-btn" id="install-btn" onclick="installPWA()" title="Instalar app" style="display:none;">📲</button>
     <button class="icon-btn" onclick="document.getElementById('import-file').click()" title="Importar JSON">↓</button>
     <button class="icon-btn" onclick="exportData()" title="Exportar JSON">↑</button>
@@ -2104,6 +2132,40 @@
   <button class="tab" data-section="scores" onclick="setSection('scores')">Scores</button>
   <button class="tab" data-section="hist" onclick="setSection('hist')">Hist</button>
   <button class="tab" data-section="internacao" onclick="setSection('internacao')">Internação</button>
+</div>
+
+<!-- =================== MODAL BUSCA DE MEDICAÇÕES =================== -->
+<div id="medsearch-modal" class="pm-overlay" style="display:none;">
+  <div class="pm-box" style="max-width:660px;">
+    <div class="pm-head">
+      <span>🔎 Buscar medicação / posologia</span>
+      <button class="pm-x" onclick="fecharMedSearch()">✕</button>
+    </div>
+    <div style="padding:16px 18px;">
+      <input type="text" id="ms-q" placeholder="Ex: ceftriaxona, dipirona, omeprazol..." oninput="buscarMed()" onkeydown="if(event.key==='Enter'){buscarMedWeb();}"
+        style="width:100%;padding:11px 14px;font-family:var(--font-mono);font-size:14px;border:1px solid var(--cyan-dim);border-radius:9px;background:var(--bg);color:var(--txt);">
+      <div style="font-size:11px;color:var(--txt-3);margin-top:7px;">Busca no banco do app (offline) — prescrições, pediatria e suas condutas.</div>
+      <div id="ms-results" style="margin-top:12px;max-height:34vh;overflow:auto;"></div>
+
+      <div style="border-top:1px solid var(--line);margin-top:12px;padding-top:11px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;">
+          <div style="font-family:var(--font-mono);font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--cyan);">🌐 BUSCA NA WEB (dentro do app)</div>
+          <button type="button" class="ef-pill" style="border-color:var(--cyan);color:var(--cyan);" onclick="buscarMedWeb()">Buscar na web</button>
+        </div>
+        <div id="ms-web" style="max-height:34vh;overflow:auto;"></div>
+      </div>
+
+      <div style="border-top:1px solid var(--line);margin-top:12px;padding-top:11px;">
+        <div style="font-family:var(--font-mono);font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--txt-3);margin-bottom:7px;">ABRIR EM NOVA ABA</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <button type="button" class="ef-pill" onclick="abrirWebMed('bulario')">💊 Bulário Anvisa</button>
+          <button type="button" class="ef-pill" onclick="abrirWebMed('medscape')">🩺 Medscape</button>
+          <button type="button" class="ef-pill" onclick="abrirWebMed('drugs')">📘 Drugs.com</button>
+          <button type="button" class="ef-pill" onclick="abrirWebMed('google')">🔍 Google</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- =================== MODAIS (impressão + salvar em Minhas) =================== -->
@@ -2180,6 +2242,8 @@
   <div class="search-row">
     <input type="text" id="search-minhas" placeholder="Buscar no meu bloco... (atalho: /)" oninput="renderMinhas()">
   </div>
+
+  <div id="user-bar" class="user-bar"></div>
 
   <div class="panel" style="background:var(--accent-bg);border-color:var(--accent-border);padding:12px 16px;margin-bottom:12px;">
     <div style="font-size:12px;color:var(--text);"><strong>📘 Bloco original</strong> — suas condutas exatamente como no GUYTFG.txt. Sem alterações de nome, dose ou prescrição.</div>
@@ -3069,7 +3133,9 @@ RETORNO SE NECESSARIO
         <button type="button" class="ef-pill" onclick="addATB('Meropenem 1g + SF 100ml EV 8/8h')">+ Meropenem</button>
         <button type="button" class="ef-pill" onclick="addATB('Clindamicina 600mg + SF 100ml EV 8/8h')">+ Clinda EV</button>
         <button type="button" class="ef-pill" onclick="addATB('')">+ ATB livre</button>
+        <button type="button" class="ef-pill" style="border-color:var(--cyan);color:var(--cyan);" onclick="abrirMedSearch('atb')">🔎 Buscar med</button>
       </div>
+      <div id="int-salvos-atb"></div>
     </div>
 
     <!-- 5. DEXTRO EDITÁVEL -->
@@ -3173,7 +3239,9 @@ RETORNO SE NECESSARIO
         <button type="button" class="ef-pill" onclick="addExtra('Ranitidina 50mg + SF 100ml EV 8/8h')">+ Ranitidina</button>
         <button type="button" class="ef-pill" onclick="addExtra('Furosemida 20mg + AD 18ml EV 12/12h')">+ Furosemida</button>
         <button type="button" class="ef-pill" onclick="addExtra('')">+ Item livre</button>
+        <button type="button" class="ef-pill" style="border-color:var(--cyan);color:var(--cyan);" onclick="abrirMedSearch('extra')">🔎 Buscar med</button>
       </div>
+      <div id="int-salvos-extra"></div>
     </div>
 
     <div style="display:flex;gap:8px;margin-top:16px;">
@@ -4227,6 +4295,7 @@ function renderMinhas() {
         <div class="card-title-wrap">
           <span class="card-title">${item.emoji ? item.emoji + ' ' : ''}${item.title}</span>
           <span class="card-tag tag-vo">${item.cat}</span>
+          ${item._owner ? `<span class="card-tag" style="background:var(--vital-glow);color:var(--vital);border-color:var(--vital);">👤 própria</span>` : ''}
         </div>
         <div class="header-right">
           ${isExtra ? `<button class="fav-btn" style="color:var(--pulse);font-size:14px;" onclick="event.stopPropagation();deleteMinhasExtra('${item.id}')" title="Excluir">✕</button>` : ''}
@@ -5507,38 +5576,124 @@ function confirmarSaveMin() {
   });
 }
 
-// Salva/atualiza uma conduta em Minhas: localStorage + CUSTOM (com flag _minhas) + nuvem
+// Salva/atualiza uma conduta em Minhas — no namespace do usuário ativo
 function salvarCondutaMinhas(id, title, cat, rx, emoji) {
   var obj = { id: id, title: title, cat: cat, rx: rx, emoji: emoji || '', _minhas: true };
-  // 1. CUSTOM (lista do editor) — é o que sobe para a nuvem
-  var i = CUSTOM.findIndex(function(c) { return c.id === id; });
-  if (i >= 0) CUSTOM[i] = obj; else CUSTOM.push(obj);
-  saveCustomLocal();
-  if (typeof renderCustom === 'function') renderCustom();
-  // 2. minhas_extra (fonte da aba Minhas)
-  var extras = [];
-  try { extras = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]'); } catch(e) {}
-  var j = extras.findIndex(function(e) { return e.id === id; });
-  if (j >= 0) extras[j] = obj; else extras.push(obj);
-  localStorage.setItem('plantao_minhas_extra', JSON.stringify(extras));
-  // 3. Nuvem
-  saveCustomCloud(obj);
-  // 4. Re-render
+  var active = getActiveUser();
+  if (active === 'principal') {
+    // Principal: CUSTOM (editor) + minhas_extra + nuvem
+    var i = CUSTOM.findIndex(function(c) { return c.id === id; });
+    if (i >= 0) CUSTOM[i] = obj; else CUSTOM.push(obj);
+    saveCustomLocal();
+    if (typeof renderCustom === 'function') renderCustom();
+    var extras = readExtras('plantao_minhas_extra');
+    var j = extras.findIndex(function(e) { return e.id === id; });
+    if (j >= 0) extras[j] = obj; else extras.push(obj);
+    localStorage.setItem('plantao_minhas_extra', JSON.stringify(extras));
+    if (typeof saveCustomCloud === 'function') saveCustomCloud(obj);
+  } else {
+    // Dependente: só no namespace local dele (não vai pra nuvem do Principal)
+    obj._owner = active;
+    var key = minhasKey(active);
+    var ex = readExtras(key);
+    var k = ex.findIndex(function(e) { return e.id === id; });
+    if (k >= 0) ex[k] = obj; else ex.push(obj);
+    localStorage.setItem(key, JSON.stringify(ex));
+  }
   buildCatsMinhas();
   renderMinhas();
 }
 
-// Lista unificada de condutas "Minhas" do usuário (minhas_extra + qualquer CUSTOM marcado _minhas)
+// =================== USUÁRIOS (dependentes) ===================
+// Senha de criação de usuário — Asclépio, deus grego da medicina (símbolo do bastão médico)
+var SENHA_NOVO_USUARIO = 'asclepio';
+
+function readExtras(key) {
+  try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) { return []; }
+}
+function getUsers() { return readExtras('plantao_users'); }
+function saveUsers(u) { try { localStorage.setItem('plantao_users', JSON.stringify(u)); } catch(e){} }
+function getActiveUser() { return localStorage.getItem('plantao_active_user') || 'principal'; }
+function setActiveUser(id) { try { localStorage.setItem('plantao_active_user', id); } catch(e){} }
+function activeUserName() {
+  var id = getActiveUser();
+  if (id === 'principal') return 'Principal';
+  var u = getUsers().find(function(x){ return x.id === id; });
+  return u ? u.name : 'Principal';
+}
+// chave de armazenamento das condutas por usuário
+function minhasKey(userId) {
+  return userId === 'principal' ? 'plantao_minhas_extra' : 'plantao_minhas_extra__' + userId;
+}
+
+function renderUserBar() {
+  var el = document.getElementById('user-bar');
+  if (!el) return;
+  var active = getActiveUser();
+  var users = getUsers();
+  var html = '<button class="user-pill ' + (active === 'principal' ? 'active' : '') + '" onclick="switchUser(\'principal\')">👤 Principal</button>';
+  users.forEach(function(u) {
+    html += '<button class="user-pill ' + (active === u.id ? 'active' : '') + '" onclick="switchUser(\'' + u.id + '\')">👤 ' + escapeHtml(u.name) +
+            '<span class="user-x" onclick="event.stopPropagation();removerUsuario(\'' + u.id + '\')" title="Remover">✕</span></button>';
+  });
+  html += '<button class="user-pill add" onclick="novoUsuario()">＋ Novo</button>';
+  el.innerHTML = html;
+}
+function switchUser(id) {
+  setActiveUser(id);
+  renderUserBar(); buildCatsMinhas(); renderMinhas();
+}
+function novoUsuario() {
+  var s = prompt('🔒 Senha para criar novo usuário:');
+  if (s === null) return;
+  if (s !== SENHA_NOVO_USUARIO) { alert('❌ Senha incorreta.'); return; }
+  var nome = prompt('Nome do novo usuário (dependente):');
+  if (!nome || !nome.trim()) return;
+  var users = getUsers();
+  var id = 'u_' + Date.now();
+  users.push({ id: id, name: nome.trim() });
+  saveUsers(users);
+  setActiveUser(id);
+  renderUserBar(); buildCatsMinhas(); renderMinhas();
+  alert('✅ Usuário "' + nome.trim() + '" criado!\nEle vê as suas condutas (Principal) + as próprias.');
+}
+function removerUsuario(id) {
+  var u = getUsers().find(function(x){ return x.id === id; });
+  if (!u) return;
+  var s = prompt('🔒 Senha para remover "' + u.name + '":');
+  if (s === null) return;
+  if (s !== SENHA_NOVO_USUARIO) { alert('❌ Senha incorreta.'); return; }
+  if (!confirm('Remover "' + u.name + '" e TODAS as condutas próprias dele? (não afeta as do Principal)')) return;
+  saveUsers(getUsers().filter(function(x){ return x.id !== id; }));
+  try { localStorage.removeItem(minhasKey(id)); } catch(e){}
+  if (getActiveUser() === id) setActiveUser('principal');
+  renderUserBar(); buildCatsMinhas(); renderMinhas();
+}
+
+// Busca uma conduta em Minhas (embutidas + extras salvas pelo usuário)
+function findMinha(id) {
+  return MINHAS.find(function(d){ return d.id === id; }) ||
+         getMinhasExtras().find(function(d){ return d.id === id; }) || null;
+}
+
+// Lista unificada de condutas "Minhas": Principal (compartilhado) + dependente ativo + CUSTOM _minhas
 function getMinhasExtras() {
   var byId = {};
-  var extras = [];
-  try { extras = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]'); } catch(e) {}
-  extras.forEach(function(e) { if (e && e.id) byId[e.id] = e; });
+  var active = getActiveUser();
+  // 1. Base: condutas do Principal (sempre visíveis para todos os usuários)
+  readExtras('plantao_minhas_extra').forEach(function(e) { if (e && e.id) byId[e.id] = e; });
+  // 2. CUSTOM marcados _minhas (nuvem do Principal)
   (typeof CUSTOM !== 'undefined' ? CUSTOM : []).forEach(function(c) {
     if (c && c._minhas && !byId[c.id]) {
       byId[c.id] = { id: c.id, cat: c.cat, title: c.title, rx: c.rx, emoji: c.emoji, _minhas: true };
     }
   });
+  // 3. Dependente ativo: acrescenta as próprias condutas
+  if (active !== 'principal') {
+    readExtras(minhasKey(active)).forEach(function(e) {
+      if (e && e.id) { e._owner = active; byId[e.id] = e; }
+    });
+  }
   return Object.keys(byId).map(function(k) { return byId[k]; });
 }
 
@@ -5627,8 +5782,8 @@ function getComboText() {
   return STATE.combo.map(k => {
     const [src, id] = k.split(':');
     if (src === 'm') {
-      const it = MINHAS.find(m => m.id === id);
-      return it ? it.rx : '';
+      const it = (typeof findMinha === 'function') ? findMinha(id) : MINHAS.find(m => m.id === id);
+      return it ? (typeof getRxForItem === 'function' ? getRxForItem(it) : it.rx) : '';
     } else if (src === 'c') {
       const it = CUSTOM.find(m => m.id === id);
       return it ? it.rx : '';
@@ -7125,7 +7280,7 @@ function calcDosePedItem(linha, peso) {
 }
 
 function calcDoseMinhas(itemId) {
-  var item = MINHAS.find(function(d) { return d.id === itemId; });
+  var item = findMinha(itemId);
   if (!item) return;
   var pesoEl = document.getElementById('peso-min-' + itemId);
   var rxEl = document.getElementById('rx-min-' + itemId);
@@ -7223,7 +7378,7 @@ function calcDoseMinhas(itemId) {
   rxEl.textContent = resultado.join('\n');
 }
 function copyMinhasRx(id, btn) {
-  var item = MINHAS.find(function(d) { return d.id === id; });
+  var item = findMinha(id);
   if (!item) return;
   var rxEl = document.getElementById('rx-min-' + id);
   var txt = rxEl ? rxEl.textContent : item.rx;
@@ -7409,18 +7564,30 @@ function saveEditFormToMinhas(id) {
 
 function deleteMinhasExtra(id) {
   if (!confirm('Remover esta conduta de Minhas?')) return;
-  var extras = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]');
-  extras = extras.filter(function(e) { return e.id !== id; });
-  localStorage.setItem('plantao_minhas_extra', JSON.stringify(extras));
-  // Remover também do CUSTOM e da nuvem para não voltar no próximo sync
-  var hadCustom = false;
-  if (typeof CUSTOM !== 'undefined') {
-    var before = CUSTOM.length;
-    CUSTOM = CUSTOM.filter(function(c) { return c.id !== id; });
-    hadCustom = CUSTOM.length !== before;
-    if (hadCustom) { saveCustomLocal(); if (typeof renderCustom === 'function') renderCustom(); }
+  var active = getActiveUser();
+  var removed = false;
+  // 1. Se um dependente está ativo, tenta remover das condutas próprias dele primeiro
+  if (active !== 'principal') {
+    var key = minhasKey(active);
+    var ex = readExtras(key);
+    var b0 = ex.length;
+    ex = ex.filter(function(e) { return e.id !== id; });
+    if (ex.length !== b0) { localStorage.setItem(key, JSON.stringify(ex)); removed = true; }
   }
-  if (hadCustom && typeof deleteCustomCloud === 'function') deleteCustomCloud(id);
+  // 2. Caso contrário (ou se não achou), remove do Principal + CUSTOM + nuvem
+  if (!removed) {
+    var extras = readExtras('plantao_minhas_extra');
+    extras = extras.filter(function(e) { return e.id !== id; });
+    localStorage.setItem('plantao_minhas_extra', JSON.stringify(extras));
+    var hadCustom = false;
+    if (typeof CUSTOM !== 'undefined') {
+      var before = CUSTOM.length;
+      CUSTOM = CUSTOM.filter(function(c) { return c.id !== id; });
+      hadCustom = CUSTOM.length !== before;
+      if (hadCustom) { saveCustomLocal(); if (typeof renderCustom === 'function') renderCustom(); }
+    }
+    if (hadCustom && typeof deleteCustomCloud === 'function') deleteCustomCloud(id);
+  }
   buildCatsMinhas();
   renderMinhas();
 }
@@ -7888,6 +8055,7 @@ function renderATBs() {
   el.innerHTML = _intATBs.map(function(t, i) {
     return '<div style="display:flex;gap:6px;align-items:center;">' +
       '<input type="text" value="' + escapeHtml(t) + '" oninput="_intATBs[' + i + '] = this.value" placeholder="Ex: Ceftriaxona 2g + SF 250ml EV 1x/dia" style="flex:1;padding:8px 10px;font-family:var(--font-mono);font-size:11.5px;border:1px solid var(--warn-dim);border-radius:6px;background:var(--bg);color:var(--txt);">' +
+      '<button type="button" onclick="salvarItemFuturo(\'atb\', _intATBs[' + i + '])" title="Salvar para futuras prescrições" style="background:none;border:1px solid var(--vital-dim);border-radius:6px;color:var(--vital);cursor:pointer;font-size:12px;padding:4px 8px;">💾</button>' +
       '<button type="button" onclick="removeATB(' + i + ')" style="background:none;border:1px solid var(--line);border-radius:6px;color:var(--pulse);cursor:pointer;font-size:13px;padding:4px 8px;">✕</button>' +
       '</div>';
   }).join('');
@@ -7912,9 +8080,278 @@ function renderExtras() {
   el.innerHTML = _intExtras.map(function(t, i) {
     return '<div style="display:flex;gap:6px;align-items:center;">' +
       '<input type="text" value="' + escapeHtml(t) + '" oninput="_intExtras[' + i + '] = this.value" placeholder="Descreva o item..." style="flex:1;padding:8px 10px;font-family:var(--font-mono);font-size:11.5px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--txt);">' +
+      '<button type="button" onclick="salvarItemFuturo(\'extra\', _intExtras[' + i + '])" title="Salvar para futuras prescrições" style="background:none;border:1px solid var(--vital-dim);border-radius:6px;color:var(--vital);cursor:pointer;font-size:12px;padding:4px 8px;">💾</button>' +
       '<button type="button" onclick="removeExtra(' + i + ')" style="background:none;border:1px solid var(--line);border-radius:6px;color:var(--pulse);cursor:pointer;font-size:13px;padding:4px 8px;">✕</button>' +
       '</div>';
   }).join('');
+}
+
+// =================== BUSCA DE MEDICAÇÕES ===================
+var _msOrigem = null; // 'atb' | 'extra' | null
+
+function abrirMedSearch(origem) {
+  _msOrigem = origem || null;
+  var m = document.getElementById('medsearch-modal');
+  if (!m) return;
+  m.style.display = 'flex';
+  var wb = document.getElementById('ms-web');
+  if (wb) wb.innerHTML = '<div style="color:var(--txt-3);font-size:12px;padding:8px 4px;">Clique em "Buscar na web" para consultar Wikipédia (PT) e a bula oficial da FDA.</div>';
+  var q = document.getElementById('ms-q');
+  setTimeout(function(){ try { q.focus(); q.select(); } catch(e){} }, 60);
+  buscarMed();
+}
+function fecharMedSearch() {
+  var m = document.getElementById('medsearch-modal');
+  if (m) m.style.display = 'none';
+  _msOrigem = null;
+}
+
+// Constrói índice de medicações a partir de todos os bancos do app
+function indexarMeds() {
+  var out = [];
+  // 1. Prescrições (DATA_RX): itens de PS e de casa
+  (typeof DATA_RX !== 'undefined' ? DATA_RX : []).forEach(function(it) {
+    ['ps','casa'].forEach(function(k) {
+      (it[k] || []).forEach(function(r) {
+        out.push({ med: r.n, pos: r.p, ctx: it.title, fonte: k === 'ps' ? 'PS/EV' : 'Receita casa' });
+      });
+    });
+  });
+  // 2. Pediatria (DATA_PED)
+  (typeof DATA_PED !== 'undefined' ? DATA_PED : []).forEach(function(it) {
+    (it.doses || []).forEach(function(d) {
+      var p = (d.mgkg ? d.mgkg + ' mg/kg' : '') + (d.freq ? ' — ' + d.freq : '');
+      out.push({ med: d.med + ' — ' + it.title, pos: (p + '. ' + (d.obs||'')).trim(), ctx: it.cat, fonte: 'Pediatria', ped: d });
+    });
+  });
+  // 3. Minhas condutas (texto livre)
+  var minhas = (typeof MINHAS !== 'undefined' ? MINHAS : []).concat(typeof getMinhasExtras === 'function' ? getMinhasExtras() : []);
+  minhas.forEach(function(it) {
+    var rx = typeof it.rx === 'string' ? it.rx : '';
+    if (rx) out.push({ med: it.title, pos: rx, ctx: it.cat, fonte: 'Minhas' });
+  });
+  // 4. Itens salvos da internação
+  ['atb','extra'].forEach(function(k) {
+    (typeof getSalvos === 'function' ? getSalvos(k) : []).forEach(function(t) {
+      out.push({ med: t, pos: '', ctx: k === 'atb' ? 'ATB salvo' : 'Item salvo', fonte: 'Internação' });
+    });
+  });
+  return out;
+}
+
+function normalizar(s) {
+  return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+function buscarMed() {
+  var el = document.getElementById('ms-results');
+  var q = normalizar((document.getElementById('ms-q') || {}).value || '').trim();
+  if (!el) return;
+  if (q.length < 2) {
+    el.innerHTML = '<div style="color:var(--txt-3);font-size:12px;padding:14px 4px;">Digite ao menos 2 letras...</div>';
+    return;
+  }
+  var termos = q.split(/\s+/);
+  var hits = indexarMeds().filter(function(r) {
+    var hay = normalizar(r.med + ' ' + r.pos + ' ' + r.ctx);
+    return termos.every(function(t) { return hay.indexOf(t) >= 0; });
+  });
+  // prioriza quando o termo está no nome da medicação
+  hits.sort(function(a, b) {
+    var na = normalizar(a.med).indexOf(termos[0]) >= 0 ? 0 : 1;
+    var nb = normalizar(b.med).indexOf(termos[0]) >= 0 ? 0 : 1;
+    return na - nb;
+  });
+  hits = hits.slice(0, 40);
+  if (!hits.length) {
+    el.innerHTML = '<div style="color:var(--txt-3);font-size:12px;padding:14px 4px;">Nada encontrado no banco local. Use os botões da web abaixo. 👇</div>';
+    return;
+  }
+  el.innerHTML = hits.map(function(r, i) {
+    var pos = r.pos.length > 240 ? r.pos.slice(0, 240) + '…' : r.pos;
+    var inserir = _msOrigem
+      ? '<button type="button" onclick="inserirMedNaPrescricao(' + i + ')" style="background:rgba(0,232,150,0.1);border:1px solid var(--vital);border-radius:6px;color:var(--vital);cursor:pointer;font-size:10.5px;font-family:var(--font-mono);padding:4px 9px;">+ inserir</button>'
+      : '';
+    return '<div style="padding:9px 11px;margin-bottom:6px;background:var(--bg-2);border:1px solid var(--line);border-radius:8px;">' +
+      '<div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;">' +
+        '<div style="font-size:12.5px;font-weight:700;color:var(--txt);flex:1;">' + escapeHtml(r.med) + '</div>' +
+        '<div style="display:flex;gap:5px;align-items:center;">' + inserir +
+          '<button type="button" onclick="copiarMedRes(' + i + ', this)" style="background:none;border:1px solid var(--line);border-radius:6px;color:var(--cyan);cursor:pointer;font-size:10.5px;font-family:var(--font-mono);padding:4px 9px;">copiar</button>' +
+        '</div>' +
+      '</div>' +
+      (pos ? '<div style="font-family:var(--font-mono);font-size:11px;color:var(--warn);margin-top:4px;white-space:pre-line;">' + escapeHtml(pos) + '</div>' : '') +
+      '<div style="font-size:10px;color:var(--txt-3);margin-top:5px;">' + escapeHtml(r.fonte) + ' · ' + escapeHtml(r.ctx || '') + '</div>' +
+      '</div>';
+  }).join('');
+  _msHits = hits;
+}
+var _msHits = [];
+
+function textoDoHit(r) {
+  return (r.med + (r.pos ? ' — ' + r.pos : '')).trim();
+}
+function copiarMedRes(i, btn) {
+  var r = _msHits[i]; if (!r) return;
+  navigator.clipboard.writeText(textoDoHit(r)).then(function() {
+    var o = btn.textContent; btn.textContent = '✓';
+    setTimeout(function(){ btn.textContent = o; }, 1300);
+  });
+}
+function inserirMedNaPrescricao(i) {
+  var r = _msHits[i]; if (!r) return;
+  var txt = textoDoHit(r);
+  if (_msOrigem === 'atb') addATB(txt);
+  else addExtra(txt);
+  fecharMedSearch();
+}
+
+// ===== BUSCA WEB NATIVA (sem chave de API — Wikipedia PT + openFDA) =====
+var _msWebHits = [];
+
+function buscarMedWeb() {
+  var q = ((document.getElementById('ms-q') || {}).value || '').trim();
+  var box = document.getElementById('ms-web');
+  if (!box) return;
+  if (q.length < 2) { box.innerHTML = '<div style="color:var(--txt-3);font-size:12px;padding:8px 4px;">Digite a medicação primeiro.</div>'; return; }
+  box.innerHTML = '<div style="color:var(--cyan);font-size:12px;padding:10px 4px;font-family:var(--font-mono);">⏳ Buscando na web...</div>';
+  _msWebHits = [];
+
+  Promise.allSettled([buscarWikiPT(q), buscarOpenFDA(q)]).then(function(rs) {
+    rs.forEach(function(r) { if (r.status === 'fulfilled' && r.value) _msWebHits = _msWebHits.concat(r.value); });
+    if (!_msWebHits.length) {
+      box.innerHTML = '<div style="color:var(--txt-3);font-size:12px;padding:10px 4px;">Nada encontrado na web (ou sem internet). Use os botões de nova aba abaixo.</div>';
+      return;
+    }
+    box.innerHTML = _msWebHits.map(function(r, i) {
+      var inserir = _msOrigem
+        ? '<button type="button" onclick="inserirMedWeb(' + i + ')" style="background:rgba(0,232,150,0.1);border:1px solid var(--vital);border-radius:6px;color:var(--vital);cursor:pointer;font-size:10.5px;font-family:var(--font-mono);padding:4px 9px;">+ inserir</button>'
+        : '';
+      return '<div style="padding:9px 11px;margin-bottom:6px;background:var(--bg-2);border:1px solid var(--cyan-dim);border-radius:8px;">' +
+        '<div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;">' +
+          '<div style="font-size:12.5px;font-weight:700;color:var(--cyan);flex:1;">' + escapeHtml(r.titulo) + '</div>' +
+          '<div style="display:flex;gap:5px;">' + inserir +
+            '<button type="button" onclick="copiarMedWeb(' + i + ', this)" style="background:none;border:1px solid var(--line);border-radius:6px;color:var(--cyan);cursor:pointer;font-size:10.5px;font-family:var(--font-mono);padding:4px 9px;">copiar</button>' +
+          '</div>' +
+        '</div>' +
+        '<div style="font-family:var(--font-mono);font-size:11px;color:var(--txt-2);margin-top:5px;white-space:pre-line;line-height:1.55;">' + escapeHtml(r.texto) + '</div>' +
+        '<div style="font-size:10px;color:var(--txt-3);margin-top:6px;">🌐 ' + escapeHtml(r.fonte) +
+          (r.url ? ' · <a href="' + r.url + '" target="_blank" rel="noopener" style="color:var(--cyan);">abrir fonte</a>' : '') + '</div>' +
+        '</div>';
+    }).join('');
+  });
+}
+
+// Wikipedia em português — resumo da medicação (CORS liberado via origin=*)
+function buscarWikiPT(q) {
+  var url = 'https://pt.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=extracts' +
+            '&exintro=1&explaintext=1&redirects=1&generator=search&gsrlimit=2&gsrsearch=' + encodeURIComponent(q);
+  return fetch(url).then(function(r) { return r.json(); }).then(function(j) {
+    var pages = (j && j.query && j.query.pages) ? j.query.pages : {};
+    return Object.keys(pages).map(function(k) {
+      var p = pages[k];
+      var txt = (p.extract || '').trim();
+      if (!txt) return null;
+      if (txt.length > 700) txt = txt.slice(0, 700) + '…';
+      return { titulo: p.title, texto: txt, fonte: 'Wikipédia (PT)',
+               url: 'https://pt.wikipedia.org/?curid=' + p.pageid };
+    }).filter(Boolean);
+  }).catch(function() { return []; });
+}
+
+// openFDA — bula oficial FDA: posologia e indicações (sem chave: 240 req/min, 1000/dia)
+function buscarOpenFDA(q) {
+  var t = encodeURIComponent(q.toLowerCase());
+  var url = 'https://api.fda.gov/drug/label.json?limit=2&search=' +
+            'openfda.generic_name:' + t + '+OR+openfda.brand_name:' + t + '+OR+openfda.substance_name:' + t;
+  return fetch(url).then(function(r) {
+    if (!r.ok) throw new Error('sem resultado');
+    return r.json();
+  }).then(function(j) {
+    return (j.results || []).map(function(res) {
+      var of = res.openfda || {};
+      var nome = (of.generic_name && of.generic_name[0]) || (of.brand_name && of.brand_name[0]) || q;
+      var partes = [];
+      function add(rot, campo) {
+        var v = res[campo];
+        if (v && v[0]) {
+          var s = String(v[0]).replace(/\s+/g, ' ').trim();
+          if (s.length > 520) s = s.slice(0, 520) + '…';
+          partes.push(rot + ': ' + s);
+        }
+      }
+      add('POSOLOGIA', 'dosage_and_administration');
+      add('APRESENTAÇÃO', 'dosage_forms_and_strengths');
+      add('INDICAÇÕES', 'indications_and_usage');
+      if (!partes.length) return null;
+      return { titulo: nome, texto: partes.join('\n\n'), fonte: 'openFDA — bula oficial (EUA, em inglês)',
+               url: 'https://labels.fda.gov/' };
+    }).filter(Boolean);
+  }).catch(function() { return []; });
+}
+
+function copiarMedWeb(i, btn) {
+  var r = _msWebHits[i]; if (!r) return;
+  navigator.clipboard.writeText(r.titulo + '\n' + r.texto).then(function() {
+    var o = btn.textContent; btn.textContent = '✓';
+    setTimeout(function(){ btn.textContent = o; }, 1300);
+  });
+}
+function inserirMedWeb(i) {
+  var r = _msWebHits[i]; if (!r) return;
+  var txt = r.titulo + ' — ' + r.texto.replace(/\n+/g, ' ').slice(0, 180);
+  if (_msOrigem === 'atb') addATB(txt); else addExtra(txt);
+  fecharMedSearch();
+}
+
+function abrirWebMed(fonte) {
+  var q = ((document.getElementById('ms-q') || {}).value || '').trim();
+  if (!q) { alert('Digite o nome da medicação primeiro.'); return; }
+  var e = encodeURIComponent(q);
+  var urls = {
+    bulario:  'https://consultas.anvisa.gov.br/#/bulario/q/?nomeProduto=' + e,
+    medscape: 'https://reference.medscape.com/search/?q=' + e,
+    drugs:    'https://www.drugs.com/search.php?searchterm=' + e,
+    google:   'https://www.google.com/search?q=' + e + '+posologia+dose+bula'
+  };
+  window.open(urls[fonte] || urls.google, '_blank', 'noopener');
+}
+function keySalvos(kind) { return 'plantao_int_salvos_' + kind; }
+function getSalvos(kind) {
+  try { return JSON.parse(localStorage.getItem(keySalvos(kind)) || '[]'); } catch(e) { return []; }
+}
+function salvarItemFuturo(kind, texto) {
+  var t = (texto || '').trim();
+  if (!t) { alert('Escreva o item antes de salvar.'); return; }
+  var lista = getSalvos(kind);
+  if (lista.indexOf(t) >= 0) { alert('Este item já está salvo.'); return; }
+  lista.push(t);
+  try { localStorage.setItem(keySalvos(kind), JSON.stringify(lista)); } catch(e) {}
+  renderSalvosPills();
+  alert('✅ Salvo! Agora aparece como botão em futuras prescrições.');
+}
+function removerSalvo(kind, idx) {
+  var lista = getSalvos(kind);
+  if (!confirm('Remover "' + lista[idx] + '" dos salvos?')) return;
+  lista.splice(idx, 1);
+  try { localStorage.setItem(keySalvos(kind), JSON.stringify(lista)); } catch(e) {}
+  renderSalvosPills();
+}
+function renderSalvosPills() {
+  [['atb', 'int-salvos-atb', 'addATB'], ['extra', 'int-salvos-extra', 'addExtra']].forEach(function(cfg) {
+    var el = document.getElementById(cfg[1]);
+    if (!el) return;
+    var lista = getSalvos(cfg[0]);
+    if (!lista.length) { el.innerHTML = ''; return; }
+    el.innerHTML = '<div style="font-family:var(--font-mono);font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--vital);margin:8px 0 5px;">⭐ MEUS SALVOS</div>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:5px;">' +
+      lista.map(function(t, i) {
+        var curto = t.length > 34 ? t.slice(0, 34) + '…' : t;
+        return '<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(0,232,150,0.08);border:1px solid var(--vital-dim);border-radius:14px;padding:2px 4px 2px 10px;">' +
+          '<button type="button" onclick="' + cfg[2] + '(' + JSON.stringify(t).replace(/"/g,'&quot;') + ')" title="' + escapeHtml(t) + '" style="background:none;border:none;color:var(--vital);font-family:var(--font-mono);font-size:11px;cursor:pointer;padding:3px 0;">+ ' + escapeHtml(curto) + '</button>' +
+          '<button type="button" onclick="removerSalvo(\'' + cfg[0] + '\',' + i + ')" title="Remover dos salvos" style="background:none;border:none;color:var(--txt-3);cursor:pointer;font-size:10px;padding:0 4px;">✕</button>' +
+          '</span>';
+      }).join('') + '</div>';
+  });
 }
 
 // ===== EXAMES EXTRAS =====
@@ -8249,6 +8686,7 @@ function limparInternacao() {
   renderExtras();
   renderLabExtras();
   renderImgExtras();
+  renderSalvosPills();
   document.querySelectorAll('.int-lab, .int-img').forEach(function(cb){ cb.checked = false; });
 }
 
@@ -8261,8 +8699,10 @@ loadCondutaFromCloud();
 // Seção Minhas
 buildCats();
 renderList();
+renderUserBar();
 buildCatsMinhas();
 renderMinhas();
+renderSalvosPills();
 renderCustom();
 renderCustomAnamBtns();
 renderCondutaModelBtns();
