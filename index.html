@@ -2187,21 +2187,15 @@
       <div id="ms-results" style="margin-top:12px;max-height:34vh;overflow:auto;"></div>
 
       <div style="border-top:1px solid var(--line);margin-top:12px;padding-top:11px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;">
-          <div style="font-family:var(--font-mono);font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--cyan);">🌐 POSOLOGIA NA WEB</div>
-          <button type="button" class="ef-pill" style="border-color:var(--cyan);color:var(--cyan);" onclick="buscarMedWeb()">Buscar posologia</button>
-        </div>
-        <div id="ms-web" style="max-height:34vh;overflow:auto;"></div>
-      </div>
-
-      <div style="border-top:1px solid var(--line);margin-top:12px;padding-top:11px;">
-        <div style="font-family:var(--font-mono);font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--txt-3);margin-bottom:7px;">ABRIR EM NOVA ABA</div>
+        <div style="font-family:var(--font-mono);font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--cyan);margin-bottom:8px;">🌐 POSOLOGIA — ABRIR EM NOVA ABA</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;">
-          <button type="button" class="ef-pill" onclick="abrirWebMed('bulario')">💊 Bulário Anvisa</button>
+          <button type="button" class="ef-pill" style="border-color:var(--vital);color:var(--vital);" onclick="abrirWebMed('whitebook')">⚕️ Whitebook</button>
+          <button type="button" class="ef-pill" style="border-color:var(--vital);color:var(--vital);" onclick="abrirWebMed('wemeds')">💊 WeMeds</button>
+          <button type="button" class="ef-pill" onclick="abrirWebMed('bulario')">📋 Bulário Anvisa</button>
           <button type="button" class="ef-pill" onclick="abrirWebMed('medscape')">🩺 Medscape</button>
-          <button type="button" class="ef-pill" onclick="abrirWebMed('drugs')">📘 Drugs.com</button>
           <button type="button" class="ef-pill" onclick="abrirWebMed('google')">🔍 Google</button>
         </div>
+        <div style="font-size:10.5px;color:var(--txt-3);margin-top:7px;">Enter abre direto no Whitebook. Login do app é exigido pelo site.</div>
       </div>
     </div>
   </div>
@@ -5010,6 +5004,12 @@ document.addEventListener('keydown', (e) => {
 const AS_URL = 'https://script.google.com/macros/s/AKfycbzSak8fVQwus47y-5S7C1S6b0l3M7oPARZ_NWj98TT7u8w-xj_aDmnK6T4QePhnwyZCaw/exec';
 
 async function apiCall(params) {
+  try {
+    params = Object.assign({}, params || {});
+    if (!params.user) {
+      params.user = (typeof getActiveUser === 'function') ? getActiveUser() : 'principal';
+    }
+  } catch(e) {}
   const qs = new URLSearchParams(params).toString();
   try {
     const res = await fetch(AS_URL + '?' + qs, {
@@ -5046,6 +5046,14 @@ function apiCallJsonp(params) {
 }
 
 async function apiPost(body) {
+  // A nuvem é compartilhada, mas cada usuário tem o seu espaço separado.
+  // Toda escrita leva o dono junto para o Apps Script gravar/filtrar por usuário.
+  try {
+    body = Object.assign({}, body || {});
+    if (!body.user) {
+      body.user = (typeof getActiveUser === 'function') ? getActiveUser() : 'principal';
+    }
+  } catch(e) {}
   try {
     // Tentar com cors primeiro (lê resposta)
     const res = await fetch(AS_URL, {
@@ -5159,14 +5167,33 @@ function updateSyncBadge(status, msg) {
   el.textContent = (icons[status] || '') + ' ' + (msg || status);
 }
 
+// Chave do editor por usuário: Principal usa a original (+nuvem); dependente tem a sua, zerada e local
+function customKey(userId) {
+  var u = userId || (typeof getActiveUser === 'function' ? getActiveUser() : 'principal');
+  return u === 'principal' ? 'plantao_custom' : 'plantao_custom__' + u;
+}
+
 function loadCustom() {
-  // Local primeiro
-  try { CUSTOM = JSON.parse(localStorage.getItem('plantao_custom') || '[]'); }
+  var ativo = (typeof getActiveUser === 'function') ? getActiveUser() : 'principal';
+  try { CUSTOM = JSON.parse(localStorage.getItem(customKey(ativo)) || '[]'); }
   catch(e) { CUSTOM = []; }
-  migrarMinhasParaCustom();
-  renderCustom();
-  // Cloud sync
-  syncFromCloud();
+  if (ativo === 'principal') {
+    migrarMinhasParaCustom();
+    renderCustom();
+    syncFromCloud();   // só o Principal sincroniza com a nuvem
+  } else {
+    renderCustom();     // dependente: editor local, começa zerado
+  }
+}
+
+// Recarrega o editor ao trocar de usuário
+function recarregarEditorUsuario() {
+  var ativo = (typeof getActiveUser === 'function') ? getActiveUser() : 'principal';
+  try { CUSTOM = JSON.parse(localStorage.getItem(customKey(ativo)) || '[]'); }
+  catch(e) { CUSTOM = []; }
+  if (typeof renderCustom === 'function') renderCustom();
+  // Puxa da nuvem o espaço DESTE usuário
+  if (typeof syncFromCloud === 'function') syncFromCloud();
 }
 
 // Garante que TODA conduta de Minhas (incl. as antigas que só estavam em
@@ -5204,12 +5231,13 @@ async function syncFromCloud() {
 
     // 4. Baixar condutas custom da nuvem e MESCLAR (nunca apaga itens locais)
     const r = await apiCall({ action: 'list' });
-    if (r && r.items) {
+    var itensNuvem = (r && (r.items || r.data)) || null;
+    if (itensNuvem) {
       var merged = {};
       // base: o que já temos localmente
       CUSTOM.forEach(function(c) { merged[c.id] = c; });
       // sobrepõe com o que veio da nuvem
-      r.items.forEach(function(c) {
+      itensNuvem.forEach(function(c) {
         if (!c || !c.id) return;
         merged[c.id] = {
           id: c.id,
@@ -5227,7 +5255,7 @@ async function syncFromCloud() {
       var minhasExtra = CUSTOM.filter(function(c){ return c._minhas; }).map(function(c){
         return { id: c.id, cat: c.cat, title: c.title, rx: c.rx, emoji: c.emoji || '', _minhas: true };
       });
-      localStorage.setItem('plantao_minhas_extra', JSON.stringify(minhasExtra));
+      localStorage.setItem(minhasKey(getActiveUser()), JSON.stringify(minhasExtra));
       buildCatsMinhas();
       renderMinhas();
     }
@@ -5257,7 +5285,7 @@ async function syncFromCloud() {
 }
 
 function saveCustomLocal() {
-  try { localStorage.setItem('plantao_custom', JSON.stringify(CUSTOM)); } catch(e) {}
+  try { localStorage.setItem(customKey(), JSON.stringify(CUSTOM)); } catch(e) {}
 }
 
 async function saveCustomCloud(item) {
@@ -5334,9 +5362,14 @@ function copyCustom(id, btn) {
 }
 
 // =================== SENHA PROTEÇÃO ===================
+// Principal usa a senha do dono; usuários dependentes usam a mesma senha de criação de usuário.
+function senhaAtual() {
+  var ativo = (typeof getActiveUser === 'function') ? getActiveUser() : 'principal';
+  return ativo === 'principal' ? 'igor123' : SENHA_NOVO_USUARIO;
+}
 function pedirSenha(callback) {
   var s = prompt('🔒 Senha para edição:');
-  if (s === 'igor123') { callback(); }
+  if (s === senhaAtual()) { callback(); }
   else if (s !== null) { alert('❌ Senha incorreta.'); }
 }
 
@@ -5653,7 +5686,24 @@ function readExtras(key) {
   try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) { return []; }
 }
 function getUsers() { return readExtras('plantao_users'); }
-function saveUsers(u) { try { localStorage.setItem('plantao_users', JSON.stringify(u)); } catch(e){} }
+function saveUsers(u) {
+  try { localStorage.setItem('plantao_users', JSON.stringify(u)); } catch(e){}
+  // Lista de usuários fica sempre no espaço do Principal
+  try {
+    if (typeof apiPost === 'function') {
+      apiPost({ action: 'saveUsers', data: u, user: 'principal' });
+    }
+  } catch(e) {}
+}
+async function carregarUsuariosDaNuvem() {
+  try {
+    var r = await apiCall({ action: 'getUsers', user: 'principal' });
+    if (r && r.ok && Array.isArray(r.data) && r.data.length) {
+      localStorage.setItem('plantao_users', JSON.stringify(r.data));
+      renderUserBar();
+    }
+  } catch(e) {}
+}
 function getActiveUser() { return localStorage.getItem('plantao_active_user') || 'principal'; }
 function setActiveUser(id) { try { localStorage.setItem('plantao_active_user', id); } catch(e){} }
 function activeUserName() {
@@ -5680,15 +5730,7 @@ function renderUserBar() {
   html += '<button class="user-pill add" onclick="novoUsuario()">＋ Novo</button>';
   el.innerHTML = html;
 }
-function switchUser(id) {
-  if (getActiveUser() === id) return;
-  setActiveUser(id);
-  renderUserBar();
-  renderUserBanner();
-  renderUserExames();
-  buildCatsMinhas();
-  renderMinhas();
-  // animação de entrada da lista + destaque na pill escolhida
+function animarTrocaUsuario() {
   var lista = document.getElementById('list-minhas');
   if (lista) {
     lista.classList.remove('user-swapping');
@@ -5697,11 +5739,23 @@ function switchUser(id) {
   }
   var bar = document.getElementById('user-bar');
   if (bar) {
-    var pills = bar.querySelectorAll('.user-pill');
-    pills.forEach(function(p) { p.classList.remove('just-picked'); });
+    bar.querySelectorAll('.user-pill').forEach(function(p) { p.classList.remove('just-picked'); });
     var ativo = bar.querySelector('.user-pill.active');
     if (ativo) { void ativo.offsetWidth; ativo.classList.add('just-picked'); }
   }
+}
+
+function switchUser(id) {
+  if (getActiveUser() === id) return;
+  setActiveUser(id);
+  renderUserBar();
+  renderUserBanner();
+  renderUserExames();
+  recarregarEditorUsuario();
+  renderSalvosPills();
+  buildCatsMinhas();
+  renderMinhas();
+  animarTrocaUsuario();
 }
 
 // ===== BANNER DO USUÁRIO ATIVO =====
@@ -5836,7 +5890,7 @@ function novoUsuario() {
   users.push({ id: id, name: nome.trim() });
   saveUsers(users);
   setActiveUser(id);
-  renderUserBar(); renderUserBanner(); renderUserExames(); buildCatsMinhas(); renderMinhas();
+  renderUserBar(); renderUserBanner(); renderUserExames(); recarregarEditorUsuario(); buildCatsMinhas(); renderMinhas(); animarTrocaUsuario();
   alert('✅ Usuário "' + nome.trim() + '" criado!\nEle vê as suas condutas (Principal) + as próprias.');
 }
 function removerUsuario(id) {
@@ -5848,8 +5902,10 @@ function removerUsuario(id) {
   if (!confirm('Remover "' + u.name + '" e TODAS as condutas próprias dele? (não afeta as do Principal)')) return;
   saveUsers(getUsers().filter(function(x){ return x.id !== id; }));
   try { localStorage.removeItem(minhasKey(id)); } catch(e){}
+  try { localStorage.removeItem(customKey(id)); } catch(e){}
+  try { localStorage.removeItem(examesKey(id)); } catch(e){}
   if (getActiveUser() === id) setActiveUser('principal');
-  renderUserBar(); renderUserBanner(); renderUserExames(); buildCatsMinhas(); renderMinhas();
+  renderUserBar(); renderUserBanner(); renderUserExames(); recarregarEditorUsuario(); buildCatsMinhas(); renderMinhas(); animarTrocaUsuario();
 }
 
 // Busca uma conduta em Minhas (embutidas + extras salvas pelo usuário)
@@ -5864,10 +5920,11 @@ function getMinhasExtras() {
   var active = getActiveUser();
   // 1. Base: condutas do Principal (sempre visíveis para todos os usuários)
   readExtras('plantao_minhas_extra').forEach(function(e) { if (e && e.id) byId[e.id] = e; });
-  // 2. CUSTOM marcados _minhas (nuvem do Principal)
+  // 2. CUSTOM marcados _minhas (editor do usuário ativo)
   (typeof CUSTOM !== 'undefined' ? CUSTOM : []).forEach(function(c) {
     if (c && c._minhas && !byId[c.id]) {
-      byId[c.id] = { id: c.id, cat: c.cat, title: c.title, rx: c.rx, emoji: c.emoji, _minhas: true };
+      byId[c.id] = { id: c.id, cat: c.cat, title: c.title, rx: c.rx, emoji: c.emoji, _minhas: true,
+                     _owner: active !== 'principal' ? active : undefined };
     }
   });
   // 3. Dependente ativo: acrescenta as próprias condutas
@@ -7707,19 +7764,21 @@ function enviarTodasParaMinhas() {
   if (typeof CUSTOM === 'undefined' || !CUSTOM.length) { alert('Nenhuma conduta no editor.'); return; }
   pedirSenha(function() {
     if (!confirm('Enviar TODAS as ' + CUSTOM.length + ' condutas do editor para Minhas?')) return;
-    var extras = [];
-    try { extras = JSON.parse(localStorage.getItem('plantao_minhas_extra') || '[]'); } catch(e) {}
+    var ativo = getActiveUser();
+    var chave = minhasKey(ativo);
+    var extras = readExtras(chave);
     var n = 0;
     CUSTOM.forEach(function(c) {
       if (!c || !c.id || !c.rx) return;
       c._minhas = true;
       var obj = { id: c.id, title: c.title, cat: c.cat || 'CUSTOM', rx: c.rx, emoji: c.emoji || '', _minhas: true };
+      if (ativo !== 'principal') obj._owner = ativo;
       var j = extras.findIndex(function(e) { return e.id === c.id; });
       if (j >= 0) extras[j] = obj; else extras.push(obj);
       n++;
-      if (typeof saveCustomCloud === 'function') saveCustomCloud(obj);
+      if (ativo === 'principal' && typeof saveCustomCloud === 'function') saveCustomCloud(obj);
     });
-    localStorage.setItem('plantao_minhas_extra', JSON.stringify(extras));
+    localStorage.setItem(chave, JSON.stringify(extras));
     if (typeof saveCustomLocal === 'function') saveCustomLocal();
     if (typeof renderCustom === 'function') renderCustom();
     buildCatsMinhas();
@@ -8276,8 +8335,6 @@ function abrirMedSearch(origem) {
   var m = document.getElementById('medsearch-modal');
   if (!m) return;
   m.style.display = 'flex';
-  var wb = document.getElementById('ms-web');
-  if (wb) wb.innerHTML = '<div style="color:var(--txt-3);font-size:12px;padding:8px 4px;">Digite a medicação e aperte Enter para buscar a posologia.</div>';
   var q = document.getElementById('ms-q');
   setTimeout(function(){ try { q.focus(); q.select(); } catch(e){} }, 60);
   buscarMed();
@@ -8387,94 +8444,20 @@ function inserirMedNaPrescricao(i) {
   fecharMedSearch();
 }
 
-// ===== BUSCA WEB NATIVA (sem chave — só nome + posologia) =====
-var _msWebHits = [];
-
-function buscarMedWeb() {
-  var q = ((document.getElementById('ms-q') || {}).value || '').trim();
-  var box = document.getElementById('ms-web');
-  if (!box) return;
-  if (q.length < 2) { box.innerHTML = '<div style="color:var(--txt-3);font-size:12px;padding:8px 4px;">Digite a medicação primeiro.</div>'; return; }
-  box.innerHTML = '<div style="color:var(--cyan);font-size:12px;padding:10px 4px;font-family:var(--font-mono);">⏳ Buscando posologia...</div>';
-  _msWebHits = [];
-
-  buscarOpenFDA(q).then(function(hits) {
-    _msWebHits = hits || [];
-    if (!_msWebHits.length) {
-      box.innerHTML = '<div style="color:var(--txt-3);font-size:12px;padding:10px 4px;">Sem posologia encontrada (ou sem internet). Use os botões de nova aba abaixo.</div>';
-      return;
-    }
-    box.innerHTML = _msWebHits.map(function(r, i) {
-      var inserir = _msOrigem
-        ? '<button type="button" onclick="inserirMedWeb(' + i + ')" style="background:rgba(0,232,150,0.1);border:1px solid var(--vital);border-radius:6px;color:var(--vital);cursor:pointer;font-size:10.5px;font-family:var(--font-mono);padding:4px 9px;">+ inserir</button>'
-        : '';
-      return '<div style="padding:10px 12px;margin-bottom:6px;background:var(--bg-2);border:1px solid var(--cyan-dim);border-radius:8px;">' +
-        '<div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;">' +
-          '<div style="font-size:13px;font-weight:700;color:var(--cyan);flex:1;">' + escapeHtml(r.titulo) + '</div>' +
-          '<div style="display:flex;gap:5px;">' + inserir +
-            '<button type="button" onclick="copiarMedWeb(' + i + ', this)" style="background:none;border:1px solid var(--line);border-radius:6px;color:var(--cyan);cursor:pointer;font-size:10.5px;font-family:var(--font-mono);padding:4px 9px;">copiar</button>' +
-          '</div>' +
-        '</div>' +
-        '<div style="font-family:var(--font-mono);font-size:11.5px;color:var(--warn);margin-top:6px;white-space:pre-line;line-height:1.55;">' + escapeHtml(r.texto) + '</div>' +
-        '</div>';
-    }).join('');
-  });
-}
-
-// openFDA — só nome do princípio ativo + posologia (sem chave: 240 req/min, 1000/dia)
-function buscarOpenFDA(q) {
-  var t = encodeURIComponent(q.toLowerCase());
-  var url = 'https://api.fda.gov/drug/label.json?limit=3&search=' +
-            'openfda.generic_name:' + t + '+OR+openfda.brand_name:' + t + '+OR+openfda.substance_name:' + t;
-  return fetch(url).then(function(r) {
-    if (!r.ok) throw new Error('sem resultado');
-    return r.json();
-  }).then(function(j) {
-    var vistos = {};
-    return (j.results || []).map(function(res) {
-      var of = res.openfda || {};
-      var nome = (of.generic_name && of.generic_name[0]) || (of.brand_name && of.brand_name[0]) || q;
-      var forca = (res.dosage_forms_and_strengths && res.dosage_forms_and_strengths[0]) || '';
-      var dose = res.dosage_and_administration && res.dosage_and_administration[0];
-      if (!dose) return null;
-      // limpa: remove cabeçalhos numerados e espaços repetidos, corta em ~340 chars
-      var txt = String(dose).replace(/\s+/g, ' ')
-                            .replace(/^\s*\d+(\.\d+)*\s*/, '')
-                            .replace(/DOSAGE AND ADMINISTRATION/ig, '')
-                            .trim();
-      if (txt.length > 340) txt = txt.slice(0, 340).replace(/\s+\S*$/, '') + '…';
-      nome = String(nome).toUpperCase();
-      if (forca) nome += ' — ' + String(forca).replace(/\s+/g,' ').slice(0, 60);
-      if (vistos[nome]) return null;
-      vistos[nome] = 1;
-      return { titulo: nome, texto: txt };
-    }).filter(Boolean);
-  }).catch(function() { return []; });
-}
-
-function copiarMedWeb(i, btn) {
-  var r = _msWebHits[i]; if (!r) return;
-  navigator.clipboard.writeText(r.titulo + '\n' + r.texto).then(function() {
-    var o = btn.textContent; btn.textContent = '✓';
-    setTimeout(function(){ btn.textContent = o; }, 1300);
-  });
-}
-function inserirMedWeb(i) {
-  var r = _msWebHits[i]; if (!r) return;
-  var txt = r.titulo + ' — ' + r.texto.replace(/\n+/g, ' ').slice(0, 180);
-  if (_msOrigem === 'atb') addATB(txt); else addExtra(txt);
-  fecharMedSearch();
-}
+// ===== CONSULTA DE POSOLOGIA NA WEB (redireciona para apps médicos BR) =====
+function buscarMedWeb() { abrirWebMed('whitebook'); }
 
 function abrirWebMed(fonte) {
   var q = ((document.getElementById('ms-q') || {}).value || '').trim();
   if (!q) { alert('Digite o nome da medicação primeiro.'); return; }
   var e = encodeURIComponent(q);
   var urls = {
-    bulario:  'https://consultas.anvisa.gov.br/#/bulario/q/?nomeProduto=' + e,
-    medscape: 'https://reference.medscape.com/search/?q=' + e,
-    drugs:    'https://www.drugs.com/search.php?searchterm=' + e,
-    google:   'https://www.google.com/search?q=' + e + '+posologia+dose+bula'
+    whitebook: 'https://whitebook.pebmed.com.br/busca?termo=' + e,
+    wemeds:    'https://wemeds.com.br/busca?q=' + e,
+    bulario:   'https://consultas.anvisa.gov.br/#/bulario/q/?nomeProduto=' + e,
+    medscape:  'https://reference.medscape.com/search/?q=' + e,
+    drugs:     'https://www.drugs.com/search.php?searchterm=' + e,
+    google:    'https://www.google.com/search?q=' + e + '+posologia+dose+bula'
   };
   window.open(urls[fonte] || urls.google, '_blank', 'noopener');
 }
@@ -8857,6 +8840,7 @@ function limparInternacao() {
 loadHist();
 loadPerfil();
 loadCustom();
+carregarUsuariosDaNuvem();
 loadAnamFromCloud();
 loadCondutaFromCloud();
 // Seção Minhas
