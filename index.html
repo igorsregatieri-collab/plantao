@@ -622,6 +622,45 @@
     letter-spacing: 0.3px;
   }
 
+  /* ===== TROCA DE USUÁRIO — animação ===== */
+  @keyframes userSwapIn {
+    0%   { opacity: 0; transform: translateY(14px) scale(0.985); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes userFlash {
+    0%   { box-shadow: 0 0 0 0 var(--cyan-glow); }
+    45%  { box-shadow: 0 0 0 7px rgba(0,212,255,0.10); }
+    100% { box-shadow: 0 0 0 0 rgba(0,212,255,0); }
+  }
+  .user-swapping { animation: userSwapIn .34s cubic-bezier(.22,.9,.28,1) both; }
+  .user-pill.just-picked { animation: userFlash .55s ease-out; }
+
+  /* Faixa de identificação do usuário ativo */
+  .user-banner {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    padding: 11px 14px; margin-bottom: 12px;
+    border-radius: 11px;
+    background: linear-gradient(90deg, var(--vital-glow), transparent 70%);
+    border: 1px solid var(--vital-dim);
+    animation: userSwapIn .34s cubic-bezier(.22,.9,.28,1) both;
+  }
+  .user-banner .ub-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--vital-glow); border: 1px solid var(--vital);
+    color: var(--vital); font-weight: 800; font-size: 14px;
+    font-family: var(--font-mono);
+  }
+  .user-banner .ub-name { font-weight: 800; font-size: 14px; color: var(--txt); }
+  .user-banner .ub-sub  { font-size: 10.5px; color: var(--txt-3); font-family: var(--font-mono); letter-spacing: .4px; }
+  .user-banner .ub-actions { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+  .ub-btn {
+    background: var(--bg-2); border: 1px solid var(--vital-dim); color: var(--vital);
+    border-radius: 8px; padding: 6px 11px; cursor: pointer;
+    font-family: var(--font-mono); font-size: 10.5px; font-weight: 700; letter-spacing: .5px;
+  }
+  .ub-btn:hover { background: var(--vital-glow); border-color: var(--vital); }
+
   .user-bar {
     display: flex; flex-wrap: wrap; gap: 7px;
     margin-bottom: 12px;
@@ -2149,8 +2188,8 @@
 
       <div style="border-top:1px solid var(--line);margin-top:12px;padding-top:11px;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;">
-          <div style="font-family:var(--font-mono);font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--cyan);">🌐 BUSCA NA WEB (dentro do app)</div>
-          <button type="button" class="ef-pill" style="border-color:var(--cyan);color:var(--cyan);" onclick="buscarMedWeb()">Buscar na web</button>
+          <div style="font-family:var(--font-mono);font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--cyan);">🌐 POSOLOGIA NA WEB</div>
+          <button type="button" class="ef-pill" style="border-color:var(--cyan);color:var(--cyan);" onclick="buscarMedWeb()">Buscar posologia</button>
         </div>
         <div id="ms-web" style="max-height:34vh;overflow:auto;"></div>
       </div>
@@ -2244,6 +2283,8 @@
   </div>
 
   <div id="user-bar" class="user-bar"></div>
+  <div id="user-banner"></div>
+  <div id="user-exames"></div>
 
   <div class="panel" style="background:var(--accent-bg);border-color:var(--accent-border);padding:12px 16px;margin-bottom:12px;">
     <div style="font-size:12px;color:var(--text);"><strong>📘 Bloco original</strong> — suas condutas exatamente como no GUYTFG.txt. Sem alterações de nome, dose ou prescrição.</div>
@@ -5640,8 +5681,149 @@ function renderUserBar() {
   el.innerHTML = html;
 }
 function switchUser(id) {
+  if (getActiveUser() === id) return;
   setActiveUser(id);
-  renderUserBar(); buildCatsMinhas(); renderMinhas();
+  renderUserBar();
+  renderUserBanner();
+  renderUserExames();
+  buildCatsMinhas();
+  renderMinhas();
+  // animação de entrada da lista + destaque na pill escolhida
+  var lista = document.getElementById('list-minhas');
+  if (lista) {
+    lista.classList.remove('user-swapping');
+    void lista.offsetWidth; // reinicia a animação
+    lista.classList.add('user-swapping');
+  }
+  var bar = document.getElementById('user-bar');
+  if (bar) {
+    var pills = bar.querySelectorAll('.user-pill');
+    pills.forEach(function(p) { p.classList.remove('just-picked'); });
+    var ativo = bar.querySelector('.user-pill.active');
+    if (ativo) { void ativo.offsetWidth; ativo.classList.add('just-picked'); }
+  }
+}
+
+// ===== BANNER DO USUÁRIO ATIVO =====
+function renderUserBanner() {
+  var el = document.getElementById('user-banner');
+  if (!el) return;
+  var id = getActiveUser();
+  if (id === 'principal') { el.innerHTML = ''; return; }
+  var nome = activeUserName();
+  var proprias = readExtras(minhasKey(id)).length;
+  var exames = getExamesUsuario(id).length;
+  el.innerHTML =
+    '<div class="user-banner">' +
+      '<div class="ub-avatar">' + escapeHtml(nome.charAt(0).toUpperCase()) + '</div>' +
+      '<div>' +
+        '<div class="ub-name">' + escapeHtml(nome) + '</div>' +
+        '<div class="ub-sub">' + proprias + ' conduta(s) própria(s) · ' + exames + ' exame(s) físico(s)</div>' +
+      '</div>' +
+      '<div class="ub-actions">' +
+        '<button class="ub-btn" onclick="novaCondutaUsuario()">＋ Conduta</button>' +
+        '<button class="ub-btn" onclick="novoExameUsuario()">＋ Exame físico</button>' +
+        '<button class="ub-btn" onclick="renomearUsuario()">✎ Renomear</button>' +
+      '</div>' +
+    '</div>';
+}
+
+function novaCondutaUsuario() {
+  abrirSaveMin('', '', '');
+}
+function renomearUsuario() {
+  var id = getActiveUser();
+  if (id === 'principal') return;
+  var users = getUsers();
+  var u = users.find(function(x){ return x.id === id; });
+  if (!u) return;
+  var novo = prompt('Novo nome:', u.name);
+  if (!novo || !novo.trim()) return;
+  u.name = novo.trim();
+  saveUsers(users);
+  renderUserBar(); renderUserBanner();
+}
+
+// ===== EXAMES FÍSICOS POR USUÁRIO =====
+function examesKey(userId) {
+  return userId === 'principal' ? 'plantao_exames_principal' : 'plantao_exames__' + userId;
+}
+function getExamesUsuario(userId) {
+  return readExtras(examesKey(userId || getActiveUser()));
+}
+function novoExameUsuario() {
+  var nome = prompt('Nome do exame físico (ex: EF NORMAL, EF ABDOME AGUDO):');
+  if (!nome || !nome.trim()) return;
+  var texto = prompt('Texto do exame físico:');
+  if (!texto || !texto.trim()) return;
+  var id = getActiveUser();
+  var lista = getExamesUsuario(id);
+  lista.push({ id: 'ex_' + Date.now(), name: nome.trim().toUpperCase(), text: texto.trim() });
+  try { localStorage.setItem(examesKey(id), JSON.stringify(lista)); } catch(e) {}
+  renderUserExames(); renderUserBanner();
+}
+function editarExameUsuario(exId) {
+  var uid = getActiveUser();
+  var lista = getExamesUsuario(uid);
+  var ex = lista.find(function(e){ return e.id === exId; });
+  if (!ex) return;
+  var texto = prompt('Editar texto de "' + ex.name + '":', ex.text);
+  if (texto === null) return;
+  ex.text = texto.trim();
+  try { localStorage.setItem(examesKey(uid), JSON.stringify(lista)); } catch(e) {}
+  renderUserExames();
+}
+function removerExameUsuario(exId) {
+  var uid = getActiveUser();
+  var lista = getExamesUsuario(uid);
+  var ex = lista.find(function(e){ return e.id === exId; });
+  if (!ex || !confirm('Excluir o exame "' + ex.name + '"?')) return;
+  lista = lista.filter(function(e){ return e.id !== exId; });
+  try { localStorage.setItem(examesKey(uid), JSON.stringify(lista)); } catch(e) {}
+  renderUserExames(); renderUserBanner();
+}
+function copiarExameUsuario(exId, btn) {
+  var ex = getExamesUsuario().find(function(e){ return e.id === exId; });
+  if (!ex) return;
+  navigator.clipboard.writeText(ex.text).then(function() {
+    var o = btn.textContent; btn.textContent = '✓ COPIADO';
+    setTimeout(function(){ btn.textContent = o; }, 1500);
+  });
+}
+function toggleExameUsuario(exId) {
+  var b = document.getElementById('exu-' + exId);
+  if (b) b.style.display = (b.style.display === 'block') ? 'none' : 'block';
+}
+function renderUserExames() {
+  var el = document.getElementById('user-exames');
+  if (!el) return;
+  var uid = getActiveUser();
+  if (uid === 'principal') { el.innerHTML = ''; return; }
+  var lista = getExamesUsuario(uid);
+  if (!lista.length) {
+    el.innerHTML = '<div style="font-size:11.5px;color:var(--txt-3);margin-bottom:12px;padding:9px 12px;border:1px dashed var(--line);border-radius:9px;">' +
+      'Nenhum exame físico salvo para ' + escapeHtml(activeUserName()) + '. Use "＋ Exame físico" acima.</div>';
+    return;
+  }
+  el.innerHTML =
+    '<div style="font-family:var(--font-mono);font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--cyan);margin-bottom:7px;">🩺 EXAMES FÍSICOS DE ' + escapeHtml(activeUserName().toUpperCase()) + '</div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;">' +
+      lista.map(function(ex) {
+        return '<span style="display:inline-flex;align-items:center;gap:3px;background:var(--bg-2);border:1px solid var(--cyan-dim);border-radius:16px;padding:2px 5px 2px 11px;">' +
+          '<button type="button" onclick="toggleExameUsuario(\'' + ex.id + '\')" style="background:none;border:none;color:var(--cyan);font-family:var(--font-mono);font-size:11px;font-weight:700;cursor:pointer;padding:4px 0;">' + escapeHtml(ex.name) + '</button>' +
+          '<button type="button" onclick="removerExameUsuario(\'' + ex.id + '\')" title="Excluir" style="background:none;border:none;color:var(--txt-3);cursor:pointer;font-size:10px;padding:0 4px;">✕</button>' +
+          '</span>';
+      }).join('') +
+    '</div>' +
+    lista.map(function(ex) {
+      return '<div id="exu-' + ex.id + '" style="display:none;margin-bottom:10px;padding:12px 14px;background:var(--bg-2);border:1px solid var(--cyan-dim);border-radius:10px;">' +
+        '<div style="font-family:var(--font-mono);font-size:12px;color:var(--txt);white-space:pre-line;line-height:1.65;">' + escapeHtml(ex.text) + '</div>' +
+        '<div style="display:flex;gap:6px;margin-top:10px;">' +
+          '<button class="copy-btn" style="flex:1;" onclick="copiarExameUsuario(\'' + ex.id + '\', this)">COPIAR</button>' +
+          '<button class="copy-btn" style="flex:1;background:var(--warn-dim);border-color:var(--warn);" onclick="editarExameUsuario(\'' + ex.id + '\')">EDITAR</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
 }
 function novoUsuario() {
   var s = prompt('🔒 Senha para criar novo usuário:');
@@ -5654,7 +5836,7 @@ function novoUsuario() {
   users.push({ id: id, name: nome.trim() });
   saveUsers(users);
   setActiveUser(id);
-  renderUserBar(); buildCatsMinhas(); renderMinhas();
+  renderUserBar(); renderUserBanner(); renderUserExames(); buildCatsMinhas(); renderMinhas();
   alert('✅ Usuário "' + nome.trim() + '" criado!\nEle vê as suas condutas (Principal) + as próprias.');
 }
 function removerUsuario(id) {
@@ -5667,7 +5849,7 @@ function removerUsuario(id) {
   saveUsers(getUsers().filter(function(x){ return x.id !== id; }));
   try { localStorage.removeItem(minhasKey(id)); } catch(e){}
   if (getActiveUser() === id) setActiveUser('principal');
-  renderUserBar(); buildCatsMinhas(); renderMinhas();
+  renderUserBar(); renderUserBanner(); renderUserExames(); buildCatsMinhas(); renderMinhas();
 }
 
 // Busca uma conduta em Minhas (embutidas + extras salvas pelo usuário)
@@ -8095,7 +8277,7 @@ function abrirMedSearch(origem) {
   if (!m) return;
   m.style.display = 'flex';
   var wb = document.getElementById('ms-web');
-  if (wb) wb.innerHTML = '<div style="color:var(--txt-3);font-size:12px;padding:8px 4px;">Clique em "Buscar na web" para consultar Wikipédia (PT) e a bula oficial da FDA.</div>';
+  if (wb) wb.innerHTML = '<div style="color:var(--txt-3);font-size:12px;padding:8px 4px;">Digite a medicação e aperte Enter para buscar a posologia.</div>';
   var q = document.getElementById('ms-q');
   setTimeout(function(){ try { q.focus(); q.select(); } catch(e){} }, 60);
   buscarMed();
@@ -8205,7 +8387,7 @@ function inserirMedNaPrescricao(i) {
   fecharMedSearch();
 }
 
-// ===== BUSCA WEB NATIVA (sem chave de API — Wikipedia PT + openFDA) =====
+// ===== BUSCA WEB NATIVA (sem chave — só nome + posologia) =====
 var _msWebHits = [];
 
 function buscarMedWeb() {
@@ -8213,78 +8395,59 @@ function buscarMedWeb() {
   var box = document.getElementById('ms-web');
   if (!box) return;
   if (q.length < 2) { box.innerHTML = '<div style="color:var(--txt-3);font-size:12px;padding:8px 4px;">Digite a medicação primeiro.</div>'; return; }
-  box.innerHTML = '<div style="color:var(--cyan);font-size:12px;padding:10px 4px;font-family:var(--font-mono);">⏳ Buscando na web...</div>';
+  box.innerHTML = '<div style="color:var(--cyan);font-size:12px;padding:10px 4px;font-family:var(--font-mono);">⏳ Buscando posologia...</div>';
   _msWebHits = [];
 
-  Promise.allSettled([buscarWikiPT(q), buscarOpenFDA(q)]).then(function(rs) {
-    rs.forEach(function(r) { if (r.status === 'fulfilled' && r.value) _msWebHits = _msWebHits.concat(r.value); });
+  buscarOpenFDA(q).then(function(hits) {
+    _msWebHits = hits || [];
     if (!_msWebHits.length) {
-      box.innerHTML = '<div style="color:var(--txt-3);font-size:12px;padding:10px 4px;">Nada encontrado na web (ou sem internet). Use os botões de nova aba abaixo.</div>';
+      box.innerHTML = '<div style="color:var(--txt-3);font-size:12px;padding:10px 4px;">Sem posologia encontrada (ou sem internet). Use os botões de nova aba abaixo.</div>';
       return;
     }
     box.innerHTML = _msWebHits.map(function(r, i) {
       var inserir = _msOrigem
         ? '<button type="button" onclick="inserirMedWeb(' + i + ')" style="background:rgba(0,232,150,0.1);border:1px solid var(--vital);border-radius:6px;color:var(--vital);cursor:pointer;font-size:10.5px;font-family:var(--font-mono);padding:4px 9px;">+ inserir</button>'
         : '';
-      return '<div style="padding:9px 11px;margin-bottom:6px;background:var(--bg-2);border:1px solid var(--cyan-dim);border-radius:8px;">' +
+      return '<div style="padding:10px 12px;margin-bottom:6px;background:var(--bg-2);border:1px solid var(--cyan-dim);border-radius:8px;">' +
         '<div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;">' +
-          '<div style="font-size:12.5px;font-weight:700;color:var(--cyan);flex:1;">' + escapeHtml(r.titulo) + '</div>' +
+          '<div style="font-size:13px;font-weight:700;color:var(--cyan);flex:1;">' + escapeHtml(r.titulo) + '</div>' +
           '<div style="display:flex;gap:5px;">' + inserir +
             '<button type="button" onclick="copiarMedWeb(' + i + ', this)" style="background:none;border:1px solid var(--line);border-radius:6px;color:var(--cyan);cursor:pointer;font-size:10.5px;font-family:var(--font-mono);padding:4px 9px;">copiar</button>' +
           '</div>' +
         '</div>' +
-        '<div style="font-family:var(--font-mono);font-size:11px;color:var(--txt-2);margin-top:5px;white-space:pre-line;line-height:1.55;">' + escapeHtml(r.texto) + '</div>' +
-        '<div style="font-size:10px;color:var(--txt-3);margin-top:6px;">🌐 ' + escapeHtml(r.fonte) +
-          (r.url ? ' · <a href="' + r.url + '" target="_blank" rel="noopener" style="color:var(--cyan);">abrir fonte</a>' : '') + '</div>' +
+        '<div style="font-family:var(--font-mono);font-size:11.5px;color:var(--warn);margin-top:6px;white-space:pre-line;line-height:1.55;">' + escapeHtml(r.texto) + '</div>' +
         '</div>';
     }).join('');
   });
 }
 
-// Wikipedia em português — resumo da medicação (CORS liberado via origin=*)
-function buscarWikiPT(q) {
-  var url = 'https://pt.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=extracts' +
-            '&exintro=1&explaintext=1&redirects=1&generator=search&gsrlimit=2&gsrsearch=' + encodeURIComponent(q);
-  return fetch(url).then(function(r) { return r.json(); }).then(function(j) {
-    var pages = (j && j.query && j.query.pages) ? j.query.pages : {};
-    return Object.keys(pages).map(function(k) {
-      var p = pages[k];
-      var txt = (p.extract || '').trim();
-      if (!txt) return null;
-      if (txt.length > 700) txt = txt.slice(0, 700) + '…';
-      return { titulo: p.title, texto: txt, fonte: 'Wikipédia (PT)',
-               url: 'https://pt.wikipedia.org/?curid=' + p.pageid };
-    }).filter(Boolean);
-  }).catch(function() { return []; });
-}
-
-// openFDA — bula oficial FDA: posologia e indicações (sem chave: 240 req/min, 1000/dia)
+// openFDA — só nome do princípio ativo + posologia (sem chave: 240 req/min, 1000/dia)
 function buscarOpenFDA(q) {
   var t = encodeURIComponent(q.toLowerCase());
-  var url = 'https://api.fda.gov/drug/label.json?limit=2&search=' +
+  var url = 'https://api.fda.gov/drug/label.json?limit=3&search=' +
             'openfda.generic_name:' + t + '+OR+openfda.brand_name:' + t + '+OR+openfda.substance_name:' + t;
   return fetch(url).then(function(r) {
     if (!r.ok) throw new Error('sem resultado');
     return r.json();
   }).then(function(j) {
+    var vistos = {};
     return (j.results || []).map(function(res) {
       var of = res.openfda || {};
       var nome = (of.generic_name && of.generic_name[0]) || (of.brand_name && of.brand_name[0]) || q;
-      var partes = [];
-      function add(rot, campo) {
-        var v = res[campo];
-        if (v && v[0]) {
-          var s = String(v[0]).replace(/\s+/g, ' ').trim();
-          if (s.length > 520) s = s.slice(0, 520) + '…';
-          partes.push(rot + ': ' + s);
-        }
-      }
-      add('POSOLOGIA', 'dosage_and_administration');
-      add('APRESENTAÇÃO', 'dosage_forms_and_strengths');
-      add('INDICAÇÕES', 'indications_and_usage');
-      if (!partes.length) return null;
-      return { titulo: nome, texto: partes.join('\n\n'), fonte: 'openFDA — bula oficial (EUA, em inglês)',
-               url: 'https://labels.fda.gov/' };
+      var forca = (res.dosage_forms_and_strengths && res.dosage_forms_and_strengths[0]) || '';
+      var dose = res.dosage_and_administration && res.dosage_and_administration[0];
+      if (!dose) return null;
+      // limpa: remove cabeçalhos numerados e espaços repetidos, corta em ~340 chars
+      var txt = String(dose).replace(/\s+/g, ' ')
+                            .replace(/^\s*\d+(\.\d+)*\s*/, '')
+                            .replace(/DOSAGE AND ADMINISTRATION/ig, '')
+                            .trim();
+      if (txt.length > 340) txt = txt.slice(0, 340).replace(/\s+\S*$/, '') + '…';
+      nome = String(nome).toUpperCase();
+      if (forca) nome += ' — ' + String(forca).replace(/\s+/g,' ').slice(0, 60);
+      if (vistos[nome]) return null;
+      vistos[nome] = 1;
+      return { titulo: nome, texto: txt };
     }).filter(Boolean);
   }).catch(function() { return []; });
 }
@@ -8700,6 +8863,8 @@ loadCondutaFromCloud();
 buildCats();
 renderList();
 renderUserBar();
+renderUserBanner();
+renderUserExames();
 buildCatsMinhas();
 renderMinhas();
 renderSalvosPills();
